@@ -1,0 +1,39 @@
+{
+  "common": {
+    "name": "ai-analytics",
+    "version": "0.1.0",
+    "title": "AI Analytics",
+    "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
+    "desc": {
+      "en": "AI-powered Q&A and proactive checks over historized ioBroker objects",
+      "de": "KI-gestuetzte Fragen und proaktive Pruefungen ueber historisierte ioBroker-Objekte"
+    },
+    "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
+    "keywords": ["ai", "analytics", "influxdb", "history"],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "enabled": true,
+    "type": "utility",
+    "mode": "daemon",
+    "compact": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "adminTab": {
+      "singleton": true,
+      "name": { "en": "Chat", "de": "Chat" }
+    },
+    "dependencies": [{ "js-controller": ">=5.0.0" }]
+  },
+  "native": {
+    "providerType": "anthropic",
+    "apiKey": "",
+    "model": "",
+    "baseUrl": "",
+    "checkIntervalHours": 24,
+    "silentIfNothingFound": false
+  },
+  "objects": [],
+  "instanceObjects": []
+}
