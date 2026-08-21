@@ -1,0 +1,37 @@
+{
+  "type": "panel",
+  "items": {
+    "providerType": {
+      "type": "select",
+      "label": "LLM-Provider",
+      "options": [
+        { "label": "Anthropic", "value": "anthropic" },
+        { "label": "OpenAI", "value": "openai" },
+        { "label": "OpenRouter", "value": "openrouter" },
+        { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
+      ]
+    },
+    "apiKey": {
+      "type": "password",
+      "label": "API-Key"
+    },
+    "model": {
+      "type": "text",
+      "label": "Modell"
+    },
+    "baseUrl": {
+      "type": "text",
+      "label": "Basis-URL (nur fuer OpenRouter/Lokal)"
+    },
+    "checkIntervalHours": {
+      "type": "number",
+      "label": "Intervall proaktive Pruefung (Stunden)",
+      "default": 24
+    },
+    "silentIfNothingFound": {
+      "type": "checkbox",
+      "label": "Bei keinem Fund keine Nachricht senden",
+      "default": false
+    }
+  }
+}
