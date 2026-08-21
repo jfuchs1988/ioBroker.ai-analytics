@@ -145,4 +145,31 @@ describe('runOnboarding', () => {
         expect(errorStub.firstCall.args[0]).to.include('Onboarding-Batch fehlgeschlagen');
         expect(setCatalogEntry.called).to.equal(false);
     });
+
+    it('logs a silly-level summary per batch and per classified object', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x', role: 'value', unit: 'kWh' } },
+        ];
+        const adapter = { log: { silly: sinon.stub(), error: sinon.stub() } };
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'Test', unit: 'kWh', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry: sinon.stub().resolves(),
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(adapter.log.silly.called).to.equal(true);
+        const messages = adapter.log.silly.getCalls().map((call) => call.args[0]);
+        expect(messages.some((m) => m.includes('javascript.0.x'))).to.equal(true);
+    });
 });

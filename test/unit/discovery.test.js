@@ -36,4 +36,22 @@ describe('findHistorizedObjects', () => {
             },
         });
     });
+
+    it('logs a silly-level summary of the scan and each matched object', async () => {
+        const adapter = {
+            log: { silly: sinon.stub() },
+            getForeignObjectsAsync: sinon.stub().resolves({
+                'javascript.0.verbrauch.gesamt': {
+                    common: { name: 'Gesamtverbrauch', custom: { 'influxdb.0': { enabled: true } } },
+                },
+            }),
+        };
+
+        await findHistorizedObjects(adapter);
+
+        expect(adapter.log.silly.called).to.equal(true);
+        const messages = adapter.log.silly.getCalls().map((call) => call.args[0]);
+        expect(messages.some((m) => m.includes('javascript.0.verbrauch.gesamt'))).to.equal(true);
+        expect(messages.some((m) => m.includes('influxdb.0'))).to.equal(true);
+    });
 });
