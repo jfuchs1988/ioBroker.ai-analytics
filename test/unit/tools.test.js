@@ -3,18 +3,23 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function loadToolsWithStubs({ getAllCatalogEntries, getHistory, compareTimeframes }) {
+function loadToolsWithStubs({ getAllCatalogEntries, getHistory, compareTimeframes, setCatalogEntry }) {
     return proxyquire('../../lib/tools', {
-        './catalog': { getAllCatalogEntries },
+        './catalog': { getAllCatalogEntries, setCatalogEntry },
         './dataAccess': { getHistory, compareTimeframes },
     });
 }
 
 describe('buildTools', () => {
-    it('exposes listCatalog, getHistory and compareTimeframes definitions', () => {
+    it('exposes listCatalog, getHistory, compareTimeframes and updateCatalogEntry definitions', () => {
         const { buildTools } = require('../../lib/tools');
         const { definitions } = buildTools({});
-        expect(definitions.map((d) => d.name)).to.deep.equal(['listCatalog', 'getHistory', 'compareTimeframes']);
+        expect(definitions.map((d) => d.name)).to.deep.equal([
+            'listCatalog',
+            'getHistory',
+            'compareTimeframes',
+            'updateCatalogEntry',
+        ]);
     });
 
     it('listCatalog excludes inactive and needsReview entries, and supports a category filter', async () => {
@@ -94,6 +99,95 @@ describe('buildTools', () => {
         let threw = false;
         try {
             await execute('doesNotExist', {});
+        } catch (e) {
+            threw = true;
+        }
+        expect(threw).to.equal(true);
+    });
+
+    it('listCatalog with needsReviewOnly returns only entries pending review', async () => {
+        const entries = [
+            { sourceId: 'a', category: 'lighting', active: true, needsReview: false },
+            { sourceId: 'b', category: 'consumption', active: true, needsReview: true },
+            { sourceId: 'c', category: 'consumption', active: false, needsReview: true },
+        ];
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves(entries),
+        });
+
+        const { execute } = buildTools({});
+        const result = await execute('listCatalog', { needsReviewOnly: true });
+
+        expect(result.map((e) => e.sourceId)).to.deep.equal(['b', 'c']);
+    });
+
+    it('updateCatalogEntry updates a needsReview entry and clears the flag', async () => {
+        const existingEntry = {
+            sourceId: 'javascript.0.steckdose3', description: 'Unklar', unit: '', category: 'device_usage',
+            room: '', confidence: 'low', needsReview: true, active: true, historyInstance: 'history.0', lastSeen: '2000-01-01T00:00:00.000Z',
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([existingEntry]),
+            setCatalogEntry,
+        });
+
+        const adapter = {};
+        const { execute } = buildTools(adapter);
+        await execute('updateCatalogEntry', {
+            sourceId: 'javascript.0.steckdose3',
+            description: 'Waschmaschine Steckdose',
+            category: 'device_usage',
+            room: 'Waschkeller',
+        });
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+        const [, updated] = setCatalogEntry.firstCall.args;
+        expect(updated).to.deep.include({
+            sourceId: 'javascript.0.steckdose3',
+            description: 'Waschmaschine Steckdose',
+            category: 'device_usage',
+            room: 'Waschkeller',
+            needsReview: false,
+            confidence: 'high',
+            active: true,
+            historyInstance: 'history.0',
+        });
+    });
+
+    it('updateCatalogEntry rejects an entry that is not marked needsReview', async () => {
+        const existingEntry = {
+            sourceId: 'javascript.0.x', description: 'Bekannt', unit: '', category: 'consumption',
+            room: '', confidence: 'high', needsReview: false, active: true, historyInstance: 'influxdb.0', lastSeen: '2000-01-01T00:00:00.000Z',
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([existingEntry]),
+            setCatalogEntry,
+        });
+
+        const { execute } = buildTools({});
+
+        let threw = false;
+        try {
+            await execute('updateCatalogEntry', { sourceId: 'javascript.0.x', description: 'x', category: 'consumption' });
+        } catch (e) {
+            threw = true;
+        }
+
+        expect(threw).to.equal(true);
+        expect(setCatalogEntry.called).to.equal(false);
+    });
+
+    it('updateCatalogEntry throws for an unknown sourceId', async () => {
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+        });
+        const { execute } = buildTools({});
+
+        let threw = false;
+        try {
+            await execute('updateCatalogEntry', { sourceId: 'unknown', description: 'x', category: 'consumption' });
         } catch (e) {
             threw = true;
         }
