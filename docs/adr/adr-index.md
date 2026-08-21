@@ -22,3 +22,4 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0014](0014-zeitanker-in-system-prompts.md) | Beide LLM-System-Prompts enthalten einen expliziten Zeitanker | Angenommen | 2026-08-21 |
 | [0015](0015-dokumentationsstruktur.md) | Dokumentationsstruktur: arc42 Multi-File + ADRs + Obsidian-MOCs | Angenommen | 2026-08-21 |
 | [0016](0016-git-branching-modell.md) | Git-Branching-Modell: develop/master mit manueller Freigabe | Angenommen | 2026-08-21 |
+| [0017](0017-scoped-catalog-write-capability.md) | Scoped Catalog Write Capability für Onboarding-Rückfragen | Angenommen | 2026-08-21 |

@@ -3,6 +3,18 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Hinzugefügt
+- Admin-Chat-Tab: defensive Verbindungs-Fallback-Kette (ersetzt die nicht-existente `adapterNamespace`-Abhängigkeit) + Chat-Bubble-UI mit Zeitstempeln und Lade-Indikator.
+- Neues, eng begrenztes Schreib-Werkzeug `updateCatalogEntry` — der Chat-Agent kann Onboarding-Rückfragen (`needsReview`-Objekte) jetzt direkt im Chat auflösen (siehe [ADR-0017](docs/adr/0017-scoped-catalog-write-capability.md)).
+- Konversationsgedächtnis: Chat-Fragen laufen jetzt mit den letzten 10 Nachrichten aus der Historie im Kontext.
+- Tägliches Token-Budget (`dailyTokenBudget`, Default 0 = kein Limit) für Chat und proaktive Prüfung.
+- `silly`-Level-Logging für Discovery, Onboarding, Agent-Aufrufe (Senden/Empfangen) und Chat-/Prüf-Läufe.
+
+### Geändert
+- Dev-Dependencies aktualisiert: mocha 10 → 11, sinon 17 → 22, `@iobroker/testing` 4 → 5. `chai` bewusst auf 4.x belassen (5/6 ist ESM-only, würde `require('chai')` brechen).
+
 ## [0.0.1-beta.1] - 2026-08-21
 
 Reine Dokumentations-/Prozess-Version, kein funktionaler Code-Unterschied zu 0.0.1-beta.
