@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.1.0",
+    "version": "0.0.1-beta",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -26,7 +26,13 @@
     },
     "dependencies": [{ "js-controller": ">=5.0.0" }],
     "encryptedNative": ["apiKey"],
-    "protectedNative": ["apiKey"]
+    "protectedNative": ["apiKey"],
+    "news": {
+      "0.0.1-beta": {
+        "en": "Initial beta release: chat Q&A and proactive checks over historized objects via a configurable LLM provider. Not yet verified against a real ioBroker Admin instance — see README/arc42 for known gaps.",
+        "de": "Erste Beta-Version: Chat-Q&A und proaktive Pruefungen ueber historisierte Objekte via konfigurierbarem LLM-Provider. Noch nicht gegen eine echte ioBroker-Admin-Instanz verifiziert — siehe README/arc42 fuer bekannte Luecken."
+      }
+    }
   },
   "native": {
     "providerType": "anthropic",
