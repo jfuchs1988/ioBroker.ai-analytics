@@ -112,4 +112,37 @@ describe('runOnboarding', () => {
         expect(result.needsReview).to.have.lengthOf(1);
         expect(result.needsReview[0].needsReview).to.equal(true);
     });
+
+    it('continues after batch processing fails', async () => {
+        const discovered = [
+            { id: 'javascript.0.bad', historyInstance: 'history.0', common: { name: 'BadObject' } },
+        ];
+        const setCatalogEntry = sinon.stub().resolves();
+        const errorStub = sinon.stub();
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: 'This is not valid JSON at all',
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const adapter = {
+            log: {
+                error: errorStub,
+            },
+        };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(result.classifiedCount).to.equal(1);
+        expect(result.needsReview).to.deep.equal([]);
+        expect(errorStub.calledOnce).to.equal(true);
+        expect(errorStub.firstCall.args[0]).to.include('Onboarding-Batch fehlgeschlagen');
+        expect(setCatalogEntry.called).to.equal(false);
+    });
 });
