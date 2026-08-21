@@ -9,13 +9,17 @@ Nur Objekte mit aktivem History-/InfluxDB-/SQL-Logging werden berücksichtigt. E
 
 ## Dokumentation
 
-- [Architekturdokumentation (arc42)](docs/arc42/arc42.md) — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Entscheidungen und offene Risiken.
-- [Design-Spec](docs/superpowers/specs/2026-08-21-ioBroker-ai-analytics-design.md) — das ursprüngliche, mit dem Nutzer abgestimmte Design.
-- [Implementierungsplan](docs/superpowers/plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde, inkl. "Known Gaps"-Abschnitt für offene Punkte.
+Zentraler Einstiegspunkt: **[docs/README.md](docs/README.md)**.
+
+- [Architekturdokumentation (arc42)](docs/architecture/arc42-index.md) — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Entscheidungen und offene Risiken.
+- [Architekturentscheidungen (ADRs)](docs/adr/adr-index.md) und [Backlog offener Entscheidungen](docs/adr/backlog.md).
+- [Design-Spec](docs/specs/2026-08-21-ai-analytics-design.md) — das ursprüngliche, mit dem Nutzer abgestimmte Design.
+- [Implementierungsplan](docs/plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde, inkl. "Known Gaps"-Abschnitt für offene Punkte.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — unser Entwicklungsprozess (Branching, wann Spec/Plan/ADR nötig sind, TDD-Erwartung).
 
 ## Status
 
-Alle 13 Implementierungs-Tasks sind abgeschlossen und reviewt (siehe arc42-Dokument, Abschnitt 11, für Details und bekannte Lücken). Vor dem produktiven Einsatz steht noch der manuelle Abnahmetest auf einer echten ioBroker-Instanz aus.
+v0.0.1-beta released. Alle 13 Implementierungs-Tasks sind abgeschlossen und reviewt. Manueller Abnahmetest läuft: Installation/Start/Discovery/Katalog bestätigt funktionierend, **Admin-Chat-Tab bestätigt defekt** (Diagnose läuft) — siehe [Risiken und technische Schulden](docs/architecture/11-risiken-und-schulden.md) für Details.
 
 ## Voraussetzungen
 

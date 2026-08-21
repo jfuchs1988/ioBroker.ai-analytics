@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta",
+    "version": "0.0.1-beta.1",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -28,6 +28,10 @@
     "encryptedNative": ["apiKey"],
     "protectedNative": ["apiKey"],
     "news": {
+      "0.0.1-beta.1": {
+        "en": "Documentation/process overhaul only, no functional code change: arc42 split into per-chapter files, decisions extracted as ADRs, Obsidian-friendly linking. See CONTRIBUTING.md for the development process.",
+        "de": "Reine Dokumentations-/Prozess-Version, kein funktionaler Code-Unterschied: arc42 in Einzelkapitel aufgeteilt, Entscheidungen als ADRs extrahiert, Obsidian-freundliche Verlinkung. Siehe CONTRIBUTING.md fuer den Entwicklungsprozess."
+      },
       "0.0.1-beta": {
         "en": "Initial beta release: chat Q&A and proactive checks over historized objects via a configurable LLM provider. Not yet verified against a real ioBroker Admin instance — see README/arc42 for known gaps.",
         "de": "Erste Beta-Version: Chat-Q&A und proaktive Pruefungen ueber historisierte Objekte via konfigurierbarem LLM-Provider. Noch nicht gegen eine echte ioBroker-Admin-Instanz verifiziert — siehe README/arc42 fuer bekannte Luecken."

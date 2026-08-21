@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js >= 18, plain JavaScript (CommonJS, no build step), `@iobroker/adapter-core`, mocha/chai/sinon for tests, `@iobroker/testing` for the adapter smoke test. No vendor LLM SDKs — providers are called directly over `fetch`.
 
-**Spec:** `docs/superpowers/specs/2026-08-21-ioBroker-ai-analytics-design.md`
+**Spec:** `docs/specs/2026-08-21-ai-analytics-design.md`
 
 ## Global Constraints
 

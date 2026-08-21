@@ -3,6 +3,21 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.1] - 2026-08-21
+
+Reine Dokumentations-/Prozess-Version, kein funktionaler Code-Unterschied zu 0.0.1-beta.
+
+### Geändert
+- Architekturdokumentation von einer einzelnen `arc42.md` in 12 einzelne, Obsidian-verlinkte Kapiteldateien unter `docs/architecture/` aufgeteilt (arc42-Multi-Page-Konvention).
+- Architekturentscheidungen aus arc42 §9 in 16 einzelne ADR-Dateien unter `docs/adr/` extrahiert (Nygard-Format), inkl. Übersichtstabelle.
+- `docs/superpowers/{specs,plans}/` zu `docs/specs/`, `docs/plans/` umbenannt (der `superpowers`-Anteil war nur ein Tooling-Artefakt).
+- Neue Map-of-Content-Einstiegspunkte: [docs/README.md](docs/README.md), [arc42-index.md](docs/architecture/arc42-index.md), [adr-index.md](docs/adr/adr-index.md).
+
+### Hinzugefügt
+- [CONTRIBUTING.md](CONTRIBUTING.md) mit dem dokumentierten Entwicklungsprozess (Branching-Modell, wann Spec/Plan/ADR nötig sind).
+- [Backlog offener Architekturentscheidungen](docs/adr/backlog.md) — 16 noch nicht entschiedene, architekturrelevante Fragen, u. a. wie der defekte Admin-Chat-Tab behoben wird.
+- Ergebnisse des laufenden manuellen Abnahmetests dokumentiert: Installation/Start/Discovery/Katalog bestätigt funktionierend, Admin-Chat-Tab bestätigt defekt.
+
 ## [0.0.1-beta] - 2026-08-21
 
 Erste Beta-Version. Alle 13 Implementierungs-Tasks abgeschlossen, einzeln reviewt, plus finales Whole-Branch-Review mit Fix-Welle (Zeitanker in LLM-Prompts, API-Key-Verschlüsselung, Katalog-Reaktivierung, u.a.). 43/43 automatisierte Tests grün.
@@ -14,7 +29,7 @@ Erste Beta-Version. Alle 13 Implementierungs-Tasks abgeschlossen, einzeln review
 - Provider-Abstraktion: Anthropic, OpenAI, OpenRouter, lokale OpenAI-kompatible Server (z. B. LM Studio) — austauschbar über die Admin-Konfiguration.
 - Admin-Konfigurationsformular und Admin-Chat-Tab.
 
-### Bekannte Lücken (siehe [arc42-Dokument](docs/arc42/arc42.md), Abschnitt 11, für Details)
+### Bekannte Lücken (siehe [arc42 §11](docs/architecture/11-risiken-und-schulden.md) und [Backlog offener Architekturentscheidungen](docs/adr/backlog.md) für Details)
 - **Admin-Chat-Tab bestätigt nicht funktionsfähig** (Abnahmetest 2026-08-21): Tab rendert, Nachrichten können nicht abgeschickt werden. Diagnose läuft.
 - `main.js` und die Admin-UI haben keine automatisierte Integrationstestabdeckung.
 - Onboarding-Rückfragen im Chat sind aktuell nicht beantwortbar (kein Schreibzugriff des Chat-Agenten auf den Katalog).
