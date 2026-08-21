@@ -9,7 +9,7 @@
 | Onboarding | Einmaliger (danach inkrementeller) Klassifizierungslauf für neu entdeckte Objekte |
 | Historisiertes Objekt | ioBroker-Objekt mit aktivem Logging in influxdb/history/sql (`common.custom[...].enabled === true`) |
 | Tool-Calling-Agent | LLM-Aufruf-Loop, bei dem das Modell selbst entscheidet, welche Werkzeuge (Datenabfragen) es wann aufruft |
-| Werkzeug / Tool | Eine der drei kuratierten Funktionen, die der Agent aufrufen kann: `listCatalog`, `getHistory`, `compareTimeframes` |
+| Werkzeug / Tool | Eine der kuratierten Funktionen, die der Agent aufrufen kann: `listCatalog`, `getHistory`, `compareTimeframes`, `updateCatalogEntry` |
 | Proaktive Prüfung | Periodischer, KI-getriebener Hintergrundlauf ohne feste Regeln, der Auffälligkeiten meldet |
 | needsReview | Katalog-Flag für Objekte, deren Bedeutung die KI nicht sicher einordnen konnte |
 | Confidence / Vertrauensgrad | `"high"` oder `"low"` — Selbsteinschätzung der KI bei der Onboarding-Klassifizierung eines Objekts |
