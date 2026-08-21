@@ -1,7 +1,7 @@
 # ioBroker.ai-analytics — Architekturdokumentation (arc42)
 
-Status: Implementierung abgeschlossen und final reviewt (43/43 Tests grün), noch kein manueller Abnahmetest an einer echten ioBroker-Instanz — siehe Abschnitt 11 für Details und offene Punkte
-Datum: 2026-08-21 (zuletzt aktualisiert nach Abschluss aller 13 Tasks + finalem Whole-Branch-Review)
+Status: v0.0.1-beta released; manueller Abnahmetest läuft — Installation/Start/Discovery/Katalog bestätigt funktionierend, Admin-Chat-Tab bestätigt defekt (Diagnose unterbrochen, wird fortgesetzt) — siehe Abschnitt 11 für Details
+Datum: 2026-08-21 (zuletzt aktualisiert während des laufenden manuellen Abnahmetests)
 Quellen: [Design-Spec](../superpowers/specs/2026-08-21-ioBroker-ai-analytics-design.md), [Implementierungsplan](../superpowers/plans/2026-08-21-ai-analytics-implementation.md)
 
 ## 1. Einführung und Ziele
@@ -243,12 +243,24 @@ Aus dem Implementierungsplan übernommen (`docs/superpowers/plans/2026-08-21-ai-
 - **Keine Konversationshistorie im Chat-Agenten:** Jede Chat-Frage startet den Agenten ohne vorherige Nachrichten im Kontext, obwohl die Spec Folgefragen mit erhaltenem Kontext vorsieht. `chat.history` ist aktuell nur ein Anzeige-Log. Für v1 als Limitierung akzeptiert; ein Folge-Plan sollte `runAgent` um optionalen `priorMessages`-Kontext erweitern.
 - **Keine Auswahl der History-Adapterinstanz(en) und kein manueller Re-Discovery-Trigger:** Die Spec sieht beides in der Admin-Konfiguration vor; aktuell werden automatisch alle aktiven influxdb/history/sql-Instanzen berücksichtigt, und ein Neu-Einlesen erfordert einen Adapter-Neustart. Für v1 als Limitierung akzeptiert.
 - **Main.js und die Admin-UI haben effektiv keine automatisierte Testabdeckung:** siehe Abschnitt 8.4 — der Adapter-Smoke-Test ist durch eine veraltete `@iobroker/testing`-v4-Verhaltensänderung ein No-Op. Ein Folge-Plan sollte entweder `tests.integration` (echter js-controller) oder einen proxyquire-basierten Fake-Adapter-Test für `main.js` ergänzen.
-- **Admin-Chat-Tab (`admin/tab.js`) nicht gegen eine echte Admin-Instanz verifiziert:** Der Tab verlässt sich auf ein globales `adapterNamespace`, das kein Standard-ioBroker-Admin-Global ist — je nach Admin-Version könnte der Tab als leere, inaktive Box rendern, ohne dass ein Fehler sichtbar wird. Muss beim manuellen Abnahmetest als Erstes geprüft werden; falls nicht funktionsfähig, sollte der Tab die Namespace-/Instanz-Ableitung aus der URL (`window.location.search`) statt aus einem ungeprüften Global vornehmen.
+- **Admin-Chat-Tab (`admin/tab.js`) bestätigt nicht funktionsfähig (bestätigt im Abnahmetest 2026-08-21):** Der Tab rendert (HTML/CSS wird angezeigt), aber Nachrichten können nicht abgeschickt werden — der Senden-Button reagiert nicht. Ursachenhypothese (noch nicht per Browser-Konsole verifiziert): `admin/tab.js`s `init()` läuft nur, wenn `typeof adapterNamespace !== 'undefined'`; `adapterNamespace` ist vermutlich kein reales ioBroker-Admin-Global (Fehler im ursprünglichen Plan-Code), wodurch `init()` nie läuft und die Klick-Handler nie angehängt werden. Nächster Schritt (mit Nutzer vereinbart, noch ausstehend): im Browser F12 auf dem Tab prüfen — `typeof adapterNamespace`, `typeof io`, `window.location.href`, `typeof parent.socket` — um die tatsächlich verfügbaren Admin-Globals zu ermitteln, bevor ein gezielter Fix geschrieben wird (kein blindes Rate-Fixing wie beim vorherigen Versuch). Voraussichtlicher Fix: Namespace/Instanz aus `window.location.search` oder `parent.socket` ableiten statt aus einem ungeprüften Global.
 - **Zwei kleinere, in der Fix-Wellen-Nachprüfung bewusst zurückgestellte Punkte:** (a) `lastSeen` wird bei der Katalog-Reaktivierung (Abschnitt 6.1) nur bei tatsächlicher Reaktivierung oder Instanzwechsel aktualisiert, nicht bei jedem "unverändert weiterhin gesehen"-Sync — kein vollständiger Heartbeat; (b) die neuen Reaktivierungs-`setCatalogEntry`-Aufrufe in `syncCatalog` sind nicht wie der übrige Abschnitt in try/catch abgesichert (geringes Risiko, da nur bereits validierte Felder per Spread übernommen werden). Beide Minor, für die CI-/Hardening-Folge-Runde vorgesehen.
 
 ### Fortschritt zum Zeitpunkt dieses Dokuments
 
-Implementierung über `subagent-driven-development` in 13 Tasks ist abgeschlossen (siehe Plan); alle Tasks wurden einzeln reviewt und teils in Fix-Runden nachgebessert. Eine finale Whole-Branch-Review hat danach mehrere Befunde aufgedeckt und einen Teil davon in einer Fix-Welle beheben lassen (Zeitanker in den LLM-System-Prompts, API-Key-Verschlüsselung, Katalog-Reaktivierung, negative Prüfintervalle, fehlende Eingabevalidierung, u.a.); ein Teil wurde bewusst als dokumentierte Lücke zurückgestellt (siehe unten und den Implementierungsplan). Vor dem produktiven Einsatz steht noch der manuelle Abnahmetest auf einer echten ioBroker-Instanz aus — insbesondere ob der Admin-Chat-Tab (Task 13) sich gegen eine echte Admin-Instanz korrekt initialisiert, da dies nicht automatisiert testbar war.
+Implementierung über `subagent-driven-development` in 13 Tasks ist abgeschlossen (siehe Plan); alle Tasks wurden einzeln reviewt und teils in Fix-Runden nachgebessert. Eine finale Whole-Branch-Review hat danach mehrere Befunde aufgedeckt und einen Teil davon in einer Fix-Welle beheben lassen (Zeitanker in den LLM-System-Prompts, API-Key-Verschlüsselung, Katalog-Reaktivierung, negative Prüfintervalle, fehlende Eingabevalidierung, u.a.); ein Teil wurde bewusst als dokumentierte Lücke zurückgestellt (siehe unten und den Implementierungsplan). Release v0.0.1-beta wurde getaggt und als GitHub-Pre-Release veröffentlicht (nicht auf npm — bewusst zurückgestellt bis nach dem Abnahmetest).
+
+**Manueller Abnahmetest (gestartet 2026-08-21, auf einer echten ioBroker-Instanz `iobroker-001`, Redis-Backend, js-controller 7.2.2, Node 22.23.2, Installation via `.tgz`):**
+
+Bestätigt funktionierend:
+- Installation via `iobroker url <pfad>.tgz` läuft sauber durch (unrelated `node-gyp`-Fehler bei anderen, bereits installierten Adaptern — nicht unser Paket, das hat keine nativen Build-Abhängigkeiten).
+- Adapter startet mehrfach fehlerfrei, `onReady` läuft vollständig durch (`ai-analytics adapter ready` im Log, keine Fehler, kein Absturz), auch nach mehreren Neustarts.
+- Discovery + Katalog-Sync + Onboarding funktionieren gegen echte Objekte: Katalogeinträge wurden unter `ai-analytics.0.catalog.<sourceId>` angelegt (die verschachtelte, dem Quellobjekt-Pfad nachempfundene Struktur im Objektbaum ist beabsichtigt, kein Fehler).
+
+Bestätigt **nicht** funktionierend:
+- **Admin-Chat-Tab**: rendert, aber Nachrichten können nicht abgeschickt werden. Siehe Detailbefund und Ursachenhypothese in der Known-Gaps-Liste oben. Debugging mit dem Nutzer unterbrochen — wird fortgesetzt (Browser-Konsole-Diagnose vereinbart, noch ausstehend).
+
+Noch nicht geprüft: Qualität der KI-Klassifizierung (Katalogeintrag-Inhalt wurde noch nicht im Detail angeschaut), Chat-Q&A-Funktionalität (blockiert durch den Chat-Tab-Fehler), proaktive Prüfung.
 
 ### Roadmap
 

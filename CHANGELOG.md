@@ -15,7 +15,7 @@ Erste Beta-Version. Alle 13 Implementierungs-Tasks abgeschlossen, einzeln review
 - Admin-Konfigurationsformular und Admin-Chat-Tab.
 
 ### Bekannte Lücken (siehe [arc42-Dokument](docs/arc42/arc42.md), Abschnitt 11, für Details)
-- Admin-Chat-Tab noch nicht gegen eine echte ioBroker-Admin-Instanz verifiziert.
+- **Admin-Chat-Tab bestätigt nicht funktionsfähig** (Abnahmetest 2026-08-21): Tab rendert, Nachrichten können nicht abgeschickt werden. Diagnose läuft.
 - `main.js` und die Admin-UI haben keine automatisierte Integrationstestabdeckung.
 - Onboarding-Rückfragen im Chat sind aktuell nicht beantwortbar (kein Schreibzugriff des Chat-Agenten auf den Katalog).
 - Keine Konversationshistorie über mehrere Chat-Fragen hinweg.
