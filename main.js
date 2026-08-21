@@ -9,6 +9,7 @@ const { buildTools } = require('./lib/tools');
 const { runAgent } = require('./lib/agent');
 const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage } = require('./lib/chatLog');
+const { startProactiveScheduler } = require('./lib/scheduler');
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -16,6 +17,7 @@ class AiAnalytics extends utils.Adapter {
         this.on('ready', this.onReady.bind(this));
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
+        this.stopScheduler = null;
     }
 
     async onReady() {
@@ -30,6 +32,12 @@ class AiAnalytics extends utils.Adapter {
         this.tools = buildTools(this);
 
         await this.syncCatalog();
+
+        const intervalMs = (Number(this.config.checkIntervalHours) || 24) * 3600 * 1000;
+        this.stopScheduler = startProactiveScheduler(this, {
+            intervalMs,
+            runCheck: () => this.runProactiveCheck(),
+        });
 
         this.log.info('ai-analytics adapter ready');
     }
@@ -53,6 +61,27 @@ class AiAnalytics extends utils.Adapter {
                 .join('\n');
             await appendChatMessage(this, 'assistant', `Ich bin mir bei folgenden Objekten unsicher:\n${question}`);
         }
+    }
+
+    async runProactiveCheck() {
+        const silentIfNothingFound = this.config.silentIfNothingFound === true;
+
+        const { finalText } = await runAgent({
+            provider: this.provider,
+            tools: this.tools,
+            systemPrompt:
+                'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
+                'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
+                'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
+            userMessage: 'Fuehre die periodische Pruefung durch.',
+        });
+
+        const isNothingFound = finalText.trim().toLowerCase().startsWith('keine auffaelligkeiten');
+        if (isNothingFound && silentIfNothingFound) {
+            return;
+        }
+
+        await appendChatMessage(this, 'assistant', finalText);
     }
 
     async onMessage(obj) {
@@ -83,6 +112,7 @@ class AiAnalytics extends utils.Adapter {
 
     onUnload(callback) {
         try {
+            if (this.stopScheduler) this.stopScheduler();
             callback();
         } catch (e) {
             callback();
