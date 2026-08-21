@@ -15,7 +15,7 @@ Nur Objekte mit aktivem History-/InfluxDB-/SQL-Logging werden berücksichtigt. E
 
 ## Status
 
-Implementierung läuft (Subagent-Driven Development, siehe Plan). Aktueller Fortschritt steht im arc42-Dokument, Abschnitt 11.
+Alle 13 Implementierungs-Tasks sind abgeschlossen und reviewt (siehe arc42-Dokument, Abschnitt 11, für Details und bekannte Lücken). Vor dem produktiven Einsatz steht noch der manuelle Abnahmetest auf einer echten ioBroker-Instanz aus.
 
 ## Voraussetzungen
 
