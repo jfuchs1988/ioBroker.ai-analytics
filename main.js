@@ -59,9 +59,9 @@ class AiAnalytics extends utils.Adapter {
         if (!obj || obj.command !== 'chatQuestion') return;
 
         const question = obj.message && obj.message.text;
-        await appendChatMessage(this, 'user', question);
 
         try {
+            await appendChatMessage(this, 'user', question);
             const { finalText } = await runAgent({
                 provider: this.provider,
                 tools: this.tools,
