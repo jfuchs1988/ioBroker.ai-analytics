@@ -47,6 +47,7 @@ describe('anthropic provider', () => {
             content: 'Der Verbrauch ist gestiegen.',
             toolCalls: [{ id: 'call_1', name: 'getHistory', input: { sourceId: 'x' } }],
             stopReason: 'tool_use',
+            usage: { inputTokens: 0, outputTokens: 0 },
         });
     });
 
@@ -76,6 +77,34 @@ describe('anthropic provider', () => {
                 content: [{ type: 'tool_result', tool_use_id: 'call_1', content: '[{"ts":1,"val":10}]' }],
             },
         ]);
+    });
+
+    it('extracts usage from the response', async () => {
+        sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            json: async () => ({
+                content: [{ type: 'text', text: 'ok' }],
+                stop_reason: 'end_turn',
+                usage: { input_tokens: 120, output_tokens: 45 },
+            }),
+        });
+
+        const provider = createAnthropicProvider({ apiKey: 'key' });
+        const result = await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(result.usage).to.deep.equal({ inputTokens: 120, outputTokens: 45 });
+    });
+
+    it('defaults usage to zero when the response has none', async () => {
+        sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            json: async () => ({ content: [{ type: 'text', text: 'ok' }], stop_reason: 'end_turn' }),
+        });
+
+        const provider = createAnthropicProvider({ apiKey: 'key' });
+        const result = await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(result.usage).to.deep.equal({ inputTokens: 0, outputTokens: 0 });
     });
 });
 
@@ -117,6 +146,7 @@ describe('openai-compatible provider', () => {
             content: 'Keine Auffaelligkeiten.',
             toolCalls: [{ id: 'call_1', name: 'listCatalog', input: {} }],
             stopReason: 'tool_calls',
+            usage: { inputTokens: 0, outputTokens: 0 },
         });
     });
 
@@ -136,6 +166,33 @@ describe('openai-compatible provider', () => {
         await provider.chat({ system: 's', messages: [], tools: [] });
 
         expect(fetchStub.firstCall.args[0]).to.equal('http://localhost:1234/v1/chat/completions');
+    });
+
+    it('extracts usage from the response', async () => {
+        sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            json: async () => ({
+                choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }],
+                usage: { prompt_tokens: 200, completion_tokens: 60 },
+            }),
+        });
+
+        const provider = createOpenAiCompatibleProvider({ apiKey: 'key', model: 'x' });
+        const result = await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(result.usage).to.deep.equal({ inputTokens: 200, outputTokens: 60 });
+    });
+
+    it('defaults usage to zero when the response has none', async () => {
+        sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            json: async () => ({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }),
+        });
+
+        const provider = createOpenAiCompatibleProvider({ apiKey: 'key', model: 'x' });
+        const result = await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(result.usage).to.deep.equal({ inputTokens: 0, outputTokens: 0 });
     });
 });
 
