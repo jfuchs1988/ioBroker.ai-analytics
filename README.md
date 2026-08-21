@@ -11,7 +11,7 @@ Nur Objekte mit aktivem History-/InfluxDB-/SQL-Logging werden berücksichtigt. E
 
 - [Architekturdokumentation (arc42)](docs/arc42/arc42.md) — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Entscheidungen und offene Risiken.
 - [Design-Spec](docs/superpowers/specs/2026-08-21-ioBroker-ai-analytics-design.md) — das ursprüngliche, mit dem Nutzer abgestimmte Design.
-- [Implementierungsplan](docs/superpowers/plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wird, inkl. Fortschritts-Ledger unter `.superpowers/sdd/`.
+- [Implementierungsplan](docs/superpowers/plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde, inkl. "Known Gaps"-Abschnitt für offene Punkte.
 
 ## Status
 

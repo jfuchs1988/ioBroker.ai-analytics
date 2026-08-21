@@ -1,7 +1,7 @@
 # ioBroker.ai-analytics — Architekturdokumentation (arc42)
 
-Status: laufende Implementierung (siehe Abschnitt 11 für aktuellen Fortschritt)
-Datum: 2026-08-21
+Status: Implementierung abgeschlossen und final reviewt (43/43 Tests grün), noch kein manueller Abnahmetest an einer echten ioBroker-Instanz — siehe Abschnitt 11 für Details und offene Punkte
+Datum: 2026-08-21 (zuletzt aktualisiert nach Abschluss aller 13 Tasks + finalem Whole-Branch-Review)
 Quellen: [Design-Spec](../superpowers/specs/2026-08-21-ioBroker-ai-analytics-design.md), [Implementierungsplan](../superpowers/plans/2026-08-21-ai-analytics-implementation.md)
 
 ## 1. Einführung und Ziele
@@ -47,8 +47,8 @@ Auslöser war die Frage des Nutzers, welche KI/AI-Adapter es für ioBroker berei
 
 ### 2.2 Organisatorische Randbedingungen
 
-- Entwicklung erfolgt über den `subagent-driven-development`-Workflow: pro Task ein frischer Implementierer-Subagent (Modell: Haiku, günstig/schnell) + ein Task-Review (Modell: Sonnet, das aktuelle/teure Sitzungsmodell) — feste Nutzervorgabe, siehe Abschnitt 9.
-- Isolierter Git-Worktree (`worktree-ai-analytics-impl`) für die gesamte Implementierung, damit der `master`-Branch des Repos unberührt bleibt.
+- Entwicklung erfolgte über den `subagent-driven-development`-Workflow: pro Task ein frischer Implementierer-Subagent (Modell: Haiku, günstig/schnell) + ein Task-Review (Modell: Sonnet, das aktuelle/teure Sitzungsmodell), abschließend eine Whole-Branch-Review (Modell: Opus, stärkstes verfügbares Modell) mit einer einzigen Fix-Welle für die dort gefundenen Punkte — feste Nutzervorgabe für die Modellwahl, siehe Abschnitt 9.
+- Implementierung erfolgte in einem isolierten Git-Worktree (`worktree-ai-analytics-impl`), damit der `master`-Branch während der Entwicklung unberührt blieb. Der Branch wurde nach Abschluss lokal in `master` gemergt, gepusht, und Worktree/Branch anschließend gelöscht. Weiterentwicklung findet seither auf dem Branch `develop` statt.
 - Privates GitHub-Repository `jfuchs1988/ioBroker.ai-analytics`.
 
 ## 3. Kontextabgrenzung
@@ -144,9 +144,10 @@ admin/
 ### 6.1 Onboarding (beim Adapterstart und danach inkrementell)
 
 1. `discovery.findHistorizedObjects` ermittelt alle Objekte mit aktivem Logging.
-2. `catalog.getAllCatalogEntries` liefert bereits bekannte Objekte; bekannte werden übersprungen, nicht mehr gefundene auf `active:false` gesetzt.
-3. `onboarding.runOnboarding` klassifiziert unbekannte Objekte in Batches (max. 20) über einen einmaligen Prompt an den Provider (kein Tool-Loop nötig, da nur vorhandene Metadaten verwendet werden).
-4. Objekte mit niedrigem Vertrauensgrad werden gesammelt und als **eine gebündelte** Chat-Nachricht als Rückfrage gepostet (nicht einzeln, um den Nutzer nicht zu fluten).
+2. `catalog.getAllCatalogEntries` liefert bereits bekannte Objekte. Nicht mehr gefundene werden auf `active:false` gesetzt. Objekte, die wieder auftauchen (History-Instanz neu gestartet, `custom` aus- und wieder eingeschaltet) oder deren `historyInstance` sich geändert hat, werden reaktiviert (`active:true`) und mit aktuellem `lastSeen`/`historyInstance` neu geschrieben — sonst blieben sie dauerhaft von Analysen ausgeschlossen.
+3. `onboarding.runOnboarding` klassifiziert die verbleibenden unbekannten Objekte in Batches (max. 20) über einen einmaligen Prompt an den Provider (kein Tool-Loop nötig, da nur vorhandene Metadaten verwendet werden). Eine fehlgeschlagene Klassifizierung eines einzelnen Objekts (z. B. ungültige Kategorie) verwirft nur diesen einen Eintrag, nicht den gesamten Batch.
+4. Objekte mit niedrigem Vertrauensgrad werden gesammelt und als **eine gebündelte** Chat-Nachricht als Rückfrage gepostet (nicht einzeln, um den Nutzer nicht zu fluten). **Bekannte Lücke:** diese Rückfrage ist aktuell nicht beantwortbar — der Chat-Agent hat keine schreibenden Werkzeuge, siehe Abschnitt 11.
+5. Ist kein API-Key konfiguriert (Erstinstallation), überspringt `onReady` Katalog-Sync und Scheduler komplett und loggt eine Warnung, statt zahllose fehlschlagende Erstversuche auszulösen.
 
 ### 6.2 Chat-Q&A
 
@@ -180,19 +181,24 @@ Jeder Provider-Client übersetzt dieses normalisierte Format in sein eigenes Wir
 - LLM-API-Fehler: Retry mit Backoff (`withRetry`, 3 Versuche, 500ms-Basis-Backoff) transparent im Provider, bevor der Fehler den Aufrufer erreicht.
 - Datenzugriffsfehler (`getHistory` schlägt fehl): als Tool-Fehler an den Agenten zurückgegeben (`{error: message}`), der Agent kann das in seiner Antwort berücksichtigen statt abzustürzen.
 - Unklare Objekte: bleiben `needsReview:true`, werden von Analysen ausgeschlossen bis der Nutzer sie im Chat klärt.
-- Entfernte History-Objekte: Katalogeintrag wird `active:false`, nicht gelöscht.
+- Entfernte History-Objekte: Katalogeintrag wird `active:false`, nicht gelöscht (siehe auch Reaktivierung in Abschnitt 6.1).
+- Korrupte/handbearbeitete Katalog-States: `getAllCatalogEntries` überspringt und loggt einen einzelnen kaputten Eintrag statt beim `JSON.parse` den kompletten Adapterstart abzubrechen.
+- Leere/fehlende Chat-Frage: wird vor der Verarbeitung abgelehnt (`{error: 'Leere Frage'}`) statt einen fehlerhaften LLM-Request auszulösen.
+- Ungültiges Prüfintervall (`checkIntervalHours` negativ, 0 oder nicht-numerisch): fällt auf 24h zurück statt ein Intervall nahe 0ms zu erzeugen, das die KI in einer engen Schleife aufrufen würde. Zusätzlich in der Admin-Konfiguration mit `min:1` abgesichert.
+- Beide LLM-System-Prompts (Chat-Q&A und proaktive Prüfung) enthalten einen expliziten Zeitanker (aktuelle ISO-Zeit + Unix-Millisekunden), da die Werkzeuge `getHistory`/`compareTimeframes` relative Zeitfenster sonst nicht korrekt bestimmen könnten.
 
 ### 8.3 Sicherheits-/Zugriffskonzept
 
 - Die KI hat **nie** direkten Datenbank-Query-Zugriff — nur die drei kuratierten Werkzeuge.
-- API-Keys werden über ein `password`-Feld in der Admin-JSON-Config gehalten (nicht im Klartext-Textfeld).
+- Der API-Key wird in `io-package.json` über `encryptedNative`/`protectedNative` als verschlüsselt und geschützt markiert — js-controller verschlüsselt ihn in der Objekte-DB und sendet ihn nicht an Nicht-Admin-Clients. Das `password`-Feld in der Admin-JSON-Config maskiert zusätzlich nur die Eingabe im Browser; die eigentliche Absicherung von Speicherung/Transport kommt von `encryptedNative`/`protectedNative`.
 - Adapter schreibt nur in seinen eigenen State-Namespace (`catalog.*`, `chat.*`) — keine Schreibzugriffe auf fremde Objekte im aktuellen Funktionsumfang (nur Lesezugriff auf historisierte Werte).
+- **Vertrauensgrenze des Chat-Message-Handlers:** `onMessage` (in `main.js`) ist nur über ioBrokers internen Adapter-Message-Bus erreichbar (`adapter.on('message', ...)`) — aufgerufen entweder von der Admin-UI (bereits Admin-authentifiziert) oder von anderen Adaptern/Scripts in derselben ioBroker-Instanz, die ohnehin vollen Zugriff auf alle States und beliebigen Node-Code-Zugriff haben. Es gibt hier keine Privilegiengrenze, die eine zusätzliche Autorisierungsprüfung verteidigen müsste — der Handler gewährt strikt *weniger* Zugriff (nur lesend, katalog-gebunden) als jeder Aufrufer ohnehin schon besitzt. Diese Einschätzung wurde in der finalen Whole-Branch-Review bewusst geprüft, nachdem ein automatischer Security-Scanner "fehlende Autorisierung" als generischen Befund gemeldet hatte (falsch-positiv relativ zu diesem Vertrauensmodell).
 
 ### 8.4 Testkonzept
 
-- Unit-Tests (mocha/chai/sinon) für jedes `lib/*`-Modul mit gemockter Adapter-API — kein echter DB- oder LLM-Zugriff nötig.
-- Adapter-Lifecycle-Smoke-Test über `@iobroker/testing`.
+- Unit-Tests (mocha/chai/sinon) für jedes `lib/*`-Modul mit gemockter Adapter-API — kein echter DB- oder LLM-Zugriff nötig. Stand: 42 Unit-Tests, alle grün.
 - Admin-UI (JSON Config, Chat-Tab) hat keine automatisierten Tests — dafür ein manueller Abnahmetest an einer echten ioBroker-Instanz (siehe Plan, Abschnitt "Post-Implementation Manual Acceptance Test").
+- **Bekannte Lücke, in der finalen Review entdeckt:** `test/adapter.test.js` nutzt `@iobroker/testing`s `tests.unit`, das in der installierten v4-Version ein deprecated No-Op ist (druckt nur eine Warnung, lädt `main.js` nie, ruft nie `onReady`/`onUnload` auf). `main.js` — der Orchestrator mit der gesamten Lifecycle-, Konfigurations- und Fehlerbehandlungslogik — hat dadurch effektiv **keine** automatisierte Testabdeckung; jedes `lib/*`-Modul ist nur isoliert getestet, nie im Zusammenspiel (`runOnboarding` → `syncCatalog` → Katalog-States als ein durchgängiger Test existiert nicht). Siehe Abschnitt 11.
 
 ## 9. Architekturentscheidungen (ADRs, komprimiert)
 
@@ -210,6 +216,8 @@ Jeder Provider-Client übersetzt dieses normalisierte Format in sein eigenes Wir
 | 10 | Ausgabekanal v1: nur Admin-Chat-Tab; WhatsApp/Alexa als spätere Erweiterung | Explizite Nutzerentscheidung ("erst mal einfach im Adapter-Tab") | Sofortige Multi-Channel-Anbindung |
 | 11 | Entwicklung via `subagent-driven-development`: Haiku für Implementierung, Sonnet für Review/Denken | Explizite, als Dauerregel gespeicherte Nutzervorgabe (siehe Memory `feedback_haiku_for_implementation`) | Ein Modell für alles |
 | 12 | Isolierter Git-Worktree für die gesamte Implementierung | Schützt den `master`-Branch, Standard-Vorgehen dieses Workflows | Direkt auf `master` entwickeln |
+| 13 | API-Key wird über `encryptedNative`/`protectedNative` in `io-package.json` verschlüsselt/geschützt statt nur per `password`-Feld maskiert | In der finalen Whole-Branch-Review als Critical-Finding entdeckt: `password`-Feld maskiert nur die Browser-Eingabe, schützt aber nicht Speicherung/Transport | Nur `password`-Feld ohne zusätzliche Verschlüsselung (ursprünglicher Stand, als unsicher erkannt) |
+| 14 | Beide LLM-System-Prompts enthalten einen expliziten Zeitanker (aktuelle Zeit als ISO + Unix-ms) | In der finalen Whole-Branch-Review als Critical-Finding entdeckt: ohne Anker hat das Modell keine Grundlage, relative Zeitfenster für `getHistory`/`compareTimeframes` korrekt zu berechnen | Kein Zeitanker (ursprünglicher Stand, führte zu leeren/falschen Zeiträumen) |
 
 ## 10. Qualitätsanforderungen (Auszug als Szenarien)
 
@@ -220,6 +228,8 @@ Jeder Provider-Client übersetzt dieses normalisierte Format in sein eigenes Wir
 | LLM-API ist kurzzeitig nicht erreichbar | Automatischer Retry mit Backoff; erst danach sichtbarer Fehler. |
 | History-Adapterinstanz fällt komplett aus | Bekannte Lücke (siehe Abschnitt 11) — aktuell keine Deduplizierung wiederholter Ausfallmeldungen. |
 | Provider wird gewechselt (z. B. Anthropic → lokal) | Nur Konfigurationsänderung nötig, kein Codeeingriff. |
+| Adapter wird frisch installiert, noch kein API-Key hinterlegt | Startet trotzdem sauber, überspringt Katalog-Sync und proaktive Prüfung mit einer Log-Warnung, statt Hunderte fehlschlagender Erstversuche auszulösen. |
+| Nutzer fragt "Wie war mein Verbrauch letzte Woche?" | Agent bestimmt den Zeitraum korrekt relativ zur tatsächlichen aktuellen Zeit (System-Prompt enthält einen Zeitanker), nicht relativ zum Trainingsstand des Modells. |
 
 ## 11. Risiken und technische Schulden
 
@@ -232,17 +242,21 @@ Aus dem Implementierungsplan übernommen (`docs/superpowers/plans/2026-08-21-ai-
 - **Onboarding-Rückfragen sind nicht auflösbar:** Für Objekte mit `needsReview: true` postet das System eine Rückfrage im Chat, aber es gibt aktuell keinen Weg, eine Nutzerantwort zurück in den Katalog zu schreiben — der Chat-Q&A-Agent hat nur lesende Werkzeuge. Objekte bleiben dauerhaft `needsReview: true` und von Analysen ausgeschlossen. Für v1 als Limitierung akzeptiert; ein Folge-Plan sollte ein Werkzeug/Message-Kommando zum Aktualisieren eines Katalogeintrags ergänzen.
 - **Keine Konversationshistorie im Chat-Agenten:** Jede Chat-Frage startet den Agenten ohne vorherige Nachrichten im Kontext, obwohl die Spec Folgefragen mit erhaltenem Kontext vorsieht. `chat.history` ist aktuell nur ein Anzeige-Log. Für v1 als Limitierung akzeptiert; ein Folge-Plan sollte `runAgent` um optionalen `priorMessages`-Kontext erweitern.
 - **Keine Auswahl der History-Adapterinstanz(en) und kein manueller Re-Discovery-Trigger:** Die Spec sieht beides in der Admin-Konfiguration vor; aktuell werden automatisch alle aktiven influxdb/history/sql-Instanzen berücksichtigt, und ein Neu-Einlesen erfordert einen Adapter-Neustart. Für v1 als Limitierung akzeptiert.
+- **Main.js und die Admin-UI haben effektiv keine automatisierte Testabdeckung:** siehe Abschnitt 8.4 — der Adapter-Smoke-Test ist durch eine veraltete `@iobroker/testing`-v4-Verhaltensänderung ein No-Op. Ein Folge-Plan sollte entweder `tests.integration` (echter js-controller) oder einen proxyquire-basierten Fake-Adapter-Test für `main.js` ergänzen.
+- **Admin-Chat-Tab (`admin/tab.js`) nicht gegen eine echte Admin-Instanz verifiziert:** Der Tab verlässt sich auf ein globales `adapterNamespace`, das kein Standard-ioBroker-Admin-Global ist — je nach Admin-Version könnte der Tab als leere, inaktive Box rendern, ohne dass ein Fehler sichtbar wird. Muss beim manuellen Abnahmetest als Erstes geprüft werden; falls nicht funktionsfähig, sollte der Tab die Namespace-/Instanz-Ableitung aus der URL (`window.location.search`) statt aus einem ungeprüften Global vornehmen.
+- **Zwei kleinere, in der Fix-Wellen-Nachprüfung bewusst zurückgestellte Punkte:** (a) `lastSeen` wird bei der Katalog-Reaktivierung (Abschnitt 6.1) nur bei tatsächlicher Reaktivierung oder Instanzwechsel aktualisiert, nicht bei jedem "unverändert weiterhin gesehen"-Sync — kein vollständiger Heartbeat; (b) die neuen Reaktivierungs-`setCatalogEntry`-Aufrufe in `syncCatalog` sind nicht wie der übrige Abschnitt in try/catch abgesichert (geringes Risiko, da nur bereits validierte Felder per Spread übernommen werden). Beide Minor, für die CI-/Hardening-Folge-Runde vorgesehen.
 
 ### Fortschritt zum Zeitpunkt dieses Dokuments
 
 Implementierung über `subagent-driven-development` in 13 Tasks ist abgeschlossen (siehe Plan); alle Tasks wurden einzeln reviewt und teils in Fix-Runden nachgebessert. Eine finale Whole-Branch-Review hat danach mehrere Befunde aufgedeckt und einen Teil davon in einer Fix-Welle beheben lassen (Zeitanker in den LLM-System-Prompts, API-Key-Verschlüsselung, Katalog-Reaktivierung, negative Prüfintervalle, fehlende Eingabevalidierung, u.a.); ein Teil wurde bewusst als dokumentierte Lücke zurückgestellt (siehe unten und den Implementierungsplan). Vor dem produktiven Einsatz steht noch der manuelle Abnahmetest auf einer echten ioBroker-Instanz aus — insbesondere ob der Admin-Chat-Tab (Task 13) sich gegen eine echte Admin-Instanz korrekt initialisiert, da dies nicht automatisiert testbar war.
 
-### Roadmap (nach Abschluss der 13 Tasks, als separater Folge-Plan)
+### Roadmap
 
-Vom Nutzer bestätigt, in dieser Reihenfolge:
-1. Diese arc42-Dokumentation (dieses Dokument) — abgeschlossen.
-2. Fertigstellung der laufenden 13 Implementierungs-Tasks + finales Review.
-3. Separater Plan für: CI via GitHub Actions (`npm test` bei jedem Push/PR), ESLint + Prettier, `@iobroker/adapter-dev`-Checker, CHANGELOG.md, Dependabot/Renovate.
+Vom Nutzer bestätigte Reihenfolge — Stand:
+1. ~~Diese arc42-Dokumentation~~ — abgeschlossen.
+2. ~~Fertigstellung der 13 Implementierungs-Tasks + finales Review + Fix-Welle~~ — abgeschlossen, gemergt nach `master`, Weiterentwicklung auf `develop`.
+3. **Nächster Schritt:** manueller Abnahmetest an einer echten ioBroker-Instanz (siehe Plan, "Post-Implementation Manual Acceptance Test") — insbesondere Admin-Chat-Tab-Initialisierung prüfen (siehe offener Punkt oben).
+4. Danach: separater Plan für CI via GitHub Actions (`npm test` bei jedem Push/PR), ESLint + Prettier, `@iobroker/adapter-dev`-Checker, CHANGELOG.md, Dependabot/Renovate — sollte dabei auch die in Abschnitt 11 gelisteten Test- und Hardening-Lücken mit aufnehmen.
 
 ## 12. Glossar
 
