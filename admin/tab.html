@@ -3,14 +3,28 @@
 <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+    <style>
+        body { font-family: sans-serif; margin: 0; }
+        #chat-messages { height: 70vh; overflow-y: auto; padding: 12px; box-sizing: border-box; }
+        .chat-message { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .chat-message-user { align-items: flex-end; }
+        .chat-message-assistant { align-items: flex-start; }
+        .chat-bubble { max-width: 70%; padding: 8px 12px; border-radius: 12px; white-space: pre-wrap; word-break: break-word; }
+        .chat-message-user .chat-bubble { background: #1976d2; color: #fff; }
+        .chat-message-assistant .chat-bubble { background: #eee; color: #222; }
+        .chat-timestamp { font-size: 11px; color: #888; margin-top: 2px; }
+        #chat-input-row { display: flex; padding: 8px; border-top: 1px solid #ddd; }
+        #chat-input { flex: 1; padding: 8px; }
+        #chat-send { padding: 8px 16px; margin-left: 8px; }
+    </style>
     <script type="text/javascript" src="../../lib/js/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
     <script type="text/javascript" src="tab.js"></script>
 </head>
 <body>
-    <div id="chat-messages" style="height: 70vh; overflow-y: auto; padding: 8px;"></div>
-    <div style="display: flex; padding: 8px;">
-        <input id="chat-input" type="text" style="flex: 1;" placeholder="Frage stellen..." />
+    <div id="chat-messages"></div>
+    <div id="chat-input-row">
+        <input id="chat-input" type="text" placeholder="Frage stellen..." />
         <button id="chat-send">Senden</button>
     </div>
 </body>

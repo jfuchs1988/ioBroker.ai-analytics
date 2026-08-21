@@ -6,15 +6,45 @@ function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
 
+function resolveNamespaceFromQuery(searchString) {
+    const params = new URLSearchParams(searchString || '');
+    const instance = params.get('instance') || params.get('i') || '0';
+    return `ai-analytics.${instance}`;
+}
+
 function renderHistory(history) {
     const container = document.getElementById('chat-messages');
     container.innerHTML = '';
     (history || []).forEach((entry) => {
         const line = document.createElement('div');
-        line.textContent = formatMessageLine(entry);
+        line.className = `chat-message chat-message-${entry.role}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        bubble.textContent = entry.text;
+        const time = document.createElement('div');
+        time.className = 'chat-timestamp';
+        time.textContent = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
+        line.appendChild(bubble);
+        line.appendChild(time);
         container.appendChild(line);
     });
     container.scrollTop = container.scrollHeight;
+}
+
+function showConnectionError(message) {
+    const container = document.getElementById('chat-messages');
+    if (container) {
+        container.textContent = message;
+    }
+    console.error(`[ai-analytics tab] ${message}`);
+}
+
+function setLoading(isLoading) {
+    const button = document.getElementById('chat-send');
+    if (button) {
+        button.disabled = isLoading;
+        button.textContent = isLoading ? '...' : 'Senden';
+    }
 }
 
 function loadHistory() {
@@ -30,8 +60,10 @@ function sendQuestion() {
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
+    setLoading(true);
 
     socket.emit('sendTo', namespace, 'chatQuestion', { text }, (response) => {
+        setLoading(false);
         if (response && response.history) {
             renderHistory(response.history);
         } else if (response && response.error) {
@@ -43,9 +75,28 @@ function sendQuestion() {
     });
 }
 
-function init(socketInstance, adapterNamespace) {
-    socket = socketInstance;
-    namespace = adapterNamespace;
+function resolveConnection() {
+    console.log('[ai-analytics tab] Versuche Verbindung herzustellen...');
+    if (window.parent && window.parent !== window && window.parent.socket) {
+        console.log('[ai-analytics tab] Verwende socket vom Elternfenster (parent.socket).');
+        return window.parent.socket;
+    }
+    if (typeof io !== 'undefined') {
+        console.log('[ai-analytics tab] Verwende eigenes io.connect() (same-origin).');
+        return io.connect();
+    }
+    return null;
+}
+
+function init() {
+    namespace = resolveNamespaceFromQuery(window.location.search);
+    socket = resolveConnection();
+
+    if (!socket) {
+        showConnectionError('Verbindung zu ioBroker konnte nicht hergestellt werden.');
+        return;
+    }
+
     loadHistory();
     document.getElementById('chat-send').addEventListener('click', sendQuestion);
     document.getElementById('chat-input').addEventListener('keydown', (event) => {
@@ -54,13 +105,9 @@ function init(socketInstance, adapterNamespace) {
 }
 
 if (typeof window !== 'undefined') {
-    window.addEventListener('DOMContentLoaded', () => {
-        if (typeof io !== 'undefined' && typeof adapterNamespace !== 'undefined') {
-            init(io.connect(), adapterNamespace);
-        }
-    });
+    window.addEventListener('DOMContentLoaded', init);
 }
 
 if (typeof module !== 'undefined') {
-    module.exports = { formatMessageLine };
+    module.exports = { formatMessageLine, resolveNamespaceFromQuery };
 }
