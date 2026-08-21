@@ -3,7 +3,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const { findHistorizedObjects } = require('./lib/discovery');
-const { getAllCatalogEntries, markInactive } = require('./lib/catalog');
+const { getAllCatalogEntries, setCatalogEntry, markInactive } = require('./lib/catalog');
 const { createProvider } = require('./lib/providers');
 const { buildTools } = require('./lib/tools');
 const { runAgent } = require('./lib/agent');
@@ -31,9 +31,18 @@ class AiAnalytics extends utils.Adapter {
         });
         this.tools = buildTools(this);
 
+        if (!this.config.apiKey && this.config.providerType !== 'local') {
+            this.log.warn(
+                'Kein API-Key konfiguriert - ueberspringe Katalog-Synchronisierung und proaktive Pruefung, bis ein API-Key hinterlegt ist.'
+            );
+            return;
+        }
+
         await this.syncCatalog();
 
-        const intervalMs = (Number(this.config.checkIntervalHours) || 24) * 3600 * 1000;
+        const configuredHours = Number(this.config.checkIntervalHours);
+        const intervalHours = Number.isFinite(configuredHours) && configuredHours >= 1 ? configuredHours : 24;
+        const intervalMs = intervalHours * 3600 * 1000;
         this.stopScheduler = startProactiveScheduler(this, {
             intervalMs,
             runCheck: () => this.runProactiveCheck(),
@@ -45,6 +54,7 @@ class AiAnalytics extends utils.Adapter {
     async syncCatalog() {
         const discovered = await findHistorizedObjects(this);
         const existing = await getAllCatalogEntries(this);
+        const existingById = new Map(existing.map((entry) => [entry.sourceId, entry]));
         const discoveredIds = new Set(discovered.map((obj) => obj.id));
 
         for (const entry of existing) {
@@ -53,13 +63,29 @@ class AiAnalytics extends utils.Adapter {
             }
         }
 
+        for (const obj of discovered) {
+            const entry = existingById.get(obj.id);
+            if (entry && (entry.active === false || entry.historyInstance !== obj.historyInstance)) {
+                await setCatalogEntry(this, {
+                    ...entry,
+                    active: true,
+                    historyInstance: obj.historyInstance,
+                    lastSeen: new Date().toISOString(),
+                });
+            }
+        }
+
         const { needsReview } = await runOnboarding(this, this.provider, discovered);
 
-        if (needsReview.length > 0) {
-            const question = needsReview
-                .map((entry) => `- ${entry.sourceId}: wofuer steht dieser Wert?`)
-                .join('\n');
-            await appendChatMessage(this, 'assistant', `Ich bin mir bei folgenden Objekten unsicher:\n${question}`);
+        try {
+            if (needsReview.length > 0) {
+                const question = needsReview
+                    .map((entry) => `- ${entry.sourceId}: wofuer steht dieser Wert?`)
+                    .join('\n');
+                await appendChatMessage(this, 'assistant', `Ich bin mir bei folgenden Objekten unsicher:\n${question}`);
+            }
+        } catch (error) {
+            this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
         }
     }
 
@@ -70,8 +96,10 @@ class AiAnalytics extends utils.Adapter {
             provider: this.provider,
             tools: this.tools,
             systemPrompt:
+                `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
                 'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
                 'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
+                'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                 'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
             userMessage: 'Fuehre die periodische Pruefung durch.',
         });
@@ -89,13 +117,22 @@ class AiAnalytics extends utils.Adapter {
 
         const question = obj.message && obj.message.text;
 
+        if (typeof question !== 'string' || !question.trim()) {
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, { error: 'Leere Frage' }, obj.callback);
+            }
+            return;
+        }
+
         try {
             await appendChatMessage(this, 'user', question);
             const { finalText } = await runAgent({
                 provider: this.provider,
                 tools: this.tools,
                 systemPrompt:
-                    'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte.',
+                    `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
+                    'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
+                    'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit.',
                 userMessage: question,
             });
             const history = await appendChatMessage(this, 'assistant', finalText);
