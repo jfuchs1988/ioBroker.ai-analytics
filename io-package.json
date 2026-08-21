@@ -44,7 +44,8 @@
     "model": "",
     "baseUrl": "",
     "checkIntervalHours": 24,
-    "silentIfNothingFound": false
+    "silentIfNothingFound": false,
+    "dailyTokenBudget": 0
   },
   "objects": [],
   "instanceObjects": []

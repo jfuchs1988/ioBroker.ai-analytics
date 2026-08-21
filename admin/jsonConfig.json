@@ -33,6 +33,12 @@
       "type": "checkbox",
       "label": "Bei keinem Fund keine Nachricht senden",
       "default": false
+    },
+    "dailyTokenBudget": {
+      "type": "number",
+      "label": "Taegliches Token-Budget (0 = kein Limit)",
+      "default": 0,
+      "min": 0
     }
   }
 }
