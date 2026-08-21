@@ -1,7 +1,7 @@
 // test/unit/chatLog.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureChatHistoryState, appendChatMessage, CHAT_HISTORY_STATE } = require('../../lib/chatLog');
+const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory, CHAT_HISTORY_STATE } = require('../../lib/chatLog');
 
 describe('chatLog', () => {
     it('CHAT_HISTORY_STATE points at chat.history', () => {
@@ -60,5 +60,29 @@ describe('chatLog', () => {
         expect(result).to.have.lengthOf(200);
         expect(result[result.length - 1].text).to.equal('neu');
         expect(result[0].text).to.equal('m1');
+    });
+
+    describe('getRecentChatHistory', () => {
+        it('returns the last N entries in chronological order', async () => {
+            const history = Array.from({ length: 15 }, (_, i) => ({ role: 'user', text: `m${i}`, timestamp: i }));
+            const adapter = { getStateAsync: sinon.stub().resolves({ val: JSON.stringify(history) }) };
+
+            const result = await getRecentChatHistory(adapter, 5);
+
+            expect(result.map((e) => e.text)).to.deep.equal(['m10', 'm11', 'm12', 'm13', 'm14']);
+        });
+
+        it('returns an empty array when there is no history yet', async () => {
+            const adapter = { getStateAsync: sinon.stub().resolves(null) };
+            const result = await getRecentChatHistory(adapter, 5);
+            expect(result).to.deep.equal([]);
+        });
+
+        it('returns everything when there are fewer entries than the limit', async () => {
+            const history = [{ role: 'user', text: 'only one', timestamp: 1 }];
+            const adapter = { getStateAsync: sinon.stub().resolves({ val: JSON.stringify(history) }) };
+            const result = await getRecentChatHistory(adapter, 10);
+            expect(result).to.deep.equal(history);
+        });
     });
 });
