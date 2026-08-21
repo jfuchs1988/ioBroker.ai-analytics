@@ -24,7 +24,9 @@
       "singleton": true,
       "name": { "en": "Chat", "de": "Chat" }
     },
-    "dependencies": [{ "js-controller": ">=5.0.0" }]
+    "dependencies": [{ "js-controller": ">=5.0.0" }],
+    "encryptedNative": ["apiKey"],
+    "protectedNative": ["apiKey"]
   },
   "native": {
     "providerType": "anthropic",
