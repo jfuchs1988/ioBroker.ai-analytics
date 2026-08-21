@@ -8,8 +8,9 @@ const { createProvider } = require('./lib/providers');
 const { buildTools } = require('./lib/tools');
 const { runAgent } = require('./lib/agent');
 const { runOnboarding } = require('./lib/onboarding');
-const { ensureChatHistoryState, appendChatMessage } = require('./lib/chatLog');
+const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
+const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage');
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -22,6 +23,7 @@ class AiAnalytics extends utils.Adapter {
 
     async onReady() {
         await ensureChatHistoryState(this);
+        await ensureUsageState(this);
 
         this.provider = createProvider({
             type: this.config.providerType,
@@ -90,9 +92,16 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async runProactiveCheck() {
+        this.log.silly('Proaktive Pruefung: Lauf gestartet');
+
+        if (await isBudgetExceeded(this)) {
+            this.log.warn('Proaktive Pruefung: Tagesbudget an Tokens ist erschoepft, Lauf wird uebersprungen.');
+            return;
+        }
+
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
-        const { finalText } = await runAgent({
+        const { finalText, usage } = await runAgent({
             provider: this.provider,
             tools: this.tools,
             systemPrompt:
@@ -104,7 +113,11 @@ class AiAnalytics extends utils.Adapter {
             userMessage: 'Fuehre die periodische Pruefung durch.',
         });
 
+        await recordUsage(this, usage);
+
         const isNothingFound = finalText.trim().toLowerCase().startsWith('keine auffaelligkeiten');
+        this.log.silly(`Proaktive Pruefung: Lauf beendet, Ergebnis: ${isNothingFound ? 'keine Auffaelligkeiten' : 'Auffaelligkeit gefunden'}`);
+
         if (isNothingFound && silentIfNothingFound) {
             return;
         }
@@ -124,17 +137,37 @@ class AiAnalytics extends utils.Adapter {
             return;
         }
 
+        this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
+
+        if (await isBudgetExceeded(this)) {
+            this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, { error: 'Tagesbudget an Tokens ist erschoepft.' }, obj.callback);
+            }
+            return;
+        }
+
         try {
             await appendChatMessage(this, 'user', question);
-            const { finalText } = await runAgent({
+            const priorEntries = await getRecentChatHistory(this, 10);
+            const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+
+            const { finalText, usage } = await runAgent({
                 provider: this.provider,
                 tools: this.tools,
                 systemPrompt:
                     `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
                     'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
-                    'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit.',
+                    'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
+                    'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
+                    'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
                 userMessage: question,
+                priorMessages,
             });
+
+            await recordUsage(this, usage);
+            this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+
             const history = await appendChatMessage(this, 'assistant', finalText);
             if (obj.callback) {
                 this.sendTo(obj.from, obj.command, { history }, obj.callback);
