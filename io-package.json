@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.1",
+    "version": "0.0.1-beta.2",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -28,6 +28,10 @@
     "encryptedNative": ["apiKey"],
     "protectedNative": ["apiKey"],
     "news": {
+      "0.0.1-beta.2": {
+        "en": "Chat tab connection fallback, onboarding follow-up answers via chat, conversation memory, daily token budget, and silly-level logging.",
+        "de": "Chat-Tab-Verbindungs-Fallback, Beantwortung von Onboarding-Rückfragen im Chat, Konversationsgedächtnis, tägliches Token-Budget und Silly-Level-Logging."
+      },
       "0.0.1-beta.1": {
         "en": "Documentation/process overhaul only, no functional code change: arc42 split into per-chapter files, decisions extracted as ADRs, Obsidian-friendly linking. See CONTRIBUTING.md for the development process.",
         "de": "Reine Dokumentations-/Prozess-Version, kein funktionaler Code-Unterschied: arc42 in Einzelkapitel aufgeteilt, Entscheidungen als ADRs extrahiert, Obsidian-freundliche Verlinkung. Siehe CONTRIBUTING.md fuer den Entwicklungsprozess."
