@@ -34,6 +34,11 @@ function sendQuestion() {
     socket.emit('sendTo', namespace, 'chatQuestion', { text }, (response) => {
         if (response && response.history) {
             renderHistory(response.history);
+        } else if (response && response.error) {
+            const container = document.getElementById('chat-messages');
+            const line = document.createElement('div');
+            line.textContent = `[Fehler] ${response.error}`;
+            container.appendChild(line);
         }
     });
 }
