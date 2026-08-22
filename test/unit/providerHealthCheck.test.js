@@ -6,6 +6,7 @@ const {
     ensureReachabilityStates,
     CHAT_STATE,
     ONBOARDING_STATE,
+    DEFAULT_TIMEOUT_MS,
 } = require('../../lib/providerHealthCheck');
 
 function makeAdapter() {
@@ -42,6 +43,50 @@ describe('providerHealthCheck', () => {
             const result = await checkProviderReachable(provider);
 
             expect(result).to.deep.equal({ reachable: false, error: '401 Unauthorized' });
+        });
+
+        it('falls back to String(error) when the rejection value has no message', async () => {
+            // Nicht-Error-Rejection (sinon's rejects(string) wuerde daraus einen Error bauen).
+            const provider = { chat: sinon.stub().callsFake(() => Promise.reject('kaputt')) };
+
+            const result = await checkProviderReachable(provider);
+
+            expect(result).to.deep.equal({ reachable: false, error: 'kaputt' });
+        });
+
+        it('handles a null rejection value without throwing', async () => {
+            const provider = { chat: sinon.stub().callsFake(() => Promise.reject(null)) };
+
+            const result = await checkProviderReachable(provider);
+
+            expect(result).to.deep.equal({ reachable: false, error: 'null' });
+        });
+
+        it('defaults to a 15 second timeout', () => {
+            expect(DEFAULT_TIMEOUT_MS).to.equal(15000);
+        });
+
+        it('gives up with a timeout error when the provider never responds', async () => {
+            // Endpunkt, der die Verbindung annimmt, aber nie antwortet.
+            const provider = { chat: sinon.stub().returns(new Promise(() => {})) };
+
+            const result = await checkProviderReachable(provider, 20);
+
+            expect(result.reachable).to.equal(false);
+            expect(result.error).to.match(/Zeit/i);
+            expect(result.error).to.include('20');
+        });
+
+        it('does not time out when the provider answers within the limit', async () => {
+            const provider = {
+                chat: sinon.stub().callsFake(
+                    () => new Promise((resolve) => setTimeout(() => resolve({ content: 'OK' }), 5))
+                ),
+            };
+
+            const result = await checkProviderReachable(provider, 200);
+
+            expect(result).to.deep.equal({ reachable: true });
         });
     });
 

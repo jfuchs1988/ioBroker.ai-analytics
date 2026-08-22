@@ -21,6 +21,44 @@ class AiAnalytics extends utils.Adapter {
         this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.stopScheduler = null;
+        // Fail-closed: solange onReady die Pruefung nicht abgeschlossen hat, gilt kein Provider als erreichbar.
+        this.chatProviderOk = false;
+        this.onboardingProviderOk = false;
+    }
+
+    /**
+     * Baut einen Provider und faengt Konfigurationsfehler ab, damit ein ungueltiger
+     * Provider-Typ nicht den gesamten onReady-Lauf (und damit den jeweils anderen Provider) mitreisst.
+     *
+     * @returns {object|undefined} der Provider oder undefined bei fehlgeschlagener Konstruktion
+     */
+    buildProviderSafely(providerConfig, label) {
+        try {
+            return createProvider(providerConfig);
+        } catch (error) {
+            this.log.error(`${label} konnte nicht initialisiert werden: ${error && error.message ? error.message : String(error)}`);
+            return undefined;
+        }
+    }
+
+    /**
+     * Erreichbarkeitspruefung mit zwei Kurzschluessen vor dem eigentlichen Netzaufruf:
+     * kein Provider (Konstruktion fehlgeschlagen) und "noch nicht konfiguriert" (kein API-Key,
+     * Typ != local) — letzteres ist bei einer frischen Installation der Normalfall und
+     * darf die Instanz nicht rot faerben.
+     *
+     * @returns {Promise<{reachable: boolean, error?: string}>} `error` nur, wenn ein echter Aufruf fehlschlug
+     */
+    async checkProviderConfigured(provider, providerConfig, label) {
+        if (!provider) {
+            // Fehler wurde bereits bei der Konstruktion geloggt.
+            return { reachable: false };
+        }
+        if (!providerConfig.apiKey && providerConfig.type !== 'local') {
+            this.log.warn(`${label} ist noch nicht konfiguriert (kein API-Key hinterlegt) — Erreichbarkeitspruefung uebersprungen.`);
+            return { reachable: false };
+        }
+        return checkProviderReachable(provider);
     }
 
     async onReady() {
@@ -28,34 +66,43 @@ class AiAnalytics extends utils.Adapter {
         await ensureUsageState(this);
         await ensureReachabilityStates(this);
 
-        this.chatProvider = createProvider({
+        const chatProviderConfig = {
             type: this.config.providerType,
             apiKey: this.config.apiKey,
             model: this.config.model,
             baseUrl: this.config.baseUrl,
-        });
-        this.onboardingProvider = this.config.onboardingProviderType
-            ? createProvider({
+        };
+        this.chatProvider = this.buildProviderSafely(chatProviderConfig, 'Chat/Pruefungs-Modell');
+
+        const onboardingProviderConfig = this.config.onboardingProviderType
+            ? {
                   type: this.config.onboardingProviderType,
                   apiKey: this.config.onboardingApiKey,
                   model: this.config.onboardingModel,
                   baseUrl: this.config.onboardingBaseUrl,
-              })
+              }
+            : chatProviderConfig;
+        this.onboardingProvider = this.config.onboardingProviderType
+            ? this.buildProviderSafely(onboardingProviderConfig, 'Onboarding-Modell')
             : this.chatProvider;
+
         this.tools = buildTools(this);
 
-        const chatCheck = await checkProviderReachable(this.chatProvider);
+        const chatCheck = await this.checkProviderConfigured(this.chatProvider, chatProviderConfig, 'Chat/Pruefungs-Modell');
         this.chatProviderOk = chatCheck.reachable;
         await this.setStateAsync(CHAT_STATE, { val: chatCheck.reachable, ack: true });
-        if (!chatCheck.reachable) {
+        if (!chatCheck.reachable && chatCheck.error) {
             this.log.error(`Chat/Pruefungs-Modell nicht erreichbar: ${chatCheck.error}`);
         }
 
+        // Ohne eigenen Onboarding-Provider ist es derselbe Provider — dann auch dieselbe Pruefung.
         const onboardingCheck =
-            this.onboardingProvider === this.chatProvider ? chatCheck : await checkProviderReachable(this.onboardingProvider);
+            this.onboardingProvider === this.chatProvider
+                ? chatCheck
+                : await this.checkProviderConfigured(this.onboardingProvider, onboardingProviderConfig, 'Onboarding-Modell');
         this.onboardingProviderOk = onboardingCheck.reachable;
         await this.setStateAsync(ONBOARDING_STATE, { val: onboardingCheck.reachable, ack: true });
-        if (!onboardingCheck.reachable) {
+        if (!onboardingCheck.reachable && onboardingCheck.error && this.onboardingProvider !== this.chatProvider) {
             this.log.error(`Onboarding-Modell nicht erreichbar: ${onboardingCheck.error}`);
         }
 
@@ -100,7 +147,8 @@ class AiAnalytics extends utils.Adapter {
 
         if (!this.onboardingProviderOk) {
             this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
-            return { foundCount: discovered.length, newCount: 0, reactivatedCount };
+            // `skipped` unterscheidet "nichts Neues gefunden" von "gar nicht erst geschaut".
+            return { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'onboardingProvider' };
         }
 
         const { classifiedCount, needsReview } = await runOnboarding(this, this.onboardingProvider, discovered);
@@ -116,20 +164,23 @@ class AiAnalytics extends utils.Adapter {
             this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
         }
 
-        return { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount };
+        return { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount, skipped: null };
     }
 
+    /**
+     * @returns {Promise<{skipped: boolean, reason?: string}>} `skipped: true` wenn der Lauf gar nicht stattfand
+     */
     async runProactiveCheck() {
         this.log.silly('Proaktive Pruefung: Lauf gestartet');
 
         if (!this.chatProviderOk) {
             this.log.warn('Proaktive Pruefung uebersprungen, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
-            return;
+            return { skipped: true, reason: 'chatProviderUnreachable' };
         }
 
         if (await isBudgetExceeded(this)) {
             this.log.warn('Proaktive Pruefung: Tagesbudget an Tokens ist erschoepft, Lauf wird uebersprungen.');
-            return;
+            return { skipped: true, reason: 'budgetExceeded' };
         }
 
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
@@ -152,10 +203,11 @@ class AiAnalytics extends utils.Adapter {
         this.log.silly(`Proaktive Pruefung: Lauf beendet, Ergebnis: ${isNothingFound ? 'keine Auffaelligkeiten' : 'Auffaelligkeit gefunden'}`);
 
         if (isNothingFound && silentIfNothingFound) {
-            return;
+            return { skipped: false };
         }
 
         await appendChatMessage(this, 'assistant', finalText);
+        return { skipped: false };
     }
 
     async onMessage(obj) {
