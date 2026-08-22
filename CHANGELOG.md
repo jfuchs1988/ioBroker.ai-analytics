@@ -3,6 +3,23 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.3] - 2026-08-22
+
+### Hinzugefügt
+- Geräte-Tab im Admin-UI (Sub-Navigation neben Chat und Budget, ein Tab "AI Analytics" — `io-package.json` erlaubt nur einen `adminTab` pro Adapter): editierbare Tabelle aller katalogisierten Objekte (Kategorie, Raum), Ignorieren/Aktivieren, Entfernen, Text-Filter/Suche.
+- Manuelle Trigger: "Geräte neu einlesen" (Re-Discovery) und "Prüfung jetzt ausführen" (proaktive Prüfung), ohne auf das konfigurierte Intervall warten zu müssen.
+- Token-Budget-Anzeige (heutiger Verbrauch vs. konfiguriertes Tageslimit), berücksichtigt korrekt einen Tageswechsel (zeigt sonst fälschlich den Vortageswert).
+- Neues Modul `lib/adminCommands.js`: Admin-Message-Bus mit vollem Katalog-Schreibzugriff, bewusst getrennte Vertrauensgrenze vom needsReview-beschränkten LLM-Tool (siehe [ADR-0020](docs/adr/0020-admin-message-bus-voller-katalog-schreibzugriff.md)).
+- Neue Katalog-Eigenschaft `ignored`; ignorierte Objekte werden von Chat-Analysen und der proaktiven Prüfung ausgeschlossen (auch aus dem `needsReviewOnly`-Pfad), bleiben aber sichtbar/reaktivierbar.
+- Raum wird beim Onboarding, wenn möglich, deterministisch aus `enum.rooms.*` übernommen statt nur vom LLM geraten.
+- Löst die bekannten Lücken "Onboarding-Rückfragen nicht auflösbar" und "kein manueller Re-Discovery-Trigger" (siehe [11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md)).
+
+### Behoben
+- Fehlende Fehlerbehandlung im neuen Admin-Message-Bus (main.js): ein Fehler hätte die UI dauerhaft hängen lassen und war ein Absturzrisiko (unhandled rejection) — gefunden im abschließenden Whole-Branch-Review.
+
+### Diagnostiziert, nicht abschließend bestätigt
+- Admin-Tab-Verbindungsproblem: Live-Diagnose an einer echten Instanz (2026-08-22) hat den Root Cause identifiziert (fehlende `adminUI.tab: "html"`-Deklaration in `io-package.json`) und einen Fix angewendet — die endgültige Bestätigung erfordert einen Redeploy auf eine erreichbare Instanz, siehe [11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md).
+
 ## [0.0.1-beta.2] - 2026-08-22
 
 ### Hinzugefügt

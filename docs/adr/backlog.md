@@ -6,9 +6,11 @@ Architekturrelevante Fragen, die noch **nicht** entschieden wurden. Jeder Eintra
 
 _Aktualisiert 2026-08-21: die vorherigen Punkte 1 (Chat-Tab-Technologie), 2 (Onboarding-Rückfragen), 3 (Konversationsgedächtnis) und 5 (Kosten-/Token-Budget) sind durch [ADR-0017](0017-scoped-catalog-write-capability.md) und die zugehörige [Spec](../specs/2026-08-21-chat-fixes-and-safeguards.md) aufgelöst. Die verbleibenden Punkte wurden entsprechend neu nummeriert._
 
-## 1. Auswahl der History-Adapterinstanz(en) + manueller Re-Discovery-Trigger
+_Aktualisiert 2026-08-22: der manuelle Re-Discovery-Trigger aus Punkt 1 und der vormalige Punkt 12 (manueller Trigger für die proaktive Prüfung) sind durch den Geräte-Tab ([Spec](../specs/2026-08-22-geraete-tab-design.md), [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md)) aufgelöst — Punkt 12 entfällt, Punkt 1 ist auf die verbleibende Instanz-Auswahl-Frage verengt._
 
-Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Zu klären: soll die Admin-Konfiguration eine Instanz-Auswahl anbieten (Mehrfachauswahl-Feld)? Soll es einen Button/Message-Kommando geben, das `syncCatalog()` manuell ohne Adapter-Neustart auslöst (auch nützlich zum Testen der proaktiven Prüfung, siehe Punkt 12 unten — eigentlich derselbe Mechanismus).
+## 1. Auswahl der History-Adapterinstanz(en)
+
+Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Zu klären: soll die Admin-Konfiguration eine Instanz-Auswahl anbieten (Mehrfachauswahl-Feld)?
 
 ## 2. Deduplizierung wiederholter Ausfallmeldungen
 
@@ -36,7 +38,7 @@ Von der Spec als spätere Optimierung markiert. Zu klären: Vorfilterung nach Ka
 
 ## 8. Sicherheitsmodell für zukünftige schreibende Werkzeuge
 
-[ADR-0017](0017-scoped-catalog-write-capability.md) hat die erste, eng begrenzte Schreibfähigkeit (`updateCatalogEntry`, nur für `needsReview`-Einträge) eingeführt. Zu klären bleibt das generelle Modell für künftige, weitergehende Schreibzugriffe (z. B. Geräte schalten): reicht die aktuelle "Admin-Message-Bus"-Vertrauensgrenze noch, oder braucht es eine explizite Nutzerbestätigung pro Schreibaktion?
+[ADR-0017](0017-scoped-catalog-write-capability.md) hat die erste, eng begrenzte Schreibfähigkeit des **LLM-Tools** (`updateCatalogEntry`, nur für `needsReview`-Einträge) eingeführt. [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) hat den **Admin-Message-Bus**-Pfad (Mensch über Admin-UI, voller Katalog-Schreibzugriff) als separate, bereits geklärte Vertrauensgrenze definiert. Offen bleibt das generelle Modell für künftige, weitergehende **LLM**-Schreibzugriffe (z. B. Geräte schalten): reicht eine enge, feld-/status-beschränkte Freigabe wie bei ADR-0017 weiterhin, oder braucht es ab einem bestimmten Wirkungsgrad eine explizite Nutzerbestätigung pro Schreibaktion?
 
 ## 9. Mehrinstanz-Unterstützung
 
@@ -49,7 +51,3 @@ Geht der State-Speicher verloren (z. B. Objekte-DB-Reset), muss das komplette On
 ## 11. WhatsApp-/Alexa-Anbindung — technische Richtung
 
 Laut [ADR-0010](0010-ausgabekanal-v1-nur-chat-tab.md) als spätere Erweiterung vorgesehen, aber keine technische Richtung entschieden (eigene Bridge? bestehender Telegram-/WhatsApp-Adapter als Zwischenschicht? Alexa Smart Home Skill?).
-
-## 12. Manueller Trigger für die proaktive Prüfung
-
-Aktuell nur über das konfigurierte Intervall (Default 24h) auslösbar — es gibt keinen Weg, sie zu Test-/Debugging-Zwecken sofort anzustoßen. Hängt eng mit Punkt 1 (Re-Discovery-Trigger) zusammen — evtl. derselbe generische "jetzt ausführen"-Mechanismus für beides.
