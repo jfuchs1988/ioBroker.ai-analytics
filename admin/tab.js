@@ -43,6 +43,54 @@ function formatBudgetLine(usage, dailyTokenBudget, today = new Date().toISOStrin
     return `Heute genutzt: ${tokensToday} / ${budget} Tokens`;
 }
 
+function computeRangeHistory(history, days) {
+    const sorted = [...(history || [])].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    if (!days) return sorted;
+    return sorted.slice(-days);
+}
+
+function computeCost(rangeEntries, prices) {
+    const p = prices || {};
+    let chatCost = 0;
+    let onboardingCost = 0;
+    (rangeEntries || []).forEach((entry) => {
+        const chat = entry.chat || { inputTokens: 0, outputTokens: 0 };
+        const onboarding = entry.onboarding || { inputTokens: 0, outputTokens: 0 };
+        chatCost += ((chat.inputTokens || 0) * (p.chatIn || 0)) / 1000000 + ((chat.outputTokens || 0) * (p.chatOut || 0)) / 1000000;
+        onboardingCost +=
+            ((onboarding.inputTokens || 0) * (p.onboardingIn || 0)) / 1000000 +
+            ((onboarding.outputTokens || 0) * (p.onboardingOut || 0)) / 1000000;
+    });
+    return { chatCost, onboardingCost, totalCost: chatCost + onboardingCost };
+}
+
+function sumDailyTokens(entry) {
+    const chat = entry.chat || { inputTokens: 0, outputTokens: 0 };
+    const onboarding = entry.onboarding || { inputTokens: 0, outputTokens: 0 };
+    return (chat.inputTokens || 0) + (chat.outputTokens || 0) + (onboarding.inputTokens || 0) + (onboarding.outputTokens || 0);
+}
+
+function recommendLimits(rangeEntries) {
+    const entries = rangeEntries || [];
+    if (entries.length < 3) return null;
+    const maxDaily = Math.max(...entries.map(sumDailyTokens));
+    const dailyTokens = Math.ceil(maxDaily * 1.2);
+    const hourlyTokens = Math.ceil(dailyTokens / 24);
+    return { dailyTokens, hourlyTokens };
+}
+
+function formatCostLine(cost) {
+    const format = (n) => n.toFixed(4);
+    return `Kosten im Zeitraum: ${format(cost.totalCost)} (Chat: ${format(cost.chatCost)}, Onboarding: ${format(cost.onboardingCost)})`;
+}
+
+function formatRecommendationLine(recommendation) {
+    if (!recommendation) {
+        return 'Noch nicht genug Daten fuer eine Empfehlung.';
+    }
+    return `Empfehlung (basierend auf bisherigem Verbrauch, kein hartes Limit): ${recommendation.dailyTokens} Tokens/Tag, ${recommendation.hourlyTokens} Tokens/Stunde`;
+}
+
 function renderHistory(history) {
     const container = document.getElementById('chat-messages');
     container.innerHTML = '';
@@ -340,5 +388,16 @@ if (typeof window !== 'undefined') {
 }
 
 if (typeof module !== 'undefined') {
-    module.exports = { formatMessageLine, resolveNamespaceFromQuery, filterEntries, formatBudgetLine, CATEGORIES };
+    module.exports = {
+        formatMessageLine,
+        resolveNamespaceFromQuery,
+        filterEntries,
+        formatBudgetLine,
+        computeRangeHistory,
+        computeCost,
+        recommendLimits,
+        formatCostLine,
+        formatRecommendationLine,
+        CATEGORIES,
+    };
 }
