@@ -17,7 +17,7 @@
 
 - Entwicklung erfolgt über einen Spec → Plan → TDD-Implementierung → Review-Workflow, dokumentiert in [CONTRIBUTING.md](../../CONTRIBUTING.md).
 - Git-Branching: `develop` ist der Arbeits-Branch, `master` wird nur auf ausdrücklichen Wunsch aktualisiert (siehe [ADR-0016](../adr/0016-git-branching-modell.md)).
-- Privates GitHub-Repository `jfuchs1988/ioBroker.ai-analytics`. Noch nicht auf npm veröffentlicht und nicht im offiziellen ioBroker-Adapter-Katalog gelistet (offene Entscheidung, siehe [Offene Architekturentscheidungen](../adr/backlog.md)).
+- Privates GitHub-Repository `jfuchs1988/ioBroker.ai-analytics`. Kein `npm publish`, keine Aufnahme in den offiziellen ioBroker-Adapter-Katalog — bewusste Entscheidung, siehe [ADR-0018](../adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) (Lizenzmodell: Beta frei, danach Sponsoring-Pflicht).
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [1. Einführung und Ziele](01-einfuehrung-und-ziele.md) · weiter zu [3. Kontextabgrenzung](03-kontextabgrenzung.md)

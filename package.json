@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "author": "Johannes Fuchs <johannes.fuchs@jfuchs.de>",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@iobroker/adapter-core": "^3.1.6"
   },

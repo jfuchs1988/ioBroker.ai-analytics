@@ -10,7 +10,7 @@
     },
     "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
     "keywords": ["ai", "analytics", "influxdb", "history"],
-    "license": "MIT",
+    "license": "SEE LICENSE IN LICENSE",
     "platform": "Javascript/Node.js",
     "main": "main.js",
     "enabled": true,

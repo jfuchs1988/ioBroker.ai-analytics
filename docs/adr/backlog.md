@@ -18,9 +18,9 @@ Spec verlangt "einmalig melden, nicht bei jedem Lauf erneut" bei komplettem Ausf
 
 `test/adapter.test.js` ist durch eine veraltete `@iobroker/testing`-Verhaltensänderung faktisch wirkungslos (bestätigt weiterhin der Fall auch nach dem Dependency-Bump auf v5.3.0). Zu klären: `tests.integration` (echter js-controller, schwerer, näher an der Realität) oder ein proxyquire-basierter Fake-Adapter-Test (leichter, aber weniger realistisch)?
 
-## 4. npm-Veröffentlichung und ioBroker-Katalog-Aufnahme
+## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (evcc-Vorbild)
 
-Aktuell nur GitHub-Release (Pre-Release), kein `npm publish`, keine Aufnahme in den offiziellen ioBroker-Adapter-Katalog. Zu klären: wann (nach erfolgreichem Abnahmetest? nach CI-Einführung? nach Behebung aller bekannten Lücken?) und ob überhaupt eine öffentliche Distribution gewünscht ist, oder ob es ein rein privates Tool bleibt.
+Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) entschieden: kein `npm publish`, keine Aufnahme in den offiziellen ioBroker-Katalog, Lizenz ist ab jetzt textlich (nicht technisch) an ein Sponsoring nach der Beta-Phase gebunden. Offen ist die **technische Durchsetzung** (Phase 2 der ADR): was genau markiert "Beta-Ende" (Versionsnummer? Datum?), Format/Ausgabe eines Sponsoring-Tokens über GitHub Sponsors, Online- vs. Offline-Prüfung im Adapter, welche Funktionen bei fehlendem Token gesperrt werden, Zeitfenster bis zur Sperre (Nutzer nannte 1 Monat als Zielgröße).
 
 ## 5. CI-/Linting-/Dependency-Scanning-Stack (konkrete Tool-Wahl)
 
