@@ -51,3 +51,11 @@ Geht der State-Speicher verloren (z. B. Objekte-DB-Reset), muss das komplette On
 ## 11. WhatsApp-/Alexa-Anbindung — technische Richtung
 
 Laut [ADR-0010](0010-ausgabekanal-v1-nur-chat-tab.md) als spätere Erweiterung vorgesehen, aber keine technische Richtung entschieden (eigene Bridge? bestehender Telegram-/WhatsApp-Adapter als Zwischenschicht? Alexa Smart Home Skill?).
+
+## 12. Mehrere/wählbare LLM-Modelle fürs Onboarding + automatische Sparsamkeits-/Qualitäts-Selbstprüfung
+
+Vom Nutzer am 2026-08-22 vorgeschlagen (noch nicht gebrainstormt): Onboarding/Einlesen soll ein anderes (ggf. mehrere, beliebig viele konfigurierbare) Modell nutzen können als Chat/proaktive Prüfung. Das System soll beim Start (`onReady`) selbst prüfen, welches konfigurierte Modell für welchen Zweck am sparsamsten bei gleichzeitig bester Ergebnisqualität geeignet ist. Zu klären: wie viele/welche Provider gleichzeitig, Format der Selbstprüfung (Testklassifikationen mit bekanntem Ergebnis? Kosten-pro-Objekt-Schätzung aus Provider-Preislisten?), wie das Ergebnis in der Admin-Konfiguration sichtbar/übersteuerbar ist.
+
+## 13. Token-Kosten-Tab (grafisch, Azure-Preise, Limit-Empfehlung)
+
+Vom Nutzer am 2026-08-22 vorgeschlagen (noch nicht gebrainstormt): eigener Tab/Bereich mit grafischer Darstellung des Token-Verbrauchs (gesamt, nicht nur heute wie der aktuelle Budget-Bereich aus dem Geräte-Tab), Kostenberechnung anhand von Azure-Preisen, sowie eine Empfehlung für ein sinnvolles Tages-/Stundenlimit. Überschneidet sich mit dem bestehenden Budget-Bereich (`admin/tab.js`s `loadBudget`/`formatBudgetLine`, siehe [Geräte-Tab-Spec](../specs/2026-08-22-geraete-tab-design.md)) — eher dessen Erweiterung/Ablösung als ein komplett neues Feature. Zu klären: woher die historischen Token-Daten kommen (aktuell speichert `lib/usage.js` nur den heutigen Tag, keine Historie), welche Chart-Bibliothek/Technik ohne Build-Schritt (ADR-0009) machbar ist, wie eine Azure-Preisliste gepflegt/aktualisiert wird.
