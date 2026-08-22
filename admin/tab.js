@@ -212,14 +212,32 @@ function triggerRescan() {
             showDevicesError(response.error);
             return;
         }
-        status.textContent = `Re-Scan fertig: ${response.newCount} neu, ${response.reactivatedCount} reaktiviert.`;
+        if (response.skipped) {
+            const reason = response.skipReason || 'Onboarding-Modell nicht erreichbar.';
+            status.textContent = `Re-Scan uebersprungen: ${reason} (${response.reactivatedCount} reaktiviert).`;
+        } else {
+            status.textContent = `Re-Scan fertig: ${response.newCount} neu, ${response.reactivatedCount} reaktiviert.`;
+        }
         loadDevices();
     });
 }
 
 function triggerProactiveCheck() {
     const status = document.getElementById('devices-status');
-    socket.emit('sendTo', namespace, 'runProactiveCheckNow', {}, () => {
+    status.textContent = 'Pruefung wird gestartet...';
+    socket.emit('sendTo', namespace, 'runProactiveCheckNow', {}, (response) => {
+        if (!response) {
+            showDevicesError('Keine Antwort vom Adapter erhalten.');
+            return;
+        }
+        if (response.error) {
+            showDevicesError(response.error);
+            return;
+        }
+        if (!response.triggered) {
+            status.textContent = `Pruefung uebersprungen: ${response.reason || 'Chat-Modell nicht erreichbar.'}`;
+            return;
+        }
         status.textContent = 'Pruefung gestartet, Ergebnis erscheint im Chat.';
     });
 }
