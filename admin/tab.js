@@ -203,7 +203,11 @@ function triggerRescan() {
     const status = document.getElementById('devices-status');
     status.textContent = 'Re-Scan laeuft...';
     socket.emit('sendTo', namespace, 'runDiscoveryNow', {}, (response) => {
-        if (response && response.error) {
+        if (!response) {
+            showDevicesError('Keine Antwort vom Adapter erhalten.');
+            return;
+        }
+        if (response.error) {
             showDevicesError(response.error);
             return;
         }
