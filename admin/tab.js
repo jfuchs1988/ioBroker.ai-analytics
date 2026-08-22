@@ -33,8 +33,9 @@ function filterEntries(entries, query) {
     });
 }
 
-function formatBudgetLine(usage, dailyTokenBudget) {
-    const tokensToday = (usage && usage.tokensToday) || 0;
+function formatBudgetLine(usage, dailyTokenBudget, today = new Date().toISOString().slice(0, 10)) {
+    const isStale = !!(usage && usage.date && usage.date !== today);
+    const tokensToday = isStale ? 0 : (usage && usage.tokensToday) || 0;
     const budget = Number(dailyTokenBudget) || 0;
     if (budget <= 0) {
         return `Heute genutzt: ${tokensToday} Tokens (kein Limit)`;
@@ -226,7 +227,14 @@ function triggerProactiveCheck() {
 function loadBudget() {
     const display = document.getElementById('budget-display');
     socket.emit('getState', `${namespace}.usage.today`, (usageErr, usageState) => {
-        const usage = !usageErr && usageState && usageState.val ? JSON.parse(usageState.val) : { tokensToday: 0 };
+        let usage = { tokensToday: 0 };
+        if (!usageErr && usageState && usageState.val) {
+            try {
+                usage = JSON.parse(usageState.val);
+            } catch (parseError) {
+                usage = { tokensToday: 0 };
+            }
+        }
         socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
             const budget = !objErr && instanceObj && instanceObj.native ? instanceObj.native.dailyTokenBudget : 0;
             display.textContent = formatBudgetLine(usage, budget);

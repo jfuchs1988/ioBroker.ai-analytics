@@ -187,33 +187,27 @@ class AiAnalytics extends utils.Adapter {
             return;
         }
 
-        if (obj.command === 'listCatalogEntries') {
-            const result = await adminCommands.listCatalogEntries(this);
-            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
-            return;
-        }
+        const adminCommandHandlers = {
+            listCatalogEntries: () => adminCommands.listCatalogEntries(this),
+            updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, obj.message),
+            removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, obj.message),
+            runDiscoveryNow: () => adminCommands.runDiscoveryNow(this),
+            runProactiveCheckNow: () => adminCommands.runProactiveCheckNow(this),
+        };
 
-        if (obj.command === 'updateCatalogEntryAdmin') {
-            const result = await adminCommands.updateCatalogEntryAdmin(this, obj.message);
-            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
-            return;
-        }
-
-        if (obj.command === 'removeCatalogEntry') {
-            const result = await adminCommands.removeCatalogEntry(this, obj.message);
-            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
-            return;
-        }
-
-        if (obj.command === 'runDiscoveryNow') {
-            const result = await adminCommands.runDiscoveryNow(this);
-            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
-            return;
-        }
-
-        if (obj.command === 'runProactiveCheckNow') {
-            const result = adminCommands.runProactiveCheckNow(this);
-            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
+        const handler = adminCommandHandlers[obj.command];
+        if (handler) {
+            try {
+                const result = await handler();
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, result, obj.callback);
+                }
+            } catch (error) {
+                this.log.error(`Admin-Befehl ${obj.command} fehlgeschlagen: ${error.message}`);
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
+                }
+            }
             return;
         }
     }

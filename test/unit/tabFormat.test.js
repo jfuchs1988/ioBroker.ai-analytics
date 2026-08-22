@@ -71,4 +71,19 @@ describe('formatBudgetLine', () => {
     it('defaults to 0 tokens when usage is missing', () => {
         expect(formatBudgetLine(null, 1000)).to.equal('Heute genutzt: 0 / 1000 Tokens');
     });
+
+    it('displays tokensToday normally when usage.date matches the injected today', () => {
+        expect(formatBudgetLine({ date: '2026-08-22', tokensToday: 150 }, 1000, '2026-08-22')).to.equal(
+            'Heute genutzt: 150 / 1000 Tokens'
+        );
+    });
+
+    it('treats usage as stale (0 tokens) when usage.date does not match the injected today', () => {
+        expect(formatBudgetLine({ date: '2026-08-21', tokensToday: 150 }, 1000, '2026-08-22')).to.equal(
+            'Heute genutzt: 0 / 1000 Tokens'
+        );
+        expect(formatBudgetLine({ date: '2026-08-21', tokensToday: 150 }, 0, '2026-08-22')).to.equal(
+            'Heute genutzt: 0 Tokens (kein Limit)'
+        );
+    });
 });

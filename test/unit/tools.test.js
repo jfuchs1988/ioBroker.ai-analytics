@@ -136,6 +136,21 @@ describe('buildTools', () => {
         expect(result.map((e) => e.sourceId)).to.deep.equal(['b', 'c']);
     });
 
+    it('listCatalog with needsReviewOnly excludes entries the admin has ignored', async () => {
+        const entries = [
+            { sourceId: 'a', category: 'consumption', active: true, needsReview: true, ignored: false },
+            { sourceId: 'b', category: 'consumption', active: true, needsReview: true, ignored: true },
+        ];
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves(entries),
+        });
+
+        const { execute } = buildTools({});
+        const result = await execute('listCatalog', { needsReviewOnly: true });
+
+        expect(result.map((e) => e.sourceId)).to.deep.equal(['a']);
+    });
+
     it('updateCatalogEntry updates a needsReview entry and clears the flag', async () => {
         const existingEntry = {
             sourceId: 'javascript.0.steckdose3', description: 'Unklar', unit: '', category: 'device_usage',
