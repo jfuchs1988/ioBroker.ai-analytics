@@ -26,3 +26,4 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) | Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Vorbild evcc) | Angenommen (Phase 1 von 2) | 2026-08-22 |
 | [0019](0019-feature-branch-pro-task.md) | Feature-/Bugfix-Branch pro Umsetzungsplan-Task, lokal nach develop gemergt | Angenommen | 2026-08-22 |
 | [0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) | Admin-Message-Bus bekommt vollen Katalog-Schreibzugriff (unabhängig von needsReview) | Angenommen | 2026-08-22 |
+| [0021](0021-getrennte-provider-pro-zweck.md) | Getrennte LLM-Provider pro Zweck (Onboarding vs. Chat/Prüfung) mit Fallback und Start-Selbstprüfung | Angenommen | 2026-08-22 |

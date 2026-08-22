@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.4] - 2026-08-22
+
+### Hinzugefügt
+- Onboarding kann jetzt einen eigenen, vom Chat/Prüfungs-Provider unabhängigen LLM-Provider nutzen (neue optionale Admin-Config-Felder `onboardingProviderType`/`onboardingApiKey`/`onboardingModel`/`onboardingBaseUrl`) — leer gelassen, verhält sich der Adapter wie bisher (ein gemeinsamer Provider).
+- Start-Selbstprüfung: beim Adapter-Start wird die Erreichbarkeit beider konfigurierten Provider per minimalem Test-Call geprüft (`lib/providerHealthCheck.js`), Ergebnis als States `info.chatProviderReachable`/`info.onboardingProviderReachable` sichtbar. Ein fehlgeschlagener Check blockiert nur die betroffene Funktion (Onboarding-Klassifikation bzw. Chat/proaktive Prüfung), nicht den gesamten Adapter.
+- Neues ADR-0021 dokumentiert die Zwei-Provider-Architektur, siehe [ADR-0021](docs/adr/0021-getrennte-provider-pro-zweck.md).
+
+### Geändert
+- Der bisherige grobe `if (!apiKey) return;`-Start-Guard in `onReady` ist entfallen, ersetzt durch die granulare, tatsächlich testende Selbstprüfung oben.
+
 ## [0.0.1-beta.3] - 2026-08-22
 
 ### Hinzugefügt
