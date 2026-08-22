@@ -3,12 +3,15 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry }) {
+function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage }) {
     return proxyquire('../../lib/onboarding', {
         './catalog': {
             getAllCatalogEntries,
             setCatalogEntry,
             CATEGORIES: ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'],
+        },
+        './usage': {
+            recordUsage: recordUsage || sinon.stub().resolves(),
         },
     });
 }
@@ -280,5 +283,56 @@ describe('runOnboarding', () => {
 
         const [, entry] = setCatalogEntry.firstCall.args;
         expect(entry.ignored).to.equal(false);
+    });
+
+    it('records onboarding token usage after a successful batch call', async () => {
+        const discovered = [{ id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } }];
+        const recordUsage = sinon.stub().resolves();
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+                usage: { inputTokens: 500, outputTokens: 80 },
+            }),
+        };
+        const adapter = {};
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry: sinon.stub().resolves(),
+            recordUsage,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(recordUsage.calledOnce).to.equal(true);
+        expect(recordUsage.firstCall.args).to.deep.equal([adapter, { inputTokens: 500, outputTokens: 80 }, 'onboarding']);
+    });
+
+    it('does not call recordUsage when the provider response has no usage field', async () => {
+        const discovered = [{ id: 'javascript.0.y', historyInstance: 'influxdb.0', common: { name: 'y' } }];
+        const recordUsage = sinon.stub().resolves();
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.y', description: 'y', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry: sinon.stub().resolves(),
+            recordUsage,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(recordUsage.called).to.equal(false);
     });
 });
