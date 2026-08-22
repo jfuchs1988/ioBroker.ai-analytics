@@ -77,6 +77,171 @@ function setLoading(isLoading) {
     }
 }
 
+let allDeviceEntries = [];
+
+function showDevicesError(message) {
+    const status = document.getElementById('devices-status');
+    if (status) status.textContent = `[Fehler] ${message}`;
+}
+
+function renderDeviceRow(entry) {
+    const row = document.createElement('tr');
+    const classes = [];
+    if (entry.active === false) classes.push('device-inactive');
+    if (entry.ignored) classes.push('device-ignored');
+    row.className = classes.join(' ');
+
+    const idCell = document.createElement('td');
+    idCell.textContent = entry.sourceId;
+    row.appendChild(idCell);
+
+    const descCell = document.createElement('td');
+    descCell.textContent = entry.description || '';
+    row.appendChild(descCell);
+
+    const categorySelect = document.createElement('select');
+    CATEGORIES.forEach((category) => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        if (category === entry.category) option.selected = true;
+        categorySelect.appendChild(option);
+    });
+    const categoryCell = document.createElement('td');
+    categoryCell.appendChild(categorySelect);
+    row.appendChild(categoryCell);
+
+    const roomInput = document.createElement('input');
+    roomInput.type = 'text';
+    roomInput.value = entry.room || '';
+    const roomCell = document.createElement('td');
+    roomCell.appendChild(roomInput);
+    row.appendChild(roomCell);
+
+    const statusCell = document.createElement('td');
+    const statusParts = [];
+    if (entry.active === false) statusParts.push('inaktiv');
+    if (entry.ignored) statusParts.push('ignoriert');
+    if (entry.needsReview) statusParts.push('needsReview');
+    statusCell.textContent = statusParts.join(', ') || 'aktiv';
+    row.appendChild(statusCell);
+
+    const actionsCell = document.createElement('td');
+
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Speichern';
+    saveButton.addEventListener('click', () => {
+        socket.emit(
+            'sendTo',
+            namespace,
+            'updateCatalogEntryAdmin',
+            { sourceId: entry.sourceId, category: categorySelect.value, room: roomInput.value },
+            (response) => {
+                if (response && response.error) {
+                    showDevicesError(response.error);
+                } else {
+                    loadDevices();
+                }
+            }
+        );
+    });
+    actionsCell.appendChild(saveButton);
+
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = entry.ignored ? 'Aktivieren' : 'Ignorieren';
+    toggleButton.addEventListener('click', () => {
+        socket.emit(
+            'sendTo',
+            namespace,
+            'updateCatalogEntryAdmin',
+            { sourceId: entry.sourceId, ignored: !entry.ignored },
+            (response) => {
+                if (response && response.error) {
+                    showDevicesError(response.error);
+                } else {
+                    loadDevices();
+                }
+            }
+        );
+    });
+    actionsCell.appendChild(toggleButton);
+
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Entfernen';
+    removeButton.addEventListener('click', () => {
+        socket.emit('sendTo', namespace, 'removeCatalogEntry', { sourceId: entry.sourceId }, (response) => {
+            if (response && response.error) {
+                showDevicesError(response.error);
+            } else {
+                loadDevices();
+            }
+        });
+    });
+    actionsCell.appendChild(removeButton);
+
+    row.appendChild(actionsCell);
+
+    return row;
+}
+
+function renderDevicesTable() {
+    const filterInput = document.getElementById('devices-filter');
+    const visible = filterEntries(allDeviceEntries, filterInput ? filterInput.value : '');
+    const tbody = document.getElementById('devices-tbody');
+    tbody.innerHTML = '';
+    visible.forEach((entry) => tbody.appendChild(renderDeviceRow(entry)));
+}
+
+function loadDevices() {
+    socket.emit('sendTo', namespace, 'listCatalogEntries', {}, (response) => {
+        allDeviceEntries = (response && response.entries) || [];
+        renderDevicesTable();
+    });
+}
+
+function triggerRescan() {
+    const status = document.getElementById('devices-status');
+    status.textContent = 'Re-Scan laeuft...';
+    socket.emit('sendTo', namespace, 'runDiscoveryNow', {}, (response) => {
+        if (response && response.error) {
+            showDevicesError(response.error);
+            return;
+        }
+        status.textContent = `Re-Scan fertig: ${response.newCount} neu, ${response.reactivatedCount} reaktiviert.`;
+        loadDevices();
+    });
+}
+
+function triggerProactiveCheck() {
+    const status = document.getElementById('devices-status');
+    socket.emit('sendTo', namespace, 'runProactiveCheckNow', {}, () => {
+        status.textContent = 'Pruefung gestartet, Ergebnis erscheint im Chat.';
+    });
+}
+
+function loadBudget() {
+    const display = document.getElementById('budget-display');
+    socket.emit('getState', `${namespace}.usage.today`, (usageErr, usageState) => {
+        const usage = !usageErr && usageState && usageState.val ? JSON.parse(usageState.val) : { tokensToday: 0 };
+        socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
+            const budget = !objErr && instanceObj && instanceObj.native ? instanceObj.native.dailyTokenBudget : 0;
+            display.textContent = formatBudgetLine(usage, budget);
+        });
+    });
+}
+
+function showSection(section) {
+    ['chat', 'devices', 'budget'].forEach((name) => {
+        const el = document.getElementById(`section-${name}`);
+        if (el) el.hidden = name !== section;
+    });
+    document.querySelectorAll('.nav-btn').forEach((button) => {
+        button.classList.toggle('active', button.dataset.section === section);
+    });
+    if (section === 'devices') loadDevices();
+    if (section === 'budget') loadBudget();
+}
+
 function loadHistory() {
     socket.emit('getState', `${namespace}.chat.history`, (err, state) => {
         if (!err && state && state.val) {
@@ -132,6 +297,12 @@ function init() {
     document.getElementById('chat-input').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') sendQuestion();
     });
+    document.querySelectorAll('.nav-btn').forEach((button) => {
+        button.addEventListener('click', () => showSection(button.dataset.section));
+    });
+    document.getElementById('devices-rescan').addEventListener('click', triggerRescan);
+    document.getElementById('devices-check-now').addEventListener('click', triggerProactiveCheck);
+    document.getElementById('devices-filter').addEventListener('input', renderDevicesTable);
 }
 
 if (typeof window !== 'undefined') {
