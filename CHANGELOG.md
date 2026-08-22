@@ -3,6 +3,17 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.5] - 2026-08-23
+
+### Hinzugefügt
+- Token-Kosten-Tab: Erweiterung des bestehenden Budget-Bereichs um eine Verbrauchs-Historie (Balkendiagramm, wählbar 30 Tage/gesamt), berechnete Kosten getrennt nach Chat/Prüfung und Onboarding, sowie eine heuristische Tages-/Stunden-Limit-Empfehlung.
+- Vier neue, manuell gepflegte Preis-Felder (Preis pro 1 Mio. Input-/Output-Tokens, je Chat und Onboarding).
+- Neuer State `usage.history` (unbegrenzte, tägliche, nach Zweck getrennte Verbrauchs-Historie).
+- Neues ADR-0022 dokumentiert die Preis-/Historie-Entscheidung, siehe [ADR-0022](docs/adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md).
+
+### Behoben
+- Onboarding-Token-Verbrauch wurde bisher nirgends erfasst (weder im Tagesbudget noch in irgendeiner Anzeige) — `runOnboarding` ruft jetzt korrekt `recordUsage` auf.
+
 ## [0.0.1-beta.4] - 2026-08-22
 
 ### Hinzugefügt

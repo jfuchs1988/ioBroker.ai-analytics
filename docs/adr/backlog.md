@@ -10,6 +10,8 @@ _Aktualisiert 2026-08-22: der manuelle Re-Discovery-Trigger aus Punkt 1 und der 
 
 _Aktualisiert 2026-08-22: Punkt 12 durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) auf die verbleibende Frage der automatischen Kandidaten-Auswahl verengt._
 
+_Aktualisiert 2026-08-23: Punkt 13 durch [ADR-0022](0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md) und den Token-Kosten-Tab aufgelöst — entfällt._
+
 ## 1. Auswahl der History-Adapterinstanz(en)
 
 Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Zu klären: soll die Admin-Konfiguration eine Instanz-Auswahl anbieten (Mehrfachauswahl-Feld)?
@@ -58,6 +60,3 @@ Laut [ADR-0010](0010-ausgabekanal-v1-nur-chat-tab.md) als spätere Erweiterung v
 
 Durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) teilweise gelöst: Onboarding und Chat/Prüfung können jetzt unabhängige, fest konfigurierte Provider nutzen, inkl. Start-Selbstprüfung der Erreichbarkeit. Weiterhin offen: automatisches Auswählen unter mehreren vom Nutzer eingetragenen Kandidatenmodellen anhand von Kosten/Qualität — bewusst nicht umgesetzt (siehe [Design-Spec](../specs/2026-08-22-multi-model-onboarding-design.md), Nicht-Ziele). Falls später gewünscht: Format der Bewertung (Testklassifikationen mit bekanntem Ergebnis? Kosten-pro-Objekt-Schätzung aus Provider-Preislisten?), Persistenz der automatischen Wahl, Override-UI.
 
-## 13. Token-Kosten-Tab (grafisch, Azure-Preise, Limit-Empfehlung)
-
-Vom Nutzer am 2026-08-22 vorgeschlagen (noch nicht gebrainstormt): eigener Tab/Bereich mit grafischer Darstellung des Token-Verbrauchs (gesamt, nicht nur heute wie der aktuelle Budget-Bereich aus dem Geräte-Tab), Kostenberechnung anhand von Azure-Preisen, sowie eine Empfehlung für ein sinnvolles Tages-/Stundenlimit. Überschneidet sich mit dem bestehenden Budget-Bereich (`admin/tab.js`s `loadBudget`/`formatBudgetLine`, siehe [Geräte-Tab-Spec](../specs/2026-08-22-geraete-tab-design.md)) — eher dessen Erweiterung/Ablösung als ein komplett neues Feature. Zu klären: woher die historischen Token-Daten kommen (aktuell speichert `lib/usage.js` nur den heutigen Tag, keine Historie), welche Chart-Bibliothek/Technik ohne Build-Schritt (ADR-0009) machbar ist, wie eine Azure-Preisliste gepflegt/aktualisiert wird.
