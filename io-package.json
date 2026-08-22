@@ -26,8 +26,8 @@
       "name": { "en": "AI Analytics", "de": "AI Analytics" }
     },
     "dependencies": [{ "js-controller": ">=5.0.0" }],
-    "encryptedNative": ["apiKey"],
-    "protectedNative": ["apiKey"],
+    "encryptedNative": ["apiKey", "onboardingApiKey"],
+    "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
       "0.0.1-beta.3": {
         "en": "Geräte tab (rename/ignore/remove devices, edit category/room, manual re-scan and check-now triggers), token-budget display. Admin tab connection root-caused (missing adminUI.tab declaration) with a fix applied — live confirmation on a redeployed instance still pending.",
@@ -52,6 +52,10 @@
     "apiKey": "",
     "model": "",
     "baseUrl": "",
+    "onboardingProviderType": "",
+    "onboardingApiKey": "",
+    "onboardingModel": "",
+    "onboardingBaseUrl": "",
     "checkIntervalHours": 24,
     "silentIfNothingFound": false,
     "dailyTokenBudget": 0
