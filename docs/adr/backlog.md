@@ -8,6 +8,8 @@ _Aktualisiert 2026-08-21: die vorherigen Punkte 1 (Chat-Tab-Technologie), 2 (Onb
 
 _Aktualisiert 2026-08-22: der manuelle Re-Discovery-Trigger aus Punkt 1 und der vormalige Punkt 12 (manueller Trigger für die proaktive Prüfung) sind durch den Geräte-Tab ([Spec](../specs/2026-08-22-geraete-tab-design.md), [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md)) aufgelöst — Punkt 12 entfällt, Punkt 1 ist auf die verbleibende Instanz-Auswahl-Frage verengt._
 
+_Aktualisiert 2026-08-22: Punkt 12 durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) auf die verbleibende Frage der automatischen Kandidaten-Auswahl verengt._
+
 ## 1. Auswahl der History-Adapterinstanz(en)
 
 Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Zu klären: soll die Admin-Konfiguration eine Instanz-Auswahl anbieten (Mehrfachauswahl-Feld)?
@@ -52,9 +54,9 @@ Geht der State-Speicher verloren (z. B. Objekte-DB-Reset), muss das komplette On
 
 Laut [ADR-0010](0010-ausgabekanal-v1-nur-chat-tab.md) als spätere Erweiterung vorgesehen, aber keine technische Richtung entschieden (eigene Bridge? bestehender Telegram-/WhatsApp-Adapter als Zwischenschicht? Alexa Smart Home Skill?).
 
-## 12. Mehrere/wählbare LLM-Modelle fürs Onboarding + automatische Sparsamkeits-/Qualitäts-Selbstprüfung
+## 12. Automatische Kandidaten-Auswahl unter mehreren LLM-Modellen (Kosten/Qualität)
 
-Vom Nutzer am 2026-08-22 vorgeschlagen (noch nicht gebrainstormt): Onboarding/Einlesen soll ein anderes (ggf. mehrere, beliebig viele konfigurierbare) Modell nutzen können als Chat/proaktive Prüfung. Das System soll beim Start (`onReady`) selbst prüfen, welches konfigurierte Modell für welchen Zweck am sparsamsten bei gleichzeitig bester Ergebnisqualität geeignet ist. Zu klären: wie viele/welche Provider gleichzeitig, Format der Selbstprüfung (Testklassifikationen mit bekanntem Ergebnis? Kosten-pro-Objekt-Schätzung aus Provider-Preislisten?), wie das Ergebnis in der Admin-Konfiguration sichtbar/übersteuerbar ist.
+Durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) teilweise gelöst: Onboarding und Chat/Prüfung können jetzt unabhängige, fest konfigurierte Provider nutzen, inkl. Start-Selbstprüfung der Erreichbarkeit. Weiterhin offen: automatisches Auswählen unter mehreren vom Nutzer eingetragenen Kandidatenmodellen anhand von Kosten/Qualität — bewusst nicht umgesetzt (siehe [Design-Spec](../specs/2026-08-22-multi-model-onboarding-design.md), Nicht-Ziele). Falls später gewünscht: Format der Bewertung (Testklassifikationen mit bekanntem Ergebnis? Kosten-pro-Objekt-Schätzung aus Provider-Preislisten?), Persistenz der automatischen Wahl, Override-UI.
 
 ## 13. Token-Kosten-Tab (grafisch, Azure-Preise, Limit-Empfehlung)
 

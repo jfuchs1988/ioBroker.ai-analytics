@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.3",
+    "version": "0.0.1-beta.4",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -29,6 +29,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.4": {
+        "en": "Onboarding can use its own LLM provider (independent from chat/checks). Startup reachability self-check for both providers, blocking only the affected function on failure.",
+        "de": "Onboarding kann jetzt einen eigenen LLM-Provider nutzen (unabhaengig von Chat/Pruefung). Start-Selbstpruefung der Erreichbarkeit beider Provider, blockiert bei Fehlschlag nur die betroffene Funktion."
+      },
       "0.0.1-beta.3": {
         "en": "Geräte tab (rename/ignore/remove devices, edit category/room, manual re-scan and check-now triggers), token-budget display. Admin tab connection root-caused (missing adminUI.tab declaration) with a fix applied — live confirmation on a redeployed instance still pending.",
         "de": "Geräte-Tab (Geräte umbenennen/ignorieren/entfernen, Kategorie/Raum bearbeiten, manuelle Re-Scan- und Prüf-Trigger), Token-Budget-Anzeige. Admin-Tab-Verbindungsproblem auf Root Cause zurückgeführt (fehlende adminUI.tab-Deklaration) und Fix angewendet — endgültige Live-Bestätigung auf einer neu ausgerollten Instanz steht noch aus."

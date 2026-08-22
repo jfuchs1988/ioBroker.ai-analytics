@@ -18,6 +18,7 @@ lib/
 ├── agent.js              Provider-agnostischer Tool-Calling-Loop
 ├── chatLog.js            Gedeckelte Chat-Historie (State-Speicher)
 ├── onboarding.js          Klassifiziert neu entdeckte Objekte (Batch-Prompt)
+├── providerHealthCheck.js Erreichbarkeits-Selbstpruefung der konfigurierten Provider
 └── scheduler.js           Periodischer Trigger für proaktive Prüfung
 
 main.js                  Verdrahtet alles: Adapter-Lifecycle, Katalog-Sync,
@@ -41,10 +42,11 @@ admin/
 | `agent.js` | Iterativer Tool-Use-Loop bis zur finalen Antwort | `runAgent({provider,tools,systemPrompt,userMessage}) => {finalText,messages}` |
 | `chatLog.js` | Persistiert Chat-/Meldungsverlauf, gedeckelt auf 200 Einträge | `ensureChatHistoryState`, `appendChatMessage` |
 | `onboarding.js` | Klassifiziert unbekannte Objekte, markiert unsichere als `needsReview`; übernimmt den Raum deterministisch aus `enum.rooms.*`, falls das Objekt dort Mitglied ist | `runOnboarding(adapter,provider,discoveredObjects) => {classifiedCount,needsReview}` |
+| `providerHealthCheck.js` | Minimaler Test-Call pro konfiguriertem Provider beim Start, persistiert Ergebnis als State | `checkProviderReachable(provider) => {reachable,error?}`, `ensureReachabilityStates(adapter)` |
 | `scheduler.js` | Ruft `runCheck` periodisch auf, fängt Fehler ab | `startProactiveScheduler(adapter,{intervalMs,runCheck}) => stopFn` |
 | `main.js` | Orchestriert alle Bausteine über den ioBroker-Adapter-Lifecycle | ioBroker-Standard (`onReady`, `onMessage`, `onUnload`) |
 
-Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (11 Module, jeweils 20–100 Zeilen, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
+Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (12 Module, jeweils 20–100 Zeilen, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [4. Lösungsstrategie](04-loesungsstrategie.md) · weiter zu [6. Laufzeitsicht](06-laufzeitsicht.md)
