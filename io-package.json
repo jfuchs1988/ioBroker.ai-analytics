@@ -22,7 +22,7 @@
     },
     "adminTab": {
       "singleton": true,
-      "name": { "en": "Chat", "de": "Chat" }
+      "name": { "en": "AI Analytics", "de": "AI Analytics" }
     },
     "dependencies": [{ "js-controller": ">=5.0.0" }],
     "encryptedNative": ["apiKey"],
