@@ -23,6 +23,33 @@
       "type": "text",
       "label": "Basis-URL (nur fuer OpenRouter/Lokal)"
     },
+    "onboardingHeader": {
+      "type": "header",
+      "text": "Onboarding-Modell (optional, sonst wie oben)"
+    },
+    "onboardingProviderType": {
+      "type": "select",
+      "label": "LLM-Provider (Onboarding)",
+      "options": [
+        { "label": "Wie oben (Chat/Pruefung)", "value": "" },
+        { "label": "Anthropic", "value": "anthropic" },
+        { "label": "OpenAI", "value": "openai" },
+        { "label": "OpenRouter", "value": "openrouter" },
+        { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
+      ]
+    },
+    "onboardingApiKey": {
+      "type": "password",
+      "label": "API-Key (Onboarding)"
+    },
+    "onboardingModel": {
+      "type": "text",
+      "label": "Modell (Onboarding)"
+    },
+    "onboardingBaseUrl": {
+      "type": "text",
+      "label": "Basis-URL (Onboarding, nur fuer OpenRouter/Lokal)"
+    },
     "checkIntervalHours": {
       "type": "number",
       "label": "Intervall proaktive Pruefung (Stunden)",
