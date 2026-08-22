@@ -172,4 +172,113 @@ describe('runOnboarding', () => {
         const messages = adapter.log.silly.getCalls().map((call) => call.args[0]);
         expect(messages.some((m) => m.includes('javascript.0.x'))).to.equal(true);
     });
+
+    it('overrides the guessed room with the ioBroker room enum when the object is a member', async () => {
+        const discovered = [
+            { id: 'javascript.0.lampe', historyInstance: 'influxdb.0', common: { name: 'Lampe', role: 'switch.light', unit: '' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.lampe', description: 'Lampe', unit: '', category: 'lighting', room: 'geraten', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const adapter = {
+            getForeignObjectsAsync: sinon.stub().resolves({
+                'enum.rooms.wohnzimmer': { common: { name: 'Wohnzimmer', members: ['javascript.0.lampe'] } },
+            }),
+        };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry.room).to.equal('Wohnzimmer');
+    });
+
+    it('falls back to the LLM-guessed room when there is no enum match', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: 'Keller', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const adapter = { getForeignObjectsAsync: sinon.stub().resolves({}) };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry.room).to.equal('Keller');
+    });
+
+    it('works without a getForeignObjectsAsync method on the adapter (defensive default)', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: 'Keller', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+    });
+
+    it('sets ignored=false by default on newly classified entries', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry.ignored).to.equal(false);
+    });
 });
