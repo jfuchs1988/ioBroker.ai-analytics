@@ -39,3 +39,9 @@ npm test
 ## Konfiguration
 
 Über die ioBroker-Admin-Oberfläche einstellbar: LLM-Provider und API-Key, Modell, Basis-URL (für OpenRouter/lokale Server), Intervall der proaktiven Prüfung, Verhalten bei ergebnislosem Prüflauf (still vs. Bestätigung).
+
+### Eigenes Modell fürs Onboarding (optional)
+
+Die einmalige Klassifizierung neu gefundener Objekte kann einen komplett eigenen Provider nutzen — z. B. ein günstiges oder lokales Modell fürs Onboarding und ein starkes für Chat/Prüfung. Dafür gibt es vier zusätzliche, optionale Felder in derselben Form wie oben: `onboardingProviderType`, `onboardingApiKey`, `onboardingModel`, `onboardingBaseUrl`. Bleibt `onboardingProviderType` leer, wird die Chat-Konfiguration mitbenutzt; ist er gesetzt, gilt die Onboarding-Konfiguration vollständig eigenständig (kein feldweiser Rückfall auf die Chat-Werte). Hintergrund: [ADR-0021](docs/adr/0021-getrennte-provider-pro-zweck.md).
+
+Beim Adapterstart wird jeder der beiden Provider einmalig auf Erreichbarkeit geprüft. Das Ergebnis steht in den States `ai-analytics.<instanz>.info.chatProviderReachable` und `ai-analytics.<instanz>.info.onboardingProviderReachable`. Eine fehlgeschlagene Prüfung blockiert jeweils nur die betroffene Funktion (Klassifizierung bzw. Chat/proaktive Prüfung), nicht den gesamten Adapter.
