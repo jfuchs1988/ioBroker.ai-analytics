@@ -12,6 +12,36 @@ function resolveNamespaceFromQuery(searchString) {
     return `ai-analytics.${instance}`;
 }
 
+const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
+
+function filterEntries(entries, query) {
+    const q = (query || '').trim().toLowerCase();
+    if (!q) return entries;
+    return entries.filter((entry) => {
+        const haystack = [
+            entry.sourceId,
+            entry.description,
+            entry.category,
+            entry.room,
+            entry.needsReview ? 'needsreview' : '',
+            entry.active === false ? 'inactive' : 'active',
+            entry.ignored ? 'ignored' : '',
+        ]
+            .join(' ')
+            .toLowerCase();
+        return haystack.includes(q);
+    });
+}
+
+function formatBudgetLine(usage, dailyTokenBudget) {
+    const tokensToday = (usage && usage.tokensToday) || 0;
+    const budget = Number(dailyTokenBudget) || 0;
+    if (budget <= 0) {
+        return `Heute genutzt: ${tokensToday} Tokens (kein Limit)`;
+    }
+    return `Heute genutzt: ${tokensToday} / ${budget} Tokens`;
+}
+
 function renderHistory(history) {
     const container = document.getElementById('chat-messages');
     container.innerHTML = '';
@@ -109,5 +139,5 @@ if (typeof window !== 'undefined') {
 }
 
 if (typeof module !== 'undefined') {
-    module.exports = { formatMessageLine, resolveNamespaceFromQuery };
+    module.exports = { formatMessageLine, resolveNamespaceFromQuery, filterEntries, formatBudgetLine, CATEGORIES };
 }
