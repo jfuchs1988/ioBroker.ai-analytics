@@ -139,6 +139,22 @@ describe('usage', () => {
             ]);
         });
 
+        it('repairs a malformed existing entry that is missing the purpose key', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const existingHistory = [{ date: today, chat: { inputTokens: 50, outputTokens: 10 } }];
+            const adapter = makeAdapter();
+            adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({ val: JSON.stringify(existingHistory) });
+
+            await recordUsage(adapter, { inputTokens: 200, outputTokens: 30 }, 'onboarding');
+
+            const historyCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === HISTORY_STATE);
+            const history = JSON.parse(historyCall.args[1].val);
+            expect(history).to.deep.equal([
+                { date: today, chat: { inputTokens: 50, outputTokens: 10 }, onboarding: { inputTokens: 200, outputTokens: 30 } },
+            ]);
+        });
+
         it('appends a separate entry for a new day without touching prior days', async () => {
             const today = new Date().toISOString().slice(0, 10);
             const existingHistory = [

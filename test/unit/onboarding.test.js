@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage }) {
+function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage, isBudgetExceeded }) {
     return proxyquire('../../lib/onboarding', {
         './catalog': {
             getAllCatalogEntries,
@@ -12,8 +12,17 @@ function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, record
         },
         './usage': {
             recordUsage: recordUsage || sinon.stub().resolves(),
+            isBudgetExceeded: isBudgetExceeded || sinon.stub().resolves(false),
         },
     });
+}
+
+function makeDiscovered(count) {
+    return Array.from({ length: count }, (unused, index) => ({
+        id: `javascript.0.obj${index}`,
+        historyInstance: 'influxdb.0',
+        common: { name: `obj${index}` },
+    }));
 }
 
 describe('runOnboarding', () => {
@@ -334,5 +343,87 @@ describe('runOnboarding', () => {
         await runOnboarding({}, provider, discovered);
 
         expect(recordUsage.called).to.equal(false);
+    });
+
+    it('stops classifying further batches once the daily token budget is exhausted', async () => {
+        // 60 Objekte = 3 Batches à 20; Budget ist nach dem ersten Batch erschoepft.
+        const discovered = makeDiscovered(60);
+        const setCatalogEntry = sinon.stub().resolves();
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: '[]',
+                toolCalls: [],
+                stopReason: 'end_turn',
+                usage: { inputTokens: 1000, outputTokens: 100 },
+            }),
+        };
+        const isBudgetExceeded = sinon.stub();
+        isBudgetExceeded.onFirstCall().resolves(false);
+        isBudgetExceeded.resolves(true);
+        const adapter = { log: { warn: sinon.stub(), error: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            isBudgetExceeded,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(provider.chat.callCount).to.equal(1);
+        expect(provider.chat.callCount).to.be.below(3);
+        expect(adapter.log.warn.calledOnce).to.equal(true);
+        expect(adapter.log.warn.firstCall.args[0]).to.include('Tagesbudget');
+        expect(adapter.log.error.called).to.equal(false);
+        expect(result.needsReview).to.deep.equal([]);
+    });
+
+    it('does not call the provider at all when the budget is already exhausted before the run', async () => {
+        const discovered = makeDiscovered(20);
+        const provider = { chat: sinon.stub() };
+        const adapter = { log: { warn: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry: sinon.stub().resolves(),
+            isBudgetExceeded: sinon.stub().resolves(true),
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(provider.chat.called).to.equal(false);
+        expect(adapter.log.warn.calledOnce).to.equal(true);
+        expect(result.needsReview).to.deep.equal([]);
+    });
+
+    it('still writes the catalog entry when recording the token usage fails', async () => {
+        const discovered = [{ id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } }];
+        const setCatalogEntry = sinon.stub().resolves();
+        const recordUsage = sinon.stub().rejects(new Error('usage.today ist kaputt'));
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+                usage: { inputTokens: 100, outputTokens: 20 },
+            }),
+        };
+        const adapter = { log: { warn: sinon.stub(), error: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            recordUsage,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(recordUsage.calledOnce).to.equal(true);
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+        expect(setCatalogEntry.firstCall.args[1]).to.deep.include({ sourceId: 'javascript.0.x', category: 'consumption' });
+        expect(adapter.log.error.called).to.equal(false);
+        expect(adapter.log.warn.calledOnce).to.equal(true);
+        expect(adapter.log.warn.firstCall.args[0]).to.include('Onboarding-Verbrauch nicht erfasst');
     });
 });
