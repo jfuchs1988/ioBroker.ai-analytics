@@ -5,6 +5,7 @@ const {
     getAllCatalogEntries,
     setCatalogEntry,
     markInactive,
+    removeCatalogEntry,
     catalogStateId,
     CATEGORIES,
 } = require('../../lib/catalog');
@@ -111,5 +112,26 @@ describe('catalog', () => {
             'device_usage',
             'environment',
         ]);
+    });
+
+    it('removeCatalogEntry deletes the state and the object', async () => {
+        const adapter = makeAdapter();
+        adapter.delStateAsync = sinon.stub().resolves();
+        adapter.delObjectAsync = sinon.stub().resolves();
+
+        await removeCatalogEntry(adapter, 'javascript.0.x');
+
+        expect(adapter.delStateAsync.calledOnceWith('catalog.javascript.0.x')).to.equal(true);
+        expect(adapter.delObjectAsync.calledOnceWith('catalog.javascript.0.x')).to.equal(true);
+    });
+
+    it('removeCatalogEntry tolerates a missing state and still deletes the object', async () => {
+        const adapter = makeAdapter();
+        adapter.delStateAsync = sinon.stub().rejects(new Error('not found'));
+        adapter.delObjectAsync = sinon.stub().resolves();
+
+        await removeCatalogEntry(adapter, 'javascript.0.x');
+
+        expect(adapter.delObjectAsync.calledOnce).to.equal(true);
     });
 });
