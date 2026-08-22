@@ -5,6 +5,7 @@ const utils = require('@iobroker/adapter-core');
 const { findHistorizedObjects } = require('./lib/discovery');
 const { getAllCatalogEntries, setCatalogEntry, markInactive } = require('./lib/catalog');
 const { createProvider } = require('./lib/providers');
+const { checkProviderReachable, ensureReachabilityStates, CHAT_STATE, ONBOARDING_STATE } = require('./lib/providerHealthCheck');
 const { buildTools } = require('./lib/tools');
 const { runAgent } = require('./lib/agent');
 const { runOnboarding } = require('./lib/onboarding');
@@ -25,20 +26,37 @@ class AiAnalytics extends utils.Adapter {
     async onReady() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
+        await ensureReachabilityStates(this);
 
-        this.provider = createProvider({
+        this.chatProvider = createProvider({
             type: this.config.providerType,
             apiKey: this.config.apiKey,
             model: this.config.model,
             baseUrl: this.config.baseUrl,
         });
+        this.onboardingProvider = this.config.onboardingProviderType
+            ? createProvider({
+                  type: this.config.onboardingProviderType,
+                  apiKey: this.config.onboardingApiKey,
+                  model: this.config.onboardingModel,
+                  baseUrl: this.config.onboardingBaseUrl,
+              })
+            : this.chatProvider;
         this.tools = buildTools(this);
 
-        if (!this.config.apiKey && this.config.providerType !== 'local') {
-            this.log.warn(
-                'Kein API-Key konfiguriert - ueberspringe Katalog-Synchronisierung und proaktive Pruefung, bis ein API-Key hinterlegt ist.'
-            );
-            return;
+        const chatCheck = await checkProviderReachable(this.chatProvider);
+        this.chatProviderOk = chatCheck.reachable;
+        await this.setStateAsync(CHAT_STATE, { val: chatCheck.reachable, ack: true });
+        if (!chatCheck.reachable) {
+            this.log.error(`Chat/Pruefungs-Modell nicht erreichbar: ${chatCheck.error}`);
+        }
+
+        const onboardingCheck =
+            this.onboardingProvider === this.chatProvider ? chatCheck : await checkProviderReachable(this.onboardingProvider);
+        this.onboardingProviderOk = onboardingCheck.reachable;
+        await this.setStateAsync(ONBOARDING_STATE, { val: onboardingCheck.reachable, ack: true });
+        if (!onboardingCheck.reachable) {
+            this.log.error(`Onboarding-Modell nicht erreichbar: ${onboardingCheck.error}`);
         }
 
         await this.syncCatalog();
@@ -80,7 +98,12 @@ class AiAnalytics extends utils.Adapter {
             }
         }
 
-        const { classifiedCount, needsReview } = await runOnboarding(this, this.provider, discovered);
+        if (!this.onboardingProviderOk) {
+            this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
+            return { foundCount: discovered.length, newCount: 0, reactivatedCount };
+        }
+
+        const { classifiedCount, needsReview } = await runOnboarding(this, this.onboardingProvider, discovered);
 
         try {
             if (needsReview.length > 0) {
@@ -99,6 +122,11 @@ class AiAnalytics extends utils.Adapter {
     async runProactiveCheck() {
         this.log.silly('Proaktive Pruefung: Lauf gestartet');
 
+        if (!this.chatProviderOk) {
+            this.log.warn('Proaktive Pruefung uebersprungen, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
+            return;
+        }
+
         if (await isBudgetExceeded(this)) {
             this.log.warn('Proaktive Pruefung: Tagesbudget an Tokens ist erschoepft, Lauf wird uebersprungen.');
             return;
@@ -107,7 +135,7 @@ class AiAnalytics extends utils.Adapter {
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
         const { finalText, usage } = await runAgent({
-            provider: this.provider,
+            provider: this.chatProvider,
             tools: this.tools,
             systemPrompt:
                 `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
@@ -145,6 +173,19 @@ class AiAnalytics extends utils.Adapter {
 
             this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
 
+            if (!this.chatProviderOk) {
+                this.log.warn('Chat: Frage nicht beantwortet, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
+                if (obj.callback) {
+                    this.sendTo(
+                        obj.from,
+                        obj.command,
+                        { error: 'Chat-Modell derzeit nicht erreichbar, siehe Log/Admin-Konfiguration.' },
+                        obj.callback
+                    );
+                }
+                return;
+            }
+
             if (await isBudgetExceeded(this)) {
                 this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
                 if (obj.callback) {
@@ -159,7 +200,7 @@ class AiAnalytics extends utils.Adapter {
                 const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
 
                 const { finalText, usage } = await runAgent({
-                    provider: this.provider,
+                    provider: this.chatProvider,
                     tools: this.tools,
                     systemPrompt:
                         `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
