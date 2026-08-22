@@ -27,3 +27,4 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0019](0019-feature-branch-pro-task.md) | Feature-/Bugfix-Branch pro Umsetzungsplan-Task, lokal nach develop gemergt | Angenommen | 2026-08-22 |
 | [0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) | Admin-Message-Bus bekommt vollen Katalog-Schreibzugriff (unabhängig von needsReview) | Angenommen | 2026-08-22 |
 | [0021](0021-getrennte-provider-pro-zweck.md) | Getrennte LLM-Provider pro Zweck (Onboarding vs. Chat/Prüfung) mit Fallback und Start-Selbstprüfung | Angenommen | 2026-08-22 |
+| [0022](0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md) | Manuell gepflegte Preise statt automatischer Preisliste, unbegrenzte tägliche Verbrauchs-Historie | Angenommen | 2026-08-23 |

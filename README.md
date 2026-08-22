@@ -45,3 +45,7 @@ npm test
 Die einmalige Klassifizierung neu gefundener Objekte kann einen komplett eigenen Provider nutzen — z. B. ein günstiges oder lokales Modell fürs Onboarding und ein starkes für Chat/Prüfung. Dafür gibt es vier zusätzliche, optionale Felder in derselben Form wie oben: `onboardingProviderType`, `onboardingApiKey`, `onboardingModel`, `onboardingBaseUrl`. Bleibt `onboardingProviderType` leer, wird die Chat-Konfiguration mitbenutzt; ist er gesetzt, gilt die Onboarding-Konfiguration vollständig eigenständig (kein feldweiser Rückfall auf die Chat-Werte). Hintergrund: [ADR-0021](docs/adr/0021-getrennte-provider-pro-zweck.md).
 
 Beim Adapterstart wird jeder der beiden Provider einmalig auf Erreichbarkeit geprüft. Das Ergebnis steht in den States `ai-analytics.<instanz>.info.chatProviderReachable` und `ai-analytics.<instanz>.info.onboardingProviderReachable`. Eine fehlgeschlagene Prüfung blockiert jeweils nur die betroffene Funktion (Klassifizierung bzw. Chat/proaktive Prüfung), nicht den gesamten Adapter.
+
+### Token-Kosten-Tab
+
+Der Budget-Bereich im Admin-Tab zeigt neben dem heutigen Verbrauch auch eine Verlaufs-Historie (Balkendiagramm, wählbar 30 Tage/gesamt), berechnete Kosten getrennt nach Chat/Prüfung und Onboarding sowie eine heuristische Tages-/Stunden-Limit-Empfehlung. Die Preise pro 1 Mio. Input-/Output-Tokens werden manuell in der Admin-Config gepflegt (vier zusätzliche Felder, Default 0 — z. B. für lokale, kostenlose Modelle). Hintergrund: [ADR-0022](docs/adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md).

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.4",
+    "version": "0.0.1-beta.5",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -29,6 +29,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.5": {
+        "en": "Token-cost tab (usage history chart, cost calculation from manually maintained prices, daily/hourly limit recommendation) extending the existing budget section. Onboarding token usage is now tracked (was previously never recorded).",
+        "de": "Token-Kosten-Tab (Verbrauchs-Historie als Diagramm, Kostenberechnung aus manuell gepflegten Preisen, Tages-/Stunden-Limit-Empfehlung) als Erweiterung des bestehenden Budget-Bereichs. Onboarding-Token-Verbrauch wird jetzt erfasst (bisher nie aufgezeichnet)."
+      },
       "0.0.1-beta.4": {
         "en": "Onboarding can use its own LLM provider (independent from chat/checks). Startup reachability self-check for both providers, blocking only the affected function on failure.",
         "de": "Onboarding kann jetzt einen eigenen LLM-Provider nutzen (unabhaengig von Chat/Pruefung). Start-Selbstpruefung der Erreichbarkeit beider Provider, blockiert bei Fehlschlag nur die betroffene Funktion."
