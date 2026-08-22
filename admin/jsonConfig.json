@@ -23,6 +23,18 @@
       "type": "text",
       "label": "Basis-URL (nur fuer OpenRouter/Lokal)"
     },
+    "chatPricePerMillionInputTokens": {
+      "type": "number",
+      "label": "Preis pro 1 Mio. Input-Tokens (Chat, z.B. USD)",
+      "default": 0,
+      "min": 0
+    },
+    "chatPricePerMillionOutputTokens": {
+      "type": "number",
+      "label": "Preis pro 1 Mio. Output-Tokens (Chat, z.B. USD)",
+      "default": 0,
+      "min": 0
+    },
     "onboardingHeader": {
       "type": "header",
       "text": "Onboarding-Modell (optional, sonst wie oben)"
@@ -49,6 +61,18 @@
     "onboardingBaseUrl": {
       "type": "text",
       "label": "Basis-URL (Onboarding, nur fuer OpenRouter/Lokal)"
+    },
+    "onboardingPricePerMillionInputTokens": {
+      "type": "number",
+      "label": "Preis pro 1 Mio. Input-Tokens (Onboarding, z.B. USD)",
+      "default": 0,
+      "min": 0
+    },
+    "onboardingPricePerMillionOutputTokens": {
+      "type": "number",
+      "label": "Preis pro 1 Mio. Output-Tokens (Onboarding, z.B. USD)",
+      "default": 0,
+      "min": 0
     },
     "checkIntervalHours": {
       "type": "number",
