@@ -11,6 +11,7 @@ const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
 const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage');
+const adminCommands = require('./lib/adminCommands');
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -65,6 +66,7 @@ class AiAnalytics extends utils.Adapter {
             }
         }
 
+        let reactivatedCount = 0;
         for (const obj of discovered) {
             const entry = existingById.get(obj.id);
             if (entry && (entry.active === false || entry.historyInstance !== obj.historyInstance)) {
@@ -74,10 +76,11 @@ class AiAnalytics extends utils.Adapter {
                     historyInstance: obj.historyInstance,
                     lastSeen: new Date().toISOString(),
                 });
+                reactivatedCount += 1;
             }
         }
 
-        const { needsReview } = await runOnboarding(this, this.provider, discovered);
+        const { classifiedCount, needsReview } = await runOnboarding(this, this.provider, discovered);
 
         try {
             if (needsReview.length > 0) {
@@ -89,6 +92,8 @@ class AiAnalytics extends utils.Adapter {
         } catch (error) {
             this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
         }
+
+        return { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount };
     }
 
     async runProactiveCheck() {
@@ -126,57 +131,90 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async onMessage(obj) {
-        if (!obj || obj.command !== 'chatQuestion') return;
+        if (!obj || !obj.command) return;
 
-        const question = obj.message && obj.message.text;
+        if (obj.command === 'chatQuestion') {
+            const question = obj.message && obj.message.text;
 
-        if (typeof question !== 'string' || !question.trim()) {
-            if (obj.callback) {
-                this.sendTo(obj.from, obj.command, { error: 'Leere Frage' }, obj.callback);
+            if (typeof question !== 'string' || !question.trim()) {
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, { error: 'Leere Frage' }, obj.callback);
+                }
+                return;
+            }
+
+            this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
+
+            if (await isBudgetExceeded(this)) {
+                this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, { error: 'Tagesbudget an Tokens ist erschoepft.' }, obj.callback);
+                }
+                return;
+            }
+
+            try {
+                await appendChatMessage(this, 'user', question);
+                const priorEntries = await getRecentChatHistory(this, 10);
+                const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+
+                const { finalText, usage } = await runAgent({
+                    provider: this.provider,
+                    tools: this.tools,
+                    systemPrompt:
+                        `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
+                        'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
+                        'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
+                        'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
+                        'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
+                    userMessage: question,
+                    priorMessages,
+                });
+
+                await recordUsage(this, usage);
+                this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+
+                const history = await appendChatMessage(this, 'assistant', finalText);
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, { history }, obj.callback);
+                }
+            } catch (error) {
+                this.log.error(`Chat-Anfrage fehlgeschlagen: ${error.message}`);
+                if (obj.callback) {
+                    this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
+                }
             }
             return;
         }
 
-        this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
-
-        if (await isBudgetExceeded(this)) {
-            this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
-            if (obj.callback) {
-                this.sendTo(obj.from, obj.command, { error: 'Tagesbudget an Tokens ist erschoepft.' }, obj.callback);
-            }
+        if (obj.command === 'listCatalogEntries') {
+            const result = await adminCommands.listCatalogEntries(this);
+            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
             return;
         }
 
-        try {
-            await appendChatMessage(this, 'user', question);
-            const priorEntries = await getRecentChatHistory(this, 10);
-            const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+        if (obj.command === 'updateCatalogEntryAdmin') {
+            const result = await adminCommands.updateCatalogEntryAdmin(this, obj.message);
+            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
+            return;
+        }
 
-            const { finalText, usage } = await runAgent({
-                provider: this.provider,
-                tools: this.tools,
-                systemPrompt:
-                    `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
-                    'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
-                    'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
-                    'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
-                    'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
-                userMessage: question,
-                priorMessages,
-            });
+        if (obj.command === 'removeCatalogEntry') {
+            const result = await adminCommands.removeCatalogEntry(this, obj.message);
+            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
+            return;
+        }
 
-            await recordUsage(this, usage);
-            this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+        if (obj.command === 'runDiscoveryNow') {
+            const result = await adminCommands.runDiscoveryNow(this);
+            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
+            return;
+        }
 
-            const history = await appendChatMessage(this, 'assistant', finalText);
-            if (obj.callback) {
-                this.sendTo(obj.from, obj.command, { history }, obj.callback);
-            }
-        } catch (error) {
-            this.log.error(`Chat-Anfrage fehlgeschlagen: ${error.message}`);
-            if (obj.callback) {
-                this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
-            }
+        if (obj.command === 'runProactiveCheckNow') {
+            const result = adminCommands.runProactiveCheckNow(this);
+            if (obj.callback) this.sendTo(obj.from, obj.command, result, obj.callback);
+            return;
         }
     }
 
