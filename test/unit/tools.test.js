@@ -42,6 +42,21 @@ describe('buildTools', () => {
         expect(filtered.map((e) => e.sourceId)).to.deep.equal(['d']);
     });
 
+    it('listCatalog also excludes ignored entries', async () => {
+        const entries = [
+            { sourceId: 'a', category: 'lighting', active: true, needsReview: false, ignored: false },
+            { sourceId: 'b', category: 'lighting', active: true, needsReview: false, ignored: true },
+        ];
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves(entries),
+        });
+
+        const { execute } = buildTools({});
+        const result = await execute('listCatalog', {});
+
+        expect(result.map((e) => e.sourceId)).to.deep.equal(['a']);
+    });
+
     it('getHistory resolves the historyInstance from the catalog and delegates to dataAccess', async () => {
         const getHistoryStub = sinon.stub().resolves([{ ts: 1, val: 5 }]);
         const { buildTools } = loadToolsWithStubs({
