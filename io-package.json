@@ -18,7 +18,8 @@
     "mode": "daemon",
     "compact": true,
     "adminUI": {
-      "config": "json"
+      "config": "json",
+      "tab": "html"
     },
     "adminTab": {
       "singleton": true,
