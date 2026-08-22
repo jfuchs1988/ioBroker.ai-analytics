@@ -1,12 +1,13 @@
 # Entwicklungsprozess
 
-Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründungen stehen in den einzelnen [ADRs](docs/adr/adr-index.md), insbesondere [ADR-0011](docs/adr/0011-subagent-driven-development.md) und [ADR-0016](docs/adr/0016-git-branching-modell.md).
+Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründungen stehen in den einzelnen [ADRs](docs/adr/adr-index.md), insbesondere [ADR-0011](docs/adr/0011-subagent-driven-development.md), [ADR-0016](docs/adr/0016-git-branching-modell.md) und [ADR-0019](docs/adr/0019-feature-branch-pro-task.md).
 
 ## Branching-Modell
 
-- `develop` ist der Arbeits-Branch. Alle Änderungen landen hier.
+- `develop` ist der Arbeits-Branch. Alle fertigen Änderungen landen hier.
 - `master` wird **nur auf ausdrücklichen Wunsch** aktualisiert (kein automatisches Mergen nach jedem Commit) — der Nutzer entscheidet bewusst, wann ein Stand freigegeben wird.
 - Releases/Tags werden auf `master` gesetzt, nachdem ein Merge angefragt wurde.
+- **Pro Plan-Task ein eigener Branch** (`feature/<kurzbeschreibung>` bzw. `fix/<kurzbeschreibung>`), von `develop` abgezweigt, TDD-Commits (rot/grün) darauf, nach grünem `npm test` lokal per `git merge --no-ff` zurück nach `develop`, danach Branch löschen. Details/Begründung: [ADR-0019](docs/adr/0019-feature-branch-pro-task.md). Gilt nicht für Spec/Plan-lose Bugfixes/Tippfehler (siehe Tabelle unten) — die bleiben direkt auf `develop`.
 
 ## Wann Spec / Plan / ADR nötig sind
 

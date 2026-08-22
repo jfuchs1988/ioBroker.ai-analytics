@@ -23,3 +23,5 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0015](0015-dokumentationsstruktur.md) | Dokumentationsstruktur: arc42 Multi-File + ADRs + Obsidian-MOCs | Angenommen | 2026-08-21 |
 | [0016](0016-git-branching-modell.md) | Git-Branching-Modell: develop/master mit manueller Freigabe | Angenommen | 2026-08-21 |
 | [0017](0017-scoped-catalog-write-capability.md) | Scoped Catalog Write Capability für Onboarding-Rückfragen | Angenommen | 2026-08-21 |
+| [0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) | Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Vorbild evcc) | Angenommen (Phase 1 von 2) | 2026-08-22 |
+| [0019](0019-feature-branch-pro-task.md) | Feature-/Bugfix-Branch pro Umsetzungsplan-Task, lokal nach develop gemergt | Angenommen | 2026-08-22 |
