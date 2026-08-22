@@ -320,15 +320,19 @@ function renderBudgetExtras() {
 
 function showBudgetRange30() {
     budgetRangeDays = 30;
-    document.getElementById('budget-range-30').classList.add('active');
-    document.getElementById('budget-range-all').classList.remove('active');
+    const btn30 = document.getElementById('budget-range-30');
+    if (btn30) btn30.classList.add('active');
+    const btnAll = document.getElementById('budget-range-all');
+    if (btnAll) btnAll.classList.remove('active');
     renderBudgetExtras();
 }
 
 function showBudgetRangeAll() {
     budgetRangeDays = null;
-    document.getElementById('budget-range-all').classList.add('active');
-    document.getElementById('budget-range-30').classList.remove('active');
+    const btnAll = document.getElementById('budget-range-all');
+    if (btnAll) btnAll.classList.add('active');
+    const btn30 = document.getElementById('budget-range-30');
+    if (btn30) btn30.classList.remove('active');
     renderBudgetExtras();
 }
 
@@ -358,10 +362,10 @@ function loadBudget() {
                 const native = !objErr && instanceObj && instanceObj.native ? instanceObj.native : {};
                 display.textContent = formatBudgetLine(usage, native.dailyTokenBudget);
                 budgetPrices = {
-                    chatIn: native.chatPricePerMillionInputTokens || 0,
-                    chatOut: native.chatPricePerMillionOutputTokens || 0,
-                    onboardingIn: native.onboardingPricePerMillionInputTokens || 0,
-                    onboardingOut: native.onboardingPricePerMillionOutputTokens || 0,
+                    chatIn: Number(native.chatPricePerMillionInputTokens) || 0,
+                    chatOut: Number(native.chatPricePerMillionOutputTokens) || 0,
+                    onboardingIn: Number(native.onboardingPricePerMillionInputTokens) || 0,
+                    onboardingOut: Number(native.onboardingPricePerMillionOutputTokens) || 0,
                 };
                 renderBudgetExtras();
             });

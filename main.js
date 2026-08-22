@@ -197,7 +197,7 @@ class AiAnalytics extends utils.Adapter {
             userMessage: 'Fuehre die periodische Pruefung durch.',
         });
 
-        await recordUsage(this, usage);
+        await recordUsage(this, usage, 'chat');
 
         const isNothingFound = finalText.trim().toLowerCase().startsWith('keine auffaelligkeiten');
         this.log.silly(`Proaktive Pruefung: Lauf beendet, Ergebnis: ${isNothingFound ? 'keine Auffaelligkeiten' : 'Auffaelligkeit gefunden'}`);
@@ -264,7 +264,7 @@ class AiAnalytics extends utils.Adapter {
                     priorMessages,
                 });
 
-                await recordUsage(this, usage);
+                await recordUsage(this, usage, 'chat');
                 this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
 
                 const history = await appendChatMessage(this, 'assistant', finalText);
