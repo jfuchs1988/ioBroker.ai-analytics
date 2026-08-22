@@ -127,6 +127,9 @@ function setLoading(isLoading) {
 }
 
 let allDeviceEntries = [];
+let budgetHistory = [];
+let budgetPrices = { chatIn: 0, chatOut: 0, onboardingIn: 0, onboardingOut: 0 };
+let budgetRangeDays = 30;
 
 function showDevicesError(message) {
     const status = document.getElementById('devices-status');
@@ -290,6 +293,45 @@ function triggerProactiveCheck() {
     });
 }
 
+function renderBudgetChart(rangeEntries) {
+    const container = document.getElementById('budget-chart');
+    if (!container) return;
+    container.innerHTML = '';
+    const totals = rangeEntries.map(sumDailyTokens);
+    const max = Math.max(1, ...totals);
+    rangeEntries.forEach((entry, index) => {
+        const bar = document.createElement('div');
+        bar.className = 'budget-bar';
+        bar.style.height = `${Math.round((totals[index] / max) * 100)}%`;
+        bar.title = `${entry.date}: ${totals[index]} Tokens`;
+        container.appendChild(bar);
+    });
+}
+
+function renderBudgetExtras() {
+    const rangeEntries = computeRangeHistory(budgetHistory, budgetRangeDays);
+    renderBudgetChart(rangeEntries);
+    const cost = computeCost(rangeEntries, budgetPrices);
+    const costLine = document.getElementById('budget-cost-line');
+    if (costLine) costLine.textContent = formatCostLine(cost);
+    const recLine = document.getElementById('budget-recommendation-line');
+    if (recLine) recLine.textContent = formatRecommendationLine(recommendLimits(rangeEntries));
+}
+
+function showBudgetRange30() {
+    budgetRangeDays = 30;
+    document.getElementById('budget-range-30').classList.add('active');
+    document.getElementById('budget-range-all').classList.remove('active');
+    renderBudgetExtras();
+}
+
+function showBudgetRangeAll() {
+    budgetRangeDays = null;
+    document.getElementById('budget-range-all').classList.add('active');
+    document.getElementById('budget-range-30').classList.remove('active');
+    renderBudgetExtras();
+}
+
 function loadBudget() {
     const display = document.getElementById('budget-display');
     socket.emit('getState', `${namespace}.usage.today`, (usageErr, usageState) => {
@@ -301,9 +343,28 @@ function loadBudget() {
                 usage = { tokensToday: 0 };
             }
         }
-        socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
-            const budget = !objErr && instanceObj && instanceObj.native ? instanceObj.native.dailyTokenBudget : 0;
-            display.textContent = formatBudgetLine(usage, budget);
+        socket.emit('getState', `${namespace}.usage.history`, (historyErr, historyState) => {
+            let history = [];
+            if (!historyErr && historyState && historyState.val) {
+                try {
+                    const parsed = JSON.parse(historyState.val);
+                    history = Array.isArray(parsed) ? parsed : [];
+                } catch (parseError) {
+                    history = [];
+                }
+            }
+            budgetHistory = history;
+            socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
+                const native = !objErr && instanceObj && instanceObj.native ? instanceObj.native : {};
+                display.textContent = formatBudgetLine(usage, native.dailyTokenBudget);
+                budgetPrices = {
+                    chatIn: native.chatPricePerMillionInputTokens || 0,
+                    chatOut: native.chatPricePerMillionOutputTokens || 0,
+                    onboardingIn: native.onboardingPricePerMillionInputTokens || 0,
+                    onboardingOut: native.onboardingPricePerMillionOutputTokens || 0,
+                };
+                renderBudgetExtras();
+            });
         });
     });
 }
@@ -381,6 +442,8 @@ function init() {
     document.getElementById('devices-rescan').addEventListener('click', triggerRescan);
     document.getElementById('devices-check-now').addEventListener('click', triggerProactiveCheck);
     document.getElementById('devices-filter').addEventListener('input', renderDevicesTable);
+    document.getElementById('budget-range-30').addEventListener('click', showBudgetRange30);
+    document.getElementById('budget-range-all').addEventListener('click', showBudgetRangeAll);
 }
 
 if (typeof window !== 'undefined') {
