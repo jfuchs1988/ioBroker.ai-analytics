@@ -6,6 +6,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 ## [Unreleased]
 
 ### Behoben
+- Lizenz-Dialog im Admin beim Anlegen einer Instanz zeigte die Admin-HTML-Seite statt des Lizenztexts: Für Adapter ohne `extIcon`/`readme` bleibt die Lizenz-URL leer (`fetch('')` lädt die aktuelle Seite), und ein GitHub-Fallback scheitert am privaten Repo. Neu: Kopie der Lizenz in `admin/LICENSE` (wird mit dem Adapter-Upload ausgeliefert) plus `common.licenseInformation` mit Link `/adapter/ai-analytics/LICENSE` — der Dialog zeigt jetzt den echten Lizenztext.
 - `LICENSE`-Datei war laut [ADR-0018](docs/adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) entschieden und lag lokal im Repo-Root, wurde aber nie committet — Folge: der Lizenz-Dialog des Admin beim Installieren aus Fremdquellen fand keinen Lizenztext auf GitHub (404) und zeigte HTML-Müll statt der Vereinbarung. Datei ist jetzt Teil des Repos.
 
 ## [0.0.1-beta.6] - 2026-08-24
