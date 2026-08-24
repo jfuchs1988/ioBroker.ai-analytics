@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { buildTimeAndLocationContext } = require('../../lib/promptContext');
+const { buildTimeAndLocationContext, getLocalDayBoundaries } = require('../../lib/promptContext');
 
 describe('buildTimeAndLocationContext', () => {
     const now = new Date('2026-08-24T11:58:00.000Z');
@@ -50,5 +50,47 @@ describe('buildTimeAndLocationContext', () => {
         const context = await buildTimeAndLocationContext(adapter, now);
 
         expect(context).to.include(String(now.getTime()));
+    });
+});
+
+describe('getLocalDayBoundaries', () => {
+    it('returns the UTC-ms boundaries of a calendar day in Europe/Berlin during DST (UTC+2)', () => {
+        // 2026-08-21 12:00 UTC is 2026-08-21 14:00 in Berlin (summer time, UTC+2)
+        const noonUtc = Date.UTC(2026, 7, 21, 12, 0, 0);
+        const { start, end } = getLocalDayBoundaries(noonUtc, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-08-20T22:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-08-21T22:00:00.000Z');
+    });
+
+    it('returns the UTC-ms boundaries of a calendar day in Europe/Berlin during standard time (UTC+1)', () => {
+        // 2026-01-15 12:00 UTC is 2026-01-15 13:00 in Berlin (winter time, UTC+1)
+        const noonUtc = Date.UTC(2026, 0, 15, 12, 0, 0);
+        const { start, end } = getLocalDayBoundaries(noonUtc, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-01-14T23:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-01-15T23:00:00.000Z');
+    });
+
+    it('returns the same boundaries for any two timestamps within the same local day', () => {
+        const morning = Date.UTC(2026, 7, 21, 4, 0, 0);
+        const evening = Date.UTC(2026, 7, 21, 20, 0, 0);
+
+        expect(getLocalDayBoundaries(morning, 'Europe/Berlin')).to.deep.equal(
+            getLocalDayBoundaries(evening, 'Europe/Berlin')
+        );
+    });
+
+    it('spans exactly 24 hours', () => {
+        const { start, end } = getLocalDayBoundaries(Date.now(), 'Europe/Berlin');
+        expect(end - start).to.equal(24 * 3600 * 1000);
+    });
+
+    it('defaults to UTC boundaries for the UTC timezone', () => {
+        const noonUtc = Date.UTC(2026, 7, 21, 12, 0, 0);
+        const { start, end } = getLocalDayBoundaries(noonUtc, 'UTC');
+
+        expect(new Date(start).toISOString()).to.equal('2026-08-21T00:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-08-22T00:00:00.000Z');
     });
 });
