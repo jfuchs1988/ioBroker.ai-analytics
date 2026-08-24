@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.8] - 2026-08-24
 
 ### Hinzugefügt
 - Onboarding-Klassifikations-Batches werden jetzt nach Adaptertyp gruppiert (nie zwei Adaptertypen in einem Batch), damit die KI pro Anfrage konsistenten Kontext hat, welchem Adapter die Objekte entstammen (`lib/onboarding.js`, neue Funktionen `buildBatches`/`adapterTypeOf`).
