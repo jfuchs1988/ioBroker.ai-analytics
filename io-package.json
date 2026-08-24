@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.5",
+    "version": "0.0.1-beta.6",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -29,6 +29,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.6": {
+        "en": "Admin tab commands reach the adapter even when sendTo from the legacy HTML tab is not delivered (React Admin v7): new state-bridge fallback channel (admin.bridge) with automatic transport selection, and visible error messages instead of silently hanging UI.",
+        "de": "Admin-Tab-Befehle erreichen den Adapter auch dann, wenn sendTo aus dem Legacy-HTML-Tab nicht zugestellt wird (React Admin v7): neuer State-Bridge-Ausweichkanal (admin.bridge) mit automatischer Transportwahl und sichtbaren Fehlermeldungen statt still hängender UI."
+      },
       "0.0.1-beta.5": {
         "en": "Token-cost tab (usage history chart, cost calculation from manually maintained prices, daily/hourly limit recommendation) extending the existing budget section. Onboarding token usage is now tracked (was previously never recorded).",
         "de": "Token-Kosten-Tab (Verbrauchs-Historie als Diagramm, Kostenberechnung aus manuell gepflegten Preisen, Tages-/Stunden-Limit-Empfehlung) als Erweiterung des bestehenden Budget-Bereichs. Onboarding-Token-Verbrauch wird jetzt erfasst (bisher nie aufgezeichnet)."
