@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.6] - 2026-08-24
 
 ### Hinzugefügt
 - Neues ADR-0023 dokumentiert den State-Bridge-Ausweichkanal für Admin-Tab-Befehle, siehe [ADR-0023](docs/adr/0023-state-bridge-ausweichkanal-admin-tab.md).
