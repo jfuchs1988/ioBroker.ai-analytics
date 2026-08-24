@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const { buildBatches } = require('../../lib/onboarding');
 
-function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage, isBudgetExceeded }) {
+function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage, isBudgetExceeded, classifyValueKind }) {
     return proxyquire('../../lib/onboarding', {
         './catalog': {
             getAllCatalogEntries,
@@ -14,6 +14,11 @@ function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, record
         './usage': {
             recordUsage: recordUsage || sinon.stub().resolves(),
             isBudgetExceeded: isBudgetExceeded || sinon.stub().resolves(false),
+        },
+        './valueKindClassifier': {
+            classifyValueKind:
+                classifyValueKind ||
+                sinon.stub().resolves({ valueKind: 'gauge', valueKindConfidence: 'low', valueKindSource: 'metadata' }),
         },
     });
 }
@@ -485,5 +490,75 @@ describe('runOnboarding', () => {
         expect(adapter.log.error.called).to.equal(false);
         expect(adapter.log.warn.calledOnce).to.equal(true);
         expect(adapter.log.warn.firstCall.args[0]).to.include('Onboarding-Verbrauch nicht erfasst');
+    });
+
+    it('attaches valueKind classification to newly classified entries', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon
+            .stub()
+            .resolves({ valueKind: 'daily_reset_counter', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.deep.include({
+            valueKind: 'daily_reset_counter',
+            valueKindConfidence: 'high',
+            valueKindSource: 'sampled',
+        });
+        expect(classifyValueKind.calledOnceWith(sinon.match.any, discovered[0], 'influxdb.0')).to.equal(true);
+    });
+
+    it('falls back to a safe gauge/low classification when classifyValueKind throws, without aborting the batch', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().rejects(new Error('History-Instanz nicht erreichbar'));
+        const adapter = { log: { warn: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.deep.include({
+            valueKind: 'gauge',
+            valueKindConfidence: 'low',
+            valueKindSource: 'metadata',
+        });
+        expect(adapter.log.warn.calledOnce).to.equal(true);
     });
 });
