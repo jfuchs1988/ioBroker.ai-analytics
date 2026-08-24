@@ -77,8 +77,27 @@ describe('getLocalDayBoundaries', () => {
         );
     });
 
-    it('spans exactly 24 hours', () => {
-        const { start, end } = getLocalDayBoundaries(Date.now(), 'Europe/Berlin');
+    it('spans 23 hours on a spring-forward (DST start) day in Europe/Berlin', () => {
+        const noonOnDstStart = Date.UTC(2026, 2, 29, 12, 0, 0); // 2026-03-29
+        const { start, end } = getLocalDayBoundaries(noonOnDstStart, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-03-28T23:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-03-29T22:00:00.000Z');
+        expect(end - start).to.equal(23 * 3600 * 1000);
+    });
+
+    it('spans 25 hours on a fall-back (DST end) day in Europe/Berlin', () => {
+        const noonOnDstEnd = Date.UTC(2026, 9, 25, 12, 0, 0); // 2026-10-25
+        const { start, end } = getLocalDayBoundaries(noonOnDstEnd, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-10-24T22:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-10-25T23:00:00.000Z');
+        expect(end - start).to.equal(25 * 3600 * 1000);
+    });
+
+    it('spans exactly 24 hours on a day with no DST transition (UTC has none, ever)', () => {
+        const fixedNoonUtc = Date.UTC(2026, 5, 15, 12, 0, 0);
+        const { start, end } = getLocalDayBoundaries(fixedNoonUtc, 'UTC');
         expect(end - start).to.equal(24 * 3600 * 1000);
     });
 
@@ -103,12 +122,11 @@ In `lib/promptContext.js`, nach `formatLocalTime` einfügen:
 
 ```js
 /**
- * Start/Ende (Unix-ms) des Kalendertags in `timeZone`, der `timestampMs` enthaelt.
- * Berechnet den lokalen Offset AM ZIELTAG (nicht "jetzt"), damit DST-Wechsel korrekt
- * behandelt werden. Wird fuer typ-bewusste Tagesauswertungen gebraucht (Tageszaehler-
- * Reset, Boolean-Zustandsdauer je Tag).
+ * Berechnet den UTC-Zeitpunkt der lokalen Mitternacht in `timeZone` fuer den Kalendertag,
+ * der `timestampMs` enthaelt. Der Offset wird AM ZIELTAG (nicht "jetzt") ermittelt, damit
+ * DST-Wechsel korrekt behandelt werden.
  */
-function getLocalDayBoundaries(timestampMs, timeZone) {
+function computeUtcMidnight(timestampMs, timeZone) {
     const dateFormatter = new Intl.DateTimeFormat('en-CA', {
         timeZone,
         year: 'numeric',
@@ -130,8 +148,20 @@ function getLocalDayBoundaries(timestampMs, timeZone) {
     const offsetMinutesPart = offsetMatch && offsetMatch[2] ? Number(offsetMatch[2]) : 0;
     const offsetMs = (offsetHours * 60 + Math.sign(offsetHours || 1) * offsetMinutesPart) * 60 * 1000;
 
-    const start = utcMidnightGuess - offsetMs;
-    const end = start + 24 * 3600 * 1000;
+    return utcMidnightGuess - offsetMs;
+}
+
+/**
+ * Start/Ende (Unix-ms) des Kalendertags in `timeZone`, der `timestampMs` enthaelt. `end`
+ * wird als die tatsaechliche naechste lokale Mitternacht ermittelt (nicht start+24h) —
+ * an DST-Umstellungstagen ist ein Tag 23 oder 25 Stunden lang, und start+24h wuerde dort
+ * entweder eine Stunde des Tages ausschliessen oder mit dem Folgetag ueberlappen. `start
+ * + 25h` liegt garantiert im naechsten Kalendertag, unabhaengig von der tatsaechlichen
+ * Tageslaenge.
+ */
+function getLocalDayBoundaries(timestampMs, timeZone) {
+    const start = computeUtcMidnight(timestampMs, timeZone);
+    const end = computeUtcMidnight(start + 25 * 3600 * 1000, timeZone);
     return { start, end };
 }
 ```
