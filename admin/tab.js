@@ -174,6 +174,11 @@ function renderDeviceRow(entry) {
     row.appendChild(categoryCell);
 
     const valueKindSelect = document.createElement('select');
+    const unclassifiedOption = document.createElement('option');
+    unclassifiedOption.value = '';
+    unclassifiedOption.textContent = '– nicht klassifiziert –';
+    if (!entry.valueKind) unclassifiedOption.selected = true;
+    valueKindSelect.appendChild(unclassifiedOption);
     VALUE_KINDS.forEach((kind) => {
         const option = document.createElement('option');
         option.value = kind;
@@ -215,7 +220,7 @@ function renderDeviceRow(entry) {
                 category: categorySelect.value,
                 room: roomInput.value,
                 description: descInput.value,
-                valueKind: valueKindSelect.value,
+                ...(valueKindSelect.value ? { valueKind: valueKindSelect.value } : {}),
             });
             loadDevices();
         } catch (error) {
