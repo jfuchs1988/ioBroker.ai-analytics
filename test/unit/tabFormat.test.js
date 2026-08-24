@@ -10,6 +10,8 @@ const {
     recommendLimits,
     formatCostLine,
     formatRecommendationLine,
+    parseBridgeResponse,
+    extractChatHistory,
 } = require('../../admin/tab.js');
 
 describe('formatMessageLine', () => {
@@ -175,5 +177,48 @@ describe('formatRecommendationLine', () => {
         expect(formatRecommendationLine({ dailyTokens: 1200, hourlyTokens: 50 })).to.equal(
             'Empfehlung (basierend auf bisherigem Verbrauch, kein hartes Limit): 1200 Tokens/Tag, 50 Tokens/Stunde'
         );
+    });
+});
+
+describe('parseBridgeResponse', () => {
+    const requestId = 'tab-123-abc';
+
+    it('ignores the tab\'s own not-yet-processed request (ack:false), even though its id matches', () => {
+        const ownRequestEchoedBack = { val: JSON.stringify({ id: requestId, command: 'chatQuestion', message: {} }), ack: false };
+        expect(parseBridgeResponse(ownRequestEchoedBack, requestId)).to.equal(null);
+    });
+
+    it('accepts a real ack:true response with a matching id', () => {
+        const response = { val: JSON.stringify({ id: requestId, ok: true, result: ['x'] }), ack: true };
+        expect(parseBridgeResponse(response, requestId)).to.deep.equal({ id: requestId, ok: true, result: ['x'] });
+    });
+
+    it('ignores an ack:true response for a different request id', () => {
+        const response = { val: JSON.stringify({ id: 'tab-other', ok: true, result: [] }), ack: true };
+        expect(parseBridgeResponse(response, requestId)).to.equal(null);
+    });
+
+    it('returns null for missing/malformed state', () => {
+        expect(parseBridgeResponse(null, requestId)).to.equal(null);
+        expect(parseBridgeResponse({ val: 'not json', ack: true }, requestId)).to.equal(null);
+        expect(parseBridgeResponse({ val: 42, ack: true }, requestId)).to.equal(null);
+    });
+});
+
+describe('extractChatHistory', () => {
+    it('accepts the real chatQuestion response shape: the history array directly', () => {
+        const history = [{ role: 'user', text: 'hi', timestamp: 1 }];
+        expect(extractChatHistory(history)).to.equal(history);
+    });
+
+    it('also accepts a {history: [...]} wrapper for backward-compat', () => {
+        const history = [{ role: 'user', text: 'hi', timestamp: 1 }];
+        expect(extractChatHistory({ history })).to.equal(history);
+    });
+
+    it('returns null for an error response or garbage', () => {
+        expect(extractChatHistory({ error: 'nope' })).to.equal(null);
+        expect(extractChatHistory(null)).to.equal(null);
+        expect(extractChatHistory(undefined)).to.equal(null);
     });
 });

@@ -415,6 +415,16 @@ function appendChatError(message) {
     container.scrollTop = container.scrollHeight;
 }
 
+/**
+ * `chatQuestion` liefert bei Erfolg die getrimmte Chat-History direkt als Array
+ * (Rueckgabewert von appendChatMessage in lib/chatLog.js), nicht als {history: [...]}.
+ */
+function extractChatHistory(response) {
+    if (Array.isArray(response)) return response;
+    if (response && Array.isArray(response.history)) return response.history;
+    return null;
+}
+
 async function sendQuestion() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
@@ -424,8 +434,9 @@ async function sendQuestion() {
 
     try {
         const response = await callAdapter('chatQuestion', { text });
-        if (response && response.history) {
-            renderHistory(response.history);
+        const history = extractChatHistory(response);
+        if (history) {
+            renderHistory(history);
         } else if (response && response.error) {
             appendChatError(response.error);
         }
@@ -513,6 +524,28 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Wertet einen gelesenen Bridge-State als Antwort auf `requestId` aus, oder null,
+ * wenn der State (noch) keine solche Antwort enthaelt.
+ *
+ * Der Bridge-State wird sowohl fuer die Anfrage (vom Tab geschrieben, ack:false) als
+ * auch fuer die Antwort (vom Adapter geschrieben, ack:true) verwendet. Beide haben
+ * dieselbe `id`, aber nur die Antwort hat `ok`/`result`/`error`. Ohne den ack-Check
+ * liest die erste Polling-Runde fast immer die eigene, gerade erst geschriebene
+ * Anfrage zurueck (id passt, `ok` ist undefined -> faelschlich als Fehlschlag gewertet).
+ */
+function parseBridgeResponse(state, requestId) {
+    if (!state || state.ack !== true || typeof state.val !== 'string') return null;
+    let parsed;
+    try {
+        parsed = JSON.parse(state.val);
+    } catch (parseError) {
+        return null;
+    }
+    if (!parsed || parsed.id !== requestId) return null;
+    return parsed;
+}
+
 let bridgeQueue = Promise.resolve();
 
 /**
@@ -528,15 +561,8 @@ function bridgeCall(command, message, timeoutMs) {
         const deadline = Date.now() + timeoutMs;
         while (Date.now() < deadline) {
             const state = await bridgeReadState();
-            let parsed = null;
-            if (state && typeof state.val === 'string') {
-                try {
-                    parsed = JSON.parse(state.val);
-                } catch (parseError) {
-                    parsed = null;
-                }
-            }
-            if (parsed && parsed.id === requestId) {
+            const parsed = parseBridgeResponse(state, requestId);
+            if (parsed) {
                 if (parsed.ok) {
                     return parsed.result;
                 }
@@ -615,5 +641,7 @@ if (typeof module !== 'undefined') {
         formatCostLine,
         formatRecommendationLine,
         CATEGORIES,
+        parseBridgeResponse,
+        extractChatHistory,
     };
 }

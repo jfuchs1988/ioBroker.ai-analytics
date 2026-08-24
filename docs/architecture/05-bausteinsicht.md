@@ -21,6 +21,7 @@ lib/
 ├── usage.js              Taeglicher Token-Verbrauch (Budget-Check) + unbegrenzte Verlaufs-Historie pro Zweck
 ├── onboarding.js          Klassifiziert neu entdeckte Objekte (Batch-Prompt)
 ├── providerHealthCheck.js Erreichbarkeits-Selbstpruefung der konfigurierten Provider
+├── promptContext.js        Standort (system.config) + lokale Zeitzone für Systemprompts
 └── scheduler.js           Periodischer Trigger für proaktive Prüfung
 
 main.js                  Verdrahtet alles: Adapter-Lifecycle, Katalog-Sync,
@@ -47,10 +48,11 @@ admin/
 | `usage.js` | Verfolgt taeglichen Token-Verbrauch fuers Budget (`dailyTokenBudget`) und eine unbegrenzte, nach Chat/Pruefung vs. Onboarding getrennte Tages-Historie fuer den Kosten-Tab (siehe [ADR-0022](../adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md)) | `ensureUsageState`, `recordUsage(adapter,usage,purpose='chat')`, `getTodayUsage`, `getUsageHistory`, `isBudgetExceeded` |
 | `onboarding.js` | Klassifiziert unbekannte Objekte, markiert unsichere als `needsReview`; übernimmt den Raum deterministisch aus `enum.rooms.*`, falls das Objekt dort Mitglied ist | `runOnboarding(adapter,provider,discoveredObjects) => {classifiedCount,needsReview}` |
 | `providerHealthCheck.js` | Minimaler Test-Call pro konfiguriertem Provider beim Start, persistiert Ergebnis als State | `checkProviderReachable(provider) => {reachable,error?}`, `ensureReachabilityStates(adapter)` |
+| `promptContext.js` | Liest Standort (`system.config.common.city/country/latitude/longitude`) und ermittelt die lokale Zeitzone des Host-Prozesses (`Intl`), formatiert beides zusammen mit aktueller UTC-/Unix-Zeit als Kontextblock für Agent-Systemprompts — ohne das wusste der Agent nur die UTC-Zeit, nicht Standort oder Zeitzone des Nutzers | `buildTimeAndLocationContext(adapter, now=new Date()) => string`, `getSystemLocation`, `getLocalTimeZone`, `formatLocalTime` |
 | `scheduler.js` | Ruft `runCheck` periodisch auf, fängt Fehler ab | `startProactiveScheduler(adapter,{intervalMs,runCheck}) => stopFn` |
 | `main.js` | Orchestriert alle Bausteine über den ioBroker-Adapter-Lifecycle | ioBroker-Standard (`onReady`, `onMessage`, `onUnload`) |
 
-Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (13 Module, jeweils 20–100 Zeilen, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
+Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (14 Module, jeweils 20–100 Zeilen, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [4. Lösungsstrategie](04-loesungsstrategie.md) · weiter zu [6. Laufzeitsicht](06-laufzeitsicht.md)

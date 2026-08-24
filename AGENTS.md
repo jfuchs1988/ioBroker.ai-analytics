@@ -43,7 +43,6 @@ Der Adapter bleibt bewusst bei einer Whitebox-Ebene (10 `lib/*`-Module, je 20–
 
 Siehe [docs/architecture/11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md) für die vollständige, aktuell gehaltene Liste. Stand zuletzt geprüft:
 
-- **Admin-Chat-Tab bestätigt defekt**: rendert, aber Nachrichten lassen sich nicht abschicken. Ein defensiver Fix (Fallback-Kette statt einer nicht-existenten `adapterNamespace`-Abhängigkeit) wurde umgesetzt, aber die geplante Browser-Konsolen-Diagnose zur endgültigen Bestätigung steht noch aus.
 - `main.js` und die Admin-UI haben effektiv keine automatisierte Testabdeckung; der Adapter-Smoke-Test ist durch eine `@iobroker/testing`-v4-Verhaltensänderung ein No-Op.
 - Onboarding-Rückfragen (`needsReview: true`) sind derzeit nicht auflösbar — der Chat-Agent hat nur lesende Werkzeuge.
 - Kein manueller Re-Discovery-Trigger und keine Auswahl der History-Adapterinstanz(en) in der Admin-Config.
