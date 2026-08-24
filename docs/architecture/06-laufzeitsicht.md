@@ -15,12 +15,12 @@
 
 ## 6.2 Chat-Q&A
 
-1. Nutzerfrage kommt über den Chat-Tab als `sendTo`-Message (`chatQuestion`) an `main.js`.
+1. Nutzerfrage kommt über den Chat-Tab an `main.js` — Transport zentral über `callAdapter()`: langlaufende Befehle (Chat-Frage, Re-Scan, Prüfung) direkt über die State-Bridge (`admin.bridge`, `stateChange`-Handler), schnelle Befehle zuerst per `sendTo` mit Timeout und Bridge-Ausweichkanal, siehe [ADR-0023](../adr/0023-state-bridge-ausweichkanal-admin-tab.md). Beide Pfade laufen in denselben Dispatcher (`dispatchAdapterCommand`) — das Verhalten ab Schritt 2 ist identisch.
 2. `appendChatMessage` loggt die Frage, `runAgent` startet mit der Frage als Ziel.
 3. Der Agent ruft iterativ `listCatalog`/`getHistory`/`compareTimeframes` auf, bis genug Datengrundlage vorliegt.
-4. Finale Antwort wird geloggt und als Socket-Antwort an den Chat-Tab zurückgegeben.
+4. Finale Antwort wird geloggt und als Socket-Antwort (bzw. Bridge-Antwort-State) an den Chat-Tab zurückgegeben; Fehler erscheinen sichtbar als Fehlerbubble im Chat.
 
-**Bestätigt im Abnahmetest (2026-08-21): dieser Ablauf ist aktuell blockiert.** Der Admin-Chat-Tab rendert, aber Nachrichten können nicht abgeschickt werden — der Ablauf 1–4 wurde serverseitig nie erreicht. Details und Ursachenhypothese in [Risiken](11-risiken-und-schulden.md).
+**Abnahmetest-Status:** der ursprünglich ausschließlich `sendTo`-basierte Ablauf war auf der Testinstanz blockiert (Nachricht erreichte `onMessage` nie, Details in [Risiken](11-risiken-und-schulden.md)). Mit dem State-Bridge-Ausweichkanal (2026-08-24) existiert ein funktionsfähiger Weg; die Live-Bestätigung des Redeploys steht noch aus.
 
 ## 6.3 Proaktive Prüfung
 

@@ -13,12 +13,14 @@ const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = requ
 const { startProactiveScheduler } = require('./lib/scheduler');
 const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage');
 const adminCommands = require('./lib/adminCommands');
+const adminBridge = require('./lib/adminBridge');
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
         super({ ...options, name: 'ai-analytics' });
         this.on('ready', this.onReady.bind(this));
         this.on('message', this.onMessage.bind(this));
+        this.on('stateChange', this.onBridgeStateChange.bind(this));
         this.on('unload', this.onUnload.bind(this));
         this.stopScheduler = null;
         // Fail-closed: solange onReady die Pruefung nicht abgeschlossen hat, gilt kein Provider als erreichbar.
@@ -65,6 +67,8 @@ class AiAnalytics extends utils.Adapter {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
         await ensureReachabilityStates(this);
+        await adminBridge.ensureBridgeState(this);
+        await this.subscribeStatesAsync(adminBridge.BRIDGE_STATE);
 
         const chatProviderConfig = {
             type: this.config.providerType,
@@ -210,98 +214,102 @@ class AiAnalytics extends utils.Adapter {
         return { skipped: false };
     }
 
-    async onMessage(obj) {
-        if (!obj || !obj.command) return;
+    /**
+     * Beantwortet eine Chat-Frage. Wirft bei Ablehnungsgruenden (Provider nicht
+     * erreichbar, Budget erschoepft, Aufruffehler) — der Aufrufer verpackt das
+     * als {error}-Antwort. Genau dieselben Guard-Texte wie vor dem Refactoring.
+     */
+    async processChatQuestion(question) {
+        if (!this.chatProviderOk) {
+            this.log.warn('Chat: Frage nicht beantwortet, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
+            throw new Error('Chat-Modell derzeit nicht erreichbar, siehe Log/Admin-Konfiguration.');
+        }
 
-        if (obj.command === 'chatQuestion') {
-            const question = obj.message && obj.message.text;
+        if (await isBudgetExceeded(this)) {
+            this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
+            throw new Error('Tagesbudget an Tokens ist erschoepft.');
+        }
 
+        await appendChatMessage(this, 'user', question);
+        const priorEntries = await getRecentChatHistory(this, 10);
+        const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+
+        const { finalText, usage } = await runAgent({
+            provider: this.chatProvider,
+            tools: this.tools,
+            systemPrompt:
+                `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
+                'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
+                'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
+                'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
+                'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
+            userMessage: question,
+            priorMessages,
+        });
+
+        await recordUsage(this, usage, 'chat');
+        this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+
+        return appendChatMessage(this, 'assistant', finalText);
+    }
+
+    /**
+     * Zentrale Ausfuehrung eines UI-Befehls (sendTo-Pfad UND State-Bridge-Pfad).
+     * Wirft im Fehlerfall; der jeweilige Transport verpackt die Fehlermeldung selbst.
+     */
+    async dispatchAdapterCommand(command, message) {
+        if (command === 'chatQuestion') {
+            const question = message && message.text;
             if (typeof question !== 'string' || !question.trim()) {
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, { error: 'Leere Frage' }, obj.callback);
-                }
-                return;
+                throw new Error('Leere Frage');
             }
-
             this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
-
-            if (!this.chatProviderOk) {
-                this.log.warn('Chat: Frage nicht beantwortet, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
-                if (obj.callback) {
-                    this.sendTo(
-                        obj.from,
-                        obj.command,
-                        { error: 'Chat-Modell derzeit nicht erreichbar, siehe Log/Admin-Konfiguration.' },
-                        obj.callback
-                    );
-                }
-                return;
-            }
-
-            if (await isBudgetExceeded(this)) {
-                this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, { error: 'Tagesbudget an Tokens ist erschoepft.' }, obj.callback);
-                }
-                return;
-            }
-
-            try {
-                await appendChatMessage(this, 'user', question);
-                const priorEntries = await getRecentChatHistory(this, 10);
-                const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
-
-                const { finalText, usage } = await runAgent({
-                    provider: this.chatProvider,
-                    tools: this.tools,
-                    systemPrompt:
-                        `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
-                        'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
-                        'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
-                        'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
-                        'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
-                    userMessage: question,
-                    priorMessages,
-                });
-
-                await recordUsage(this, usage, 'chat');
-                this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
-
-                const history = await appendChatMessage(this, 'assistant', finalText);
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, { history }, obj.callback);
-                }
-            } catch (error) {
-                this.log.error(`Chat-Anfrage fehlgeschlagen: ${error.message}`);
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
-                }
-            }
-            return;
+            return this.processChatQuestion(question);
         }
 
         const adminCommandHandlers = {
             listCatalogEntries: () => adminCommands.listCatalogEntries(this),
-            updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, obj.message),
-            removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, obj.message),
+            updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, message),
+            removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, message),
             runDiscoveryNow: () => adminCommands.runDiscoveryNow(this),
             runProactiveCheckNow: () => adminCommands.runProactiveCheckNow(this),
         };
 
-        const handler = adminCommandHandlers[obj.command];
-        if (handler) {
-            try {
-                const result = await handler();
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, result, obj.callback);
-                }
-            } catch (error) {
-                this.log.error(`Admin-Befehl ${obj.command} fehlgeschlagen: ${error.message}`);
-                if (obj.callback) {
-                    this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
-                }
+        const handler = adminCommandHandlers[command];
+        if (!handler) {
+            throw new Error(`Unbekannter Befehl: ${command}`);
+        }
+        return handler();
+    }
+
+    async onMessage(obj) {
+        if (!obj || !obj.command) return;
+        if (obj.command !== 'chatQuestion' && !adminBridge.ALLOWED_COMMANDS.includes(obj.command)) return;
+
+        try {
+            const result = await this.dispatchAdapterCommand(obj.command, obj.message);
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, result, obj.callback);
             }
-            return;
+        } catch (error) {
+            if (obj.command === 'chatQuestion') {
+                this.log.error(`Chat-Anfrage fehlgeschlagen: ${error.message}`);
+            } else {
+                this.log.error(`Admin-Befehl ${obj.command} fehlgeschlagen: ${error.message}`);
+            }
+            if (obj.callback) {
+                this.sendTo(obj.from, obj.command, { error: error.message }, obj.callback);
+            }
+        }
+    }
+
+    async onBridgeStateChange(id, state) {
+        try {
+            await adminBridge.handleBridgeStateChange(this, id, state, (command, message) =>
+                this.dispatchAdapterCommand(command, message)
+            );
+        } catch (error) {
+            this.log.error(`Admin-Bridge: Verarbeitung fehlgeschlagen: ${error && error.message ? error.message : String(error)}`);
         }
     }
 

@@ -24,3 +24,7 @@
 ## Verworfene Alternativen
 
 - **`updateCatalogEntryAdmin` ebenfalls auf `needsReview`-Einträge beschränken**: hätte die Kernanforderung (Raum verschieben, ignorieren für beliebige, auch bereits verifizierte Geräte) verfehlt.
+
+## Nachtrag (2026-08-24)
+
+Die Formulierung "angesprochen ausschließlich über `sendTo` aus dem Admin-UI" ist seit [ADR-0023](0023-state-bridge-ausweichkanal-admin-tab.md) nicht mehr zutreffend: dieselben Befehle erreichen den Bus zusätzlich über den State `admin.bridge`, wenn der `sendTo`-Pfad aus dem Legacy-Tab-Kontext nicht zustellt. Die Vertrauensgrenze selbst (Mensch über Admin-UI, kein autonomes Modell) und die Trennung vom LLM-Tool bleiben unverändert.
