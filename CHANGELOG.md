@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.9] - 2026-08-24
+
+### Behoben
+- `getHistory` konnte bei rohen Aggregaten (`aggregate:'none'`/`'onchange'`) Daten lautlos abschneiden: die ioBroker-History-API begrenzt Ergebnisse ohne explizites `count` standardmäßig auf 2000 Werte — bei sekündlich loggenden Objekten fehlten so über 96% eines Tages, ohne jede Fehlermeldung. `getHistory` übergibt jetzt immer ein explizites `count` (bei gebündelten Aggregaten wie `average`/`minmax` aus dem angefragten Zeitraum berechnet — stündliche/tägliche/wöchentliche Buckets, gedeckelt auf 500 — bei rohen Aggregaten der bisherige Default 2000) und loggt eine Warnung, wenn ein rohes Ergebnis das Limit erreicht (möglicher Datenverlust).
+
 ## [0.0.1-beta.8] - 2026-08-24
 
 ### Hinzugefügt

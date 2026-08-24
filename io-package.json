@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.8",
+    "version": "0.0.1-beta.9",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.9": {
+        "en": "Fixed a silent data-loss risk: getHistory could silently cap results at 2000 values for raw queries, missing most of a day for densely-logged datapoints. It now always passes an explicit, appropriately-sized count and warns when a raw result likely got truncated.",
+        "de": "Stille Datenlücke behoben: getHistory konnte Ergebnisse bei rohen Abfragen standardmäßig auf 2000 Werte begrenzen und so bei dicht loggenden Datenpunkten den Großteil eines Tages verlieren. Übergibt jetzt immer ein explizites, passend berechnetes count und warnt, wenn ein Ergebnis wahrscheinlich abgeschnitten wurde."
+      },
       "0.0.1-beta.8": {
         "en": "Onboarding classification batches are now grouped by adapter type for more consistent AI context. The history query sent to the InfluxDB/History instance is now logged (silly). The AI now uses clean, German, catalog descriptions instead of raw datapoint IDs in chat answers, and descriptions are editable in the Devices tab. Fixed: the Devices tab (list/edit/remove) did not respond at all on some installations (sendTo timeout with no fallback) — it now falls back to the same state-bridge channel already used for chat.",
         "de": "Onboarding-Klassifikations-Batches werden jetzt nach Adaptertyp gruppiert für konsistenteren KI-Kontext. Die an die InfluxDB-/History-Instanz gesendete Abfrage wird jetzt geloggt (silly). Die KI nutzt jetzt saubere, deutsche Katalog-Beschreibungen statt roher Datenpunkt-IDs im Chat, und Beschreibungen sind im Geräte-Tab editierbar. Behoben: der Geräte-Tab (Liste/Bearbeiten/Entfernen) reagierte auf manchen Installationen gar nicht (sendTo-Timeout ohne Fallback) — er fällt jetzt auf denselben State-Bridge-Kanal zurück, der schon für den Chat genutzt wird."
