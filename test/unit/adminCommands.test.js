@@ -93,6 +93,41 @@ describe('adminCommands', () => {
 
             expect(result).to.deep.equal({ error: 'Unbekanntes Objekt: unknown' });
         });
+
+        it('updates valueKind and marks the source as manual', async () => {
+            const existing = {
+                sourceId: 'javascript.0.x',
+                category: 'lighting',
+                valueKind: 'gauge',
+                valueKindConfidence: 'low',
+                valueKindSource: 'metadata',
+            };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', valueKind: 'daily_reset_counter' });
+
+            expect(result.entry).to.deep.include({
+                valueKind: 'daily_reset_counter',
+                valueKindSource: 'manual',
+            });
+        });
+
+        it('leaves valueKind untouched when not provided', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'lighting', valueKind: 'gauge', valueKindSource: 'sampled' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', room: 'Keller' });
+
+            expect(result.entry).to.deep.include({ valueKind: 'gauge', valueKindSource: 'sampled' });
+        });
     });
 
     describe('removeCatalogEntry', () => {
