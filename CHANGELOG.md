@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.7] - 2026-08-24
 
 ### Hinzugefügt
 - Chat-Agent kennt jetzt Standort (aus `system.config`) und lokale Zeitzone des ioBroker-Hosts (neues Modul `lib/promptContext.js`) — vorher enthielt der Systemprompt nur die UTC-Zeit ohne jeden Zeitzonen- oder Standortbezug, der Agent musste raten oder aus dem Gesprächsverlauf schließen.
