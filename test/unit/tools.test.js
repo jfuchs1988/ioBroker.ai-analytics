@@ -71,7 +71,7 @@ describe('buildTools', () => {
         const result = await execute('getHistory', { sourceId: 'javascript.0.x', start: 1, end: 2, aggregate: 'average' });
 
         expect(getHistoryStub.calledOnceWith(adapter, 'influxdb.0', 'javascript.0.x', 1, 2, 'average')).to.equal(true);
-        expect(result).to.deep.equal([{ ts: 1, val: 5 }]);
+        expect(result).to.deep.equal({ description: undefined, room: undefined, unit: undefined, history: [{ ts: 1, val: 5 }] });
     });
 
     it('getHistory throws for objects not in the catalog', async () => {
@@ -105,7 +105,34 @@ describe('buildTools', () => {
         const result = await execute('compareTimeframes', { sourceId: 'javascript.0.x', periodA, periodB });
 
         expect(compareStub.calledOnceWith(adapter, 'influxdb.0', 'javascript.0.x', periodA, periodB)).to.equal(true);
-        expect(result).to.deep.equal({ deltaSum: 5 });
+        expect(result).to.deep.equal({ description: undefined, room: undefined, unit: undefined, deltaSum: 5 });
+    });
+
+    it('getHistory includes description/room/unit from the catalog entry in the result', async () => {
+        const getHistoryStub = sinon.stub().resolves([{ ts: 1, val: 5 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([
+                {
+                    sourceId: 'javascript.0.x',
+                    historyInstance: 'influxdb.0',
+                    description: 'Wohnzimmer Lampe',
+                    room: 'Wohnzimmer',
+                    unit: 'kWh',
+                },
+            ]),
+            getHistory: getHistoryStub,
+        });
+
+        const adapter = {};
+        const { execute } = buildTools(adapter);
+        const result = await execute('getHistory', { sourceId: 'javascript.0.x', start: 1, end: 2 });
+
+        expect(result).to.deep.equal({
+            description: 'Wohnzimmer Lampe',
+            room: 'Wohnzimmer',
+            unit: 'kWh',
+            history: [{ ts: 1, val: 5 }],
+        });
     });
 
     it('throws for unknown tool names', async () => {

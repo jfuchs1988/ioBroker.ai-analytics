@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.7",
+    "version": "0.0.1-beta.8",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.8": {
+        "en": "Onboarding classification batches are now grouped by adapter type for more consistent AI context. The history query sent to the InfluxDB/History instance is now logged (silly). The AI now uses clean, German, catalog descriptions instead of raw datapoint IDs in chat answers, and descriptions are editable in the Devices tab. Fixed: the Devices tab (list/edit/remove) did not respond at all on some installations (sendTo timeout with no fallback) — it now falls back to the same state-bridge channel already used for chat.",
+        "de": "Onboarding-Klassifikations-Batches werden jetzt nach Adaptertyp gruppiert für konsistenteren KI-Kontext. Die an die InfluxDB-/History-Instanz gesendete Abfrage wird jetzt geloggt (silly). Die KI nutzt jetzt saubere, deutsche Katalog-Beschreibungen statt roher Datenpunkt-IDs im Chat, und Beschreibungen sind im Geräte-Tab editierbar. Behoben: der Geräte-Tab (Liste/Bearbeiten/Entfernen) reagierte auf manchen Installationen gar nicht (sendTo-Timeout ohne Fallback) — er fällt jetzt auf denselben State-Bridge-Kanal zurück, der schon für den Chat genutzt wird."
+      },
       "0.0.1-beta.7": {
         "en": "Chat answers (and Devices/Budget tab actions) now appear immediately instead of only after switching tabs: fixed a race condition and a response-shape bug in the admin tab's fallback transport. The AI now knows your location and local timezone (read from the ioBroker system config) instead of only UTC. The license dialog now shows the real license text.",
         "de": "Chat-Antworten (und Aktionen im Geräte-/Budget-Tab) erscheinen jetzt sofort statt erst nach einem Tab-Wechsel: ein Timing- und ein Antwort-Format-Fehler im Ausweichkanal des Admin-Tabs wurden behoben. Die KI kennt jetzt Standort und lokale Zeitzone (aus der ioBroker-Systemkonfiguration) statt nur UTC. Der Lizenz-Dialog zeigt jetzt den echten Lizenztext."

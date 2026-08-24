@@ -28,6 +28,36 @@ describe('dataAccess', () => {
         expect(threw).to.equal(true);
     });
 
+    it('getHistory logs to silly when adapter.log.silly is provided', async () => {
+        const sillyStub = sinon.stub();
+        const adapter = {
+            log: { silly: sillyStub },
+            sendToAsync: sinon.stub().resolves({ result: [{ ts: 1, val: 10 }] }),
+        };
+
+        await getHistory(adapter, 'influxdb.0', 'javascript.0.x', 100, 200, 'average');
+
+        expect(sillyStub.calledOnce).to.equal(true);
+        const message = sillyStub.firstCall.args[0];
+        expect(message).to.include('influxdb.0');
+        expect(message).to.include('javascript.0.x');
+        expect(message).to.include('average');
+    });
+
+    it('getHistory does not throw when adapter.log is absent', async () => {
+        const adapter = {
+            sendToAsync: sinon.stub().resolves({ result: [{ ts: 1, val: 10 }] }),
+        };
+
+        let threw = false;
+        try {
+            await getHistory(adapter, 'influxdb.0', 'javascript.0.x', 100, 200, 'average');
+        } catch (e) {
+            threw = true;
+        }
+        expect(threw).to.equal(false);
+    });
+
     it('compareTimeframes computes sum/avg/delta for two periods', async () => {
         const adapter = {
             sendToAsync: sinon

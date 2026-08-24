@@ -153,8 +153,11 @@ function renderDeviceRow(entry) {
     idCell.textContent = entry.sourceId;
     row.appendChild(idCell);
 
+    const descInput = document.createElement('input');
+    descInput.type = 'text';
+    descInput.value = entry.description || '';
     const descCell = document.createElement('td');
-    descCell.textContent = entry.description || '';
+    descCell.appendChild(descInput);
     row.appendChild(descCell);
 
     const categorySelect = document.createElement('select');
@@ -194,6 +197,7 @@ function renderDeviceRow(entry) {
                 sourceId: entry.sourceId,
                 category: categorySelect.value,
                 room: roomInput.value,
+                description: descInput.value,
             });
             loadDevices();
         } catch (error) {
@@ -592,9 +596,13 @@ async function callAdapter(command, message) {
     const bridgeTimeoutMs = SLOW_COMMANDS.includes(command) ? BRIDGE_TIMEOUT_SLOW_MS : BRIDGE_TIMEOUT_FAST_MS;
 
     if (!SLOW_COMMANDS.includes(command)) {
-        const response = await emitSendTo(command, message, SENDTO_TIMEOUT_MS);
-        console.log(`[ai-analytics tab] '${command}' über sendTo beantwortet.`);
-        return response;
+        try {
+            const response = await emitSendTo(command, message, SENDTO_TIMEOUT_MS);
+            console.log(`[ai-analytics tab] '${command}' über sendTo beantwortet.`);
+            return response;
+        } catch (error) {
+            console.log(`[ai-analytics tab] '${command}' über sendTo fehlgeschlagen (${error.message}), Fallback auf State-Bridge.`);
+        }
     }
 
     console.log(`[ai-analytics tab] '${command}' über State-Bridge.`);
