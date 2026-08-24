@@ -851,7 +851,15 @@ Im inneren `for`-Loop, in dem `entry` gebaut wird (in `runOnboarding`), vor `try
 wird ersetzt durch:
 
 ```js
-            const valueKindResult = await classifyValueKind(adapter, source, source.historyInstance);
+            let valueKindResult;
+            try {
+                valueKindResult = await classifyValueKind(adapter, source, source.historyInstance);
+            } catch (error) {
+                if (adapter.log && adapter.log.warn) {
+                    adapter.log.warn(`valueKind-Klassifizierung fuer ${source.id} fehlgeschlagen, verwende Fallback: ${error.message}`);
+                }
+                valueKindResult = { valueKind: 'gauge', valueKindConfidence: 'low', valueKindSource: 'metadata' };
+            }
             const entry = {
                 sourceId: classification.sourceId,
                 description: classification.description,
@@ -866,6 +874,47 @@ wird ersetzt durch:
                 lastSeen: new Date().toISOString(),
                 ...valueKindResult,
             };
+```
+
+**Warum ein eigenes try/catch nur um `classifyValueKind`:** Task 4s Review stellte fest, dass `classifyValueKind` werfen kann (z.B. wenn die History-Instanz eine fehlerhafte Antwort liefert — `lib/dataAccess.js`s `getHistory` wirft dann). Ohne dieses try/catch wuerde ein einzelnes Objekt mit History-Problemen die komplette Batch-Klassifizierung abbrechen (der äussere try/catch weiter unten faengt nur Fehler von `setCatalogEntry` ab, nicht von Code davor). Der Fallback (`gauge`/`low`/`metadata`) entspricht genau dem, was `classifyValueKind` selbst bei uneindeutigen Daten zurueckgeben wuerde.
+
+Ergaenze dafuer einen weiteren Test in derselben Suite (nach dem Test `'attaches valueKind classification to newly classified entries'`):
+
+```js
+    it('falls back to a safe gauge/low classification when classifyValueKind throws, without aborting the batch', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    { sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().rejects(new Error('History-Instanz nicht erreichbar'));
+        const adapter = { log: { warn: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.deep.include({
+            valueKind: 'gauge',
+            valueKindConfidence: 'low',
+            valueKindSource: 'metadata',
+        });
+        expect(adapter.log.warn.calledOnce).to.equal(true);
+    });
 ```
 
 - [ ] **Step 5: Test laufen lassen, Erfolg bestätigen**
