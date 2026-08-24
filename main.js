@@ -15,6 +15,9 @@ const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage
 const adminCommands = require('./lib/adminCommands');
 const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
+const { classifyValueKind } = require('./lib/valueKindClassifier');
+
+const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -169,7 +172,36 @@ class AiAnalytics extends utils.Adapter {
             this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
         }
 
+        if (this.config.enableValueKindBackfill) {
+            const currentEntries = await getAllCatalogEntries(this);
+            await this.backfillValueKinds(currentEntries);
+        }
+
         return { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount, skipped: null };
+    }
+
+    async backfillValueKinds(entries) {
+        const pending = entries
+            .filter((entry) => entry.active !== false && !entry.ignored && !entry.valueKind)
+            .slice(0, VALUE_KIND_BACKFILL_BATCH_SIZE);
+
+        for (const entry of pending) {
+            try {
+                const sourceObj = await this.getForeignObjectAsync(entry.sourceId);
+                const obj = { id: entry.sourceId, common: (sourceObj && sourceObj.common) || {} };
+                const result = await classifyValueKind(this, obj, entry.historyInstance);
+                await setCatalogEntry(this, { ...entry, ...result });
+                if (this.log && this.log.silly) {
+                    this.log.silly(`valueKind-Backfill: ${entry.sourceId} -> ${result.valueKind} (${result.valueKindConfidence}, ${result.valueKindSource})`);
+                }
+            } catch (error) {
+                if (this.log) {
+                    this.log.error(`valueKind-Backfill fuer ${entry.sourceId} fehlgeschlagen: ${error.message}`);
+                }
+            }
+        }
+
+        return { backfilledCount: pending.length };
     }
 
     /**
