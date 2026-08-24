@@ -1,0 +1,46 @@
+Proprietary License — ioBroker.ai-analytics
+
+Copyright (c) 2026 Johannes Fuchs. Alle Rechte vorbehalten, soweit nachfolgend
+nicht ausdrücklich anders geregelt.
+
+## 1. Beta-Phase
+
+Für alle Versionen mit einem `-beta`-Suffix (z. B. `0.0.1-beta.2`) wird
+folgendes Nutzungsrecht eingeräumt: kostenlose Installation, Ausführung und
+Nutzung, privat wie kommerziell, ohne Einschränkung der Nutzungsdauer.
+
+## 2. Nach der Beta-Phase
+
+Mit Veröffentlichung der ersten Version ohne `-beta`-Suffix endet das
+kostenlose Nutzungsrecht aus Abschnitt 1. Die fortgesetzte Nutzung dieser
+Software ist ab diesem Zeitpunkt an ein aktives Sponsoring in Höhe von
+mindestens 0,99 EUR pro Monat gebunden, zahlbar über die vom Urheber
+angegebenen Kanäle (aktuell: GitHub Sponsors, https://github.com/sponsors/jfuchs1988).
+
+Diese Bedingung ist zum Stand dieser Lizenzversion **vertraglich/rechtlich
+auferlegt, aber nicht technisch durchgesetzt** — die Software prüft
+Sponsoring-Status derzeit nicht selbst. Eine technische Durchsetzung
+(zeitlich begrenzter Betrieb, Freischaltung über ein Sponsoring-Token) ist
+für eine spätere Version geplant; siehe
+[ADR-0018](docs/adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md).
+
+## 3. Sonstige Rechte
+
+Modifikation und Weitergabe für den eigenen, nicht-kommerziellen Gebrauch
+sind gestattet. Der Weiterverkauf, die kommerzielle Weitervermarktung sowie
+die Veröffentlichung abgeleiteter Werke unter eigenem Namen sind ohne
+vorherige schriftliche Zustimmung des Urhebers nicht gestattet.
+
+## 4. Gewährleistungsausschluss
+
+Diese Software wird ohne jegliche Gewährleistung bereitgestellt, weder
+ausdrücklich noch stillschweigend, einschließlich, aber nicht beschränkt auf
+die Gewährleistung der Marktgängigkeit oder der Eignung für einen bestimmten
+Zweck. Der Urheber haftet nicht für Schäden, die aus der Nutzung dieser
+Software entstehen.
+
+---
+
+Hinweis: Dieser Lizenztext wurde nicht von einem Rechtsanwalt geprüft. Vor
+tatsächlichem kommerziellem Einsatz oder Durchsetzung wird eine rechtliche
+Prüfung empfohlen.

@@ -11,6 +11,11 @@
     "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
     "keywords": ["ai", "analytics", "influxdb", "history"],
     "license": "SEE LICENSE IN LICENSE",
+    "licenseInformation": {
+      "type": "limited",
+      "license": "Proprietär — Beta-Phase kostenlos, danach Sponsoring-Pflicht (Text siehe Link)",
+      "link": "/adapter/ai-analytics/LICENSE"
+    },
     "platform": "Javascript/Node.js",
     "main": "main.js",
     "enabled": true,
