@@ -65,6 +65,25 @@ describe('adminCommands', () => {
             expect(result.entry).to.deep.include({ category: 'lighting', room: 'Keller', ignored: true, needsReview: false });
         });
 
+        it('updates description when provided and leaves existing description untouched when omitted', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'lighting', room: 'Keller', description: 'Alte Beschreibung', ignored: false, active: true };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', description: 'Neue Beschreibung' });
+
+            expect(result.entry).to.deep.include({ description: 'Neue Beschreibung', sourceId: 'javascript.0.x' });
+            expect(setCatalogEntry.calledOnce).to.equal(true);
+
+            // Also verify that omitting description leaves it unchanged
+            setCatalogEntry.resetHistory();
+            const result2 = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', category: 'device_usage' });
+            expect(result2.entry).to.deep.include({ description: 'Alte Beschreibung' });
+        });
+
         it('returns an error for an unknown sourceId instead of throwing', async () => {
             const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
                 getAllCatalogEntries: sinon.stub().resolves([]),

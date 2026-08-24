@@ -2,6 +2,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const { buildBatches } = require('../../lib/onboarding');
 
 function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage, isBudgetExceeded }) {
     return proxyquire('../../lib/onboarding', {
@@ -24,6 +25,65 @@ function makeDiscovered(count) {
         common: { name: `obj${index}` },
     }));
 }
+
+describe('buildBatches', () => {
+    it('never mixes two adapter types in the same batch, even if that means a smaller batch', () => {
+        const objects = [
+            { id: 'hm-rpc.0.a' },
+            { id: 'hm-rpc.0.b' },
+            { id: 'shelly.0.c' },
+            { id: 'shelly.0.d' },
+        ];
+
+        const batches = buildBatches(objects, 3);
+
+        expect(batches).to.have.lengthOf(2);
+        expect(batches[0].map((o) => o.id)).to.deep.equal(['hm-rpc.0.a', 'hm-rpc.0.b']);
+        expect(batches[1].map((o) => o.id)).to.deep.equal(['shelly.0.c', 'shelly.0.d']);
+    });
+
+    it('groups by adapter type regardless of instance number', () => {
+        const objects = [
+            { id: 'hm-rpc.0.a' },
+            { id: 'hm-rpc.1.b' },
+            { id: 'shelly.0.c' },
+        ];
+
+        const batches = buildBatches(objects, 10);
+
+        expect(batches).to.have.lengthOf(2);
+        expect(batches[0].map((o) => o.id)).to.deep.equal(['hm-rpc.0.a', 'hm-rpc.1.b']);
+        expect(batches[1].map((o) => o.id)).to.deep.equal(['shelly.0.c']);
+    });
+
+    it('splits a single adapter type into multiple batches once it exceeds the batch size', () => {
+        const objects = Array.from({ length: 5 }, (unused, i) => ({ id: `javascript.0.obj${i}` }));
+
+        const batches = buildBatches(objects, 2);
+
+        expect(batches).to.have.lengthOf(3);
+        expect(batches.map((b) => b.length)).to.deep.equal([2, 2, 1]);
+    });
+
+    it('keeps adapter types separate even when their objects are interleaved in the input order', () => {
+        const objects = [
+            { id: 'hm-rpc.0.a' },
+            { id: 'shelly.0.x' },
+            { id: 'hm-rpc.0.b' },
+            { id: 'shelly.0.y' },
+        ];
+
+        const batches = buildBatches(objects, 10);
+
+        expect(batches).to.have.lengthOf(2);
+        expect(batches[0].map((o) => o.id)).to.deep.equal(['hm-rpc.0.a', 'hm-rpc.0.b']);
+        expect(batches[1].map((o) => o.id)).to.deep.equal(['shelly.0.x', 'shelly.0.y']);
+    });
+
+    it('returns an empty array for no objects', () => {
+        expect(buildBatches([], 20)).to.deep.equal([]);
+    });
+});
 
 describe('runOnboarding', () => {
     it('classifies newly discovered objects and stores them in the catalog', async () => {

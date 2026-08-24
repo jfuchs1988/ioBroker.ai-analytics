@@ -3,6 +3,17 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Hinzugefügt
+- Onboarding-Klassifikations-Batches werden jetzt nach Adaptertyp gruppiert (nie zwei Adaptertypen in einem Batch), damit die KI pro Anfrage konsistenten Kontext hat, welchem Adapter die Objekte entstammen (`lib/onboarding.js`, neue Funktionen `buildBatches`/`adapterTypeOf`).
+- `getHistory` loggt vor jedem Abruf silly die exakte Anfrage an die History-Adapter-Instanz (Ziel-Instanz, sourceId, Zeitraum als ISO+ms, Aggregation), damit sich die tatsächlich ausgeführte Abfrage nachvollziehen lässt (`lib/dataAccess.js`).
+- Saubere Beschreibungen statt roher Datenpunkt-IDs im Chat: die KI wird beim Onboarding angewiesen, Beschreibungen auf Deutsch in Alltagssprache zu formulieren; `getHistory`/`compareTimeframes` liefern `description`/`room`/`unit` aus dem Katalogeintrag mit ans Modell zurück; die Systemprompts weisen das Modell an, in der Antwort die Beschreibung statt der rohen sourceId zu verwenden.
+- `description` ist jetzt im Geräte-Tab editierbar, analog zu Kategorie und Raum.
+
+### Behoben
+- Geräte-Tab (Liste/Bearbeiten/Entfernen) reagierte nicht (`[Fehler] Keine Antwort auf 'listCatalogEntries' nach 12000 ms`): `callAdapter()` im Admin-Tab fiel bei einem sendTo-Timeout nur für die "langsamen" Befehle (Chat, Re-Scan, Prüfung) auf die State-Bridge zurück, nicht aber für Geräteliste/-Bearbeitung/-Entfernen — obwohl sendTo aus dem Legacy-Tab-Kontext bereits als nicht zuverlässig dokumentiert war. Fällt jetzt für alle Befehle automatisch auf die Bridge zurück.
+
 ## [0.0.1-beta.7] - 2026-08-24
 
 ### Hinzugefügt
