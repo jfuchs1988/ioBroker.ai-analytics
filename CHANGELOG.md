@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Behoben
+- `LICENSE`-Datei war laut [ADR-0018](docs/adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) entschieden und lag lokal im Repo-Root, wurde aber nie committet — Folge: der Lizenz-Dialog des Admin beim Installieren aus Fremdquellen fand keinen Lizenztext auf GitHub (404) und zeigte HTML-Müll statt der Vereinbarung. Datei ist jetzt Teil des Repos.
+
 ## [0.0.1-beta.6] - 2026-08-24
 
 ### Hinzugefügt
