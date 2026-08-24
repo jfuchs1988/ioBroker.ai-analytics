@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.6",
+    "version": "0.0.1-beta.7",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.7": {
+        "en": "Chat answers (and Devices/Budget tab actions) now appear immediately instead of only after switching tabs: fixed a race condition and a response-shape bug in the admin tab's fallback transport. The AI now knows your location and local timezone (read from the ioBroker system config) instead of only UTC. The license dialog now shows the real license text.",
+        "de": "Chat-Antworten (und Aktionen im Geräte-/Budget-Tab) erscheinen jetzt sofort statt erst nach einem Tab-Wechsel: ein Timing- und ein Antwort-Format-Fehler im Ausweichkanal des Admin-Tabs wurden behoben. Die KI kennt jetzt Standort und lokale Zeitzone (aus der ioBroker-Systemkonfiguration) statt nur UTC. Der Lizenz-Dialog zeigt jetzt den echten Lizenztext."
+      },
       "0.0.1-beta.6": {
         "en": "Admin tab commands reach the adapter even when sendTo from the legacy HTML tab is not delivered (React Admin v7): new state-bridge fallback channel (admin.bridge) with automatic transport selection, and visible error messages instead of silently hanging UI.",
         "de": "Admin-Tab-Befehle erreichen den Adapter auch dann, wenn sendTo aus dem Legacy-HTML-Tab nicht zugestellt wird (React Admin v7): neuer State-Bridge-Ausweichkanal (admin.bridge) mit automatischer Transportwahl und sichtbaren Fehlermeldungen statt still hängender UI."

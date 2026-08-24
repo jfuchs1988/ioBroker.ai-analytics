@@ -3,9 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.7] - 2026-08-24
+
+### Hinzugefügt
+- Chat-Agent kennt jetzt Standort (aus `system.config`) und lokale Zeitzone des ioBroker-Hosts (neues Modul `lib/promptContext.js`) — vorher enthielt der Systemprompt nur die UTC-Zeit ohne jeden Zeitzonen- oder Standortbezug, der Agent musste raten oder aus dem Gesprächsverlauf schließen.
 
 ### Behoben
+- Admin-Chat-Tab: Antworten (und die eigene gesendete Frage) erschienen erst nach einem Tab-Wechsel, nicht direkt nach dem Senden — live reproduziert und zwei Ursachen im State-Bridge-Pfad gefunden: (1) das Antwort-Polling in `admin/tab.js` konnte die eigene, gerade erst geschriebene Anfrage nicht von der echten Antwort unterscheiden (beide teilen dieselbe `id`) und wertete sie fast immer fälschlich als Fehler; (2) `chatQuestion` liefert die Chat-History bei Erfolg direkt als Array, die UI prüfte aber auf ein `{history:[...]}`-Objekt und verwarf die Antwort stillschweigend. Betraf denselben Bridge-Pfad wie „Geräte neu einlesen“/„Prüfung jetzt ausführen“.
 - Lizenz-Dialog im Admin beim Anlegen einer Instanz zeigte die Admin-HTML-Seite statt des Lizenztexts: Für Adapter ohne `extIcon`/`readme` bleibt die Lizenz-URL leer (`fetch('')` lädt die aktuelle Seite), und ein GitHub-Fallback scheitert am privaten Repo. Neu: Kopie der Lizenz in `admin/LICENSE` (wird mit dem Adapter-Upload ausgeliefert) plus `common.licenseInformation` mit Link `/adapter/ai-analytics/LICENSE` — der Dialog zeigt jetzt den echten Lizenztext.
 - `LICENSE`-Datei war laut [ADR-0018](docs/adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) entschieden und lag lokal im Repo-Root, wurde aber nie committet — Folge: der Lizenz-Dialog des Admin beim Installieren aus Fremdquellen fand keinen Lizenztext auf GitHub (404) und zeigte HTML-Müll statt der Vereinbarung. Datei ist jetzt Teil des Repos.
 

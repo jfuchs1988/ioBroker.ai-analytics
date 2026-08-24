@@ -14,6 +14,7 @@ const { startProactiveScheduler } = require('./lib/scheduler');
 const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage');
 const adminCommands = require('./lib/adminCommands');
 const adminBridge = require('./lib/adminBridge');
+const { buildTimeAndLocationContext } = require('./lib/promptContext');
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -189,11 +190,12 @@ class AiAnalytics extends utils.Adapter {
 
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
+        const timeAndLocation = await buildTimeAndLocationContext(this);
         const { finalText, usage } = await runAgent({
             provider: this.chatProvider,
             tools: this.tools,
             systemPrompt:
-                `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
+                timeAndLocation +
                 'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
                 'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
                 'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
@@ -234,13 +236,15 @@ class AiAnalytics extends utils.Adapter {
         const priorEntries = await getRecentChatHistory(this, 10);
         const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
 
+        const timeAndLocation = await buildTimeAndLocationContext(this);
         const { finalText, usage } = await runAgent({
             provider: this.chatProvider,
             tools: this.tools,
             systemPrompt:
-                `Aktuelle Zeit: ${new Date().toISOString()} (${Date.now()} ms seit Epoch, Unix-Millisekunden). ` +
+                timeAndLocation +
                 'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
                 'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
+                'Falls der Nutzer nach seinem Standort oder der aktuellen Uhrzeit/Zeitzone fragt, nutze die oben genannten Angaben. ' +
                 'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
                 'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
             userMessage: question,
