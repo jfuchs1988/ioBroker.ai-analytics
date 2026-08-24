@@ -1,5 +1,13 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 const { classifyFromMetadata, detectPatternFromSamples, VALUE_KINDS } = require('../../lib/valueKindClassifier');
+
+function loadClassifierWithStubs({ getHistory }) {
+    return proxyquire('../../lib/valueKindClassifier', {
+        './dataAccess': { getHistory },
+    });
+}
 
 describe('VALUE_KINDS', () => {
     it('lists exactly the five defined value kinds', () => {
@@ -94,5 +102,71 @@ describe('detectPatternFromSamples', () => {
             { ts: 1, val: 10 }, { ts: 2, val: null }, { ts: 3, val: 20 }, { ts: 4, val: undefined }, { ts: 5, val: 30 },
         ];
         expect(detectPatternFromSamples(points)).to.equal('monotonic_no_reset');
+    });
+});
+
+describe('classifyValueKind', () => {
+    const obj = { id: 'sun2000.0.collected.dailyEnergyYield', common: { type: 'number', name: 'Heutiger Energieertrag' } };
+
+    it('returns the metadata result immediately for boolean_state (no history call)', async () => {
+        const getHistory = sinon.stub();
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+        const boolObj = { id: 'shelly.0.relay', common: { type: 'boolean', name: 'Relais' } };
+
+        const result = await classifyValueKind({}, boolObj, 'influxdb.0');
+
+        expect(result).to.deep.equal({ valueKind: 'boolean_state', valueKindConfidence: 'high', valueKindSource: 'metadata' });
+        expect(getHistory.called).to.equal(false);
+    });
+
+    it('confirms a daily_reset_counter from the first (48h) sample window', async () => {
+        const resetPoints = [
+            { ts: 1, val: 0 }, { ts: 2, val: 10 }, { ts: 3, val: 20 }, { ts: 4, val: 0.2 }, { ts: 5, val: 5 },
+        ];
+        const getHistory = sinon.stub().resolves(resetPoints);
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyValueKind({}, obj, 'influxdb.0');
+
+        expect(result).to.deep.equal({ valueKind: 'daily_reset_counter', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        expect(getHistory.calledOnce).to.equal(true);
+        expect(getHistory.firstCall.args[5]).to.equal('none');
+    });
+
+    it('escalates to a 7-day window and confirms cumulative_total once 5+ days without a reset are observed', async () => {
+        const inconclusive48h = [{ ts: 1, val: 10 }, { ts: 2, val: 15 }, { ts: 3, val: 20 }];
+        const monotonic7d = [{ ts: 1, val: 10 }, { ts: 2, val: 500 }, { ts: 3, val: 900 }];
+        const getHistory = sinon.stub();
+        getHistory.onFirstCall().resolves(inconclusive48h);
+        getHistory.onSecondCall().resolves(monotonic7d);
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyValueKind({}, obj, 'influxdb.0');
+
+        expect(result).to.deep.equal({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        expect(getHistory.calledTwice).to.equal(true);
+    });
+
+    it('falls back to the low-confidence metadata guess after exhausting all escalation steps', async () => {
+        const tooFewPoints = [{ ts: 1, val: 1 }];
+        const getHistory = sinon.stub().resolves(tooFewPoints);
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyValueKind({}, obj, 'influxdb.0');
+
+        expect(result).to.deep.equal({ valueKind: 'daily_reset_counter', valueKindConfidence: 'low', valueKindSource: 'metadata' });
+        expect(getHistory.callCount).to.equal(4);
+    });
+
+    it('confirms gauge as soon as a plain fluctuation is seen, without further escalation', async () => {
+        const fluctuating = [{ ts: 1, val: 20 }, { ts: 2, val: 18 }, { ts: 3, val: 22 }, { ts: 4, val: 19 }];
+        const getHistory = sinon.stub().resolves(fluctuating);
+        const gaugeObj = { id: 'sun2000.0.meter.activePower', common: { type: 'number', name: 'Wirkleistung' } };
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyValueKind({}, gaugeObj, 'influxdb.0');
+
+        expect(result).to.deep.equal({ valueKind: 'gauge', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        expect(getHistory.calledOnce).to.equal(true);
     });
 });
