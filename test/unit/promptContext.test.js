@@ -81,8 +81,27 @@ describe('getLocalDayBoundaries', () => {
         );
     });
 
-    it('spans exactly 24 hours', () => {
-        const { start, end } = getLocalDayBoundaries(Date.now(), 'Europe/Berlin');
+    it('spans 23 hours on a spring-forward (DST start) day in Europe/Berlin', () => {
+        const noonOnDstStart = Date.UTC(2026, 2, 29, 12, 0, 0); // 2026-03-29
+        const { start, end } = getLocalDayBoundaries(noonOnDstStart, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-03-28T23:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-03-29T22:00:00.000Z');
+        expect(end - start).to.equal(23 * 3600 * 1000);
+    });
+
+    it('spans 25 hours on a fall-back (DST end) day in Europe/Berlin', () => {
+        const noonOnDstEnd = Date.UTC(2026, 9, 25, 12, 0, 0); // 2026-10-25
+        const { start, end } = getLocalDayBoundaries(noonOnDstEnd, 'Europe/Berlin');
+
+        expect(new Date(start).toISOString()).to.equal('2026-10-24T22:00:00.000Z');
+        expect(new Date(end).toISOString()).to.equal('2026-10-25T23:00:00.000Z');
+        expect(end - start).to.equal(25 * 3600 * 1000);
+    });
+
+    it('spans exactly 24 hours on a day with no DST transition (UTC has none, ever)', () => {
+        const fixedNoonUtc = Date.UTC(2026, 5, 15, 12, 0, 0);
+        const { start, end } = getLocalDayBoundaries(fixedNoonUtc, 'UTC');
         expect(end - start).to.equal(24 * 3600 * 1000);
     });
 
