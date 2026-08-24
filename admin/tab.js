@@ -2,6 +2,12 @@
 let socket;
 let namespace;
 
+const SENDTO_TIMEOUT_MS = 12000;
+const BRIDGE_POLL_INTERVAL_MS = 400;
+const BRIDGE_TIMEOUT_FAST_MS = 60000;
+const BRIDGE_TIMEOUT_SLOW_MS = 300000;
+const SLOW_COMMANDS = ['chatQuestion', 'runDiscoveryNow', 'runProactiveCheckNow'];
+
 function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
@@ -182,52 +188,41 @@ function renderDeviceRow(entry) {
 
     const saveButton = document.createElement('button');
     saveButton.textContent = 'Speichern';
-    saveButton.addEventListener('click', () => {
-        socket.emit(
-            'sendTo',
-            namespace,
-            'updateCatalogEntryAdmin',
-            { sourceId: entry.sourceId, category: categorySelect.value, room: roomInput.value },
-            (response) => {
-                if (response && response.error) {
-                    showDevicesError(response.error);
-                } else {
-                    loadDevices();
-                }
-            }
-        );
+    saveButton.addEventListener('click', async () => {
+        try {
+            await callAdapter('updateCatalogEntryAdmin', {
+                sourceId: entry.sourceId,
+                category: categorySelect.value,
+                room: roomInput.value,
+            });
+            loadDevices();
+        } catch (error) {
+            showDevicesError(error.message);
+        }
     });
     actionsCell.appendChild(saveButton);
 
     const toggleButton = document.createElement('button');
     toggleButton.textContent = entry.ignored ? 'Aktivieren' : 'Ignorieren';
-    toggleButton.addEventListener('click', () => {
-        socket.emit(
-            'sendTo',
-            namespace,
-            'updateCatalogEntryAdmin',
-            { sourceId: entry.sourceId, ignored: !entry.ignored },
-            (response) => {
-                if (response && response.error) {
-                    showDevicesError(response.error);
-                } else {
-                    loadDevices();
-                }
-            }
-        );
+    toggleButton.addEventListener('click', async () => {
+        try {
+            await callAdapter('updateCatalogEntryAdmin', { sourceId: entry.sourceId, ignored: !entry.ignored });
+            loadDevices();
+        } catch (error) {
+            showDevicesError(error.message);
+        }
     });
     actionsCell.appendChild(toggleButton);
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Entfernen';
-    removeButton.addEventListener('click', () => {
-        socket.emit('sendTo', namespace, 'removeCatalogEntry', { sourceId: entry.sourceId }, (response) => {
-            if (response && response.error) {
-                showDevicesError(response.error);
-            } else {
-                loadDevices();
-            }
-        });
+    removeButton.addEventListener('click', async () => {
+        try {
+            await callAdapter('removeCatalogEntry', { sourceId: entry.sourceId });
+            loadDevices();
+        } catch (error) {
+            showDevicesError(error.message);
+        }
     });
     actionsCell.appendChild(removeButton);
 
@@ -244,17 +239,23 @@ function renderDevicesTable() {
     visible.forEach((entry) => tbody.appendChild(renderDeviceRow(entry)));
 }
 
-function loadDevices() {
-    socket.emit('sendTo', namespace, 'listCatalogEntries', {}, (response) => {
+async function loadDevices() {
+    try {
+        const response = await callAdapter('listCatalogEntries', {});
         allDeviceEntries = (response && response.entries) || [];
         renderDevicesTable();
-    });
+    } catch (error) {
+        allDeviceEntries = [];
+        renderDevicesTable();
+        showDevicesError(error.message);
+    }
 }
 
-function triggerRescan() {
+async function triggerRescan() {
     const status = document.getElementById('devices-status');
-    status.textContent = 'Re-Scan laeuft...';
-    socket.emit('sendTo', namespace, 'runDiscoveryNow', {}, (response) => {
+    status.textContent = 'Re-Scan laeuft... (Klassifikation kann bei vielen neuen Objekten einige Minuten dauern)';
+    try {
+        const response = await callAdapter('runDiscoveryNow', {});
         if (!response) {
             showDevicesError('Keine Antwort vom Adapter erhalten.');
             return;
@@ -270,13 +271,16 @@ function triggerRescan() {
             status.textContent = `Re-Scan fertig: ${response.newCount} neu, ${response.reactivatedCount} reaktiviert.`;
         }
         loadDevices();
-    });
+    } catch (error) {
+        showDevicesError(error.message);
+    }
 }
 
-function triggerProactiveCheck() {
+async function triggerProactiveCheck() {
     const status = document.getElementById('devices-status');
     status.textContent = 'Pruefung wird gestartet...';
-    socket.emit('sendTo', namespace, 'runProactiveCheckNow', {}, (response) => {
+    try {
+        const response = await callAdapter('runProactiveCheckNow', {});
         if (!response) {
             showDevicesError('Keine Antwort vom Adapter erhalten.');
             return;
@@ -290,7 +294,9 @@ function triggerProactiveCheck() {
             return;
         }
         status.textContent = 'Pruefung gestartet, Ergebnis erscheint im Chat.';
-    });
+    } catch (error) {
+        showDevicesError(error.message);
+    }
 }
 
 function renderBudgetChart(rangeEntries) {
@@ -387,43 +393,186 @@ function showSection(section) {
 
 function loadHistory() {
     socket.emit('getState', `${namespace}.chat.history`, (err, state) => {
-        if (!err && state && state.val) {
+        if (err || !state || !state.val) return;
+        try {
             renderHistory(JSON.parse(state.val));
+        } catch (parseError) {
+            console.error(`[ai-analytics tab] chat.history nicht lesbar: ${parseError.message}`);
         }
     });
 }
 
-function sendQuestion() {
+function appendChatError(message) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return;
+    const line = document.createElement('div');
+    line.className = 'chat-message chat-message-assistant';
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.textContent = `[Fehler] ${message}`;
+    line.appendChild(bubble);
+    container.appendChild(line);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendQuestion() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
     input.value = '';
     setLoading(true);
 
-    socket.emit('sendTo', namespace, 'chatQuestion', { text }, (response) => {
-        setLoading(false);
+    try {
+        const response = await callAdapter('chatQuestion', { text });
         if (response && response.history) {
             renderHistory(response.history);
         } else if (response && response.error) {
-            const container = document.getElementById('chat-messages');
-            const line = document.createElement('div');
-            line.textContent = `[Fehler] ${response.error}`;
-            container.appendChild(line);
+            appendChatError(response.error);
         }
-    });
+    } catch (error) {
+        appendChatError(error.message);
+    } finally {
+        setLoading(false);
+    }
 }
 
 function resolveConnection() {
     console.log('[ai-analytics tab] Versuche Verbindung herzustellen...');
-    if (window.parent && window.parent !== window && window.parent.socket) {
+    const parentWindow = window.parent && window.parent !== window ? window.parent : null;
+    if (parentWindow && parentWindow.socket && typeof parentWindow.socket.emit === 'function') {
         console.log('[ai-analytics tab] Verwende socket vom Elternfenster (parent.socket).');
-        return window.parent.socket;
+        return parentWindow.socket;
+    }
+    if (parentWindow && parentWindow.socketIo) {
+        // React-Admin exponiert die Connection-Instanz als window.socketIo; der rohen
+        // socket.io-Client darunter ist .socket (mit emit), nicht die Connection selbst.
+        const rawSocket = parentWindow.socketIo.socket;
+        if (rawSocket && typeof rawSocket.emit === 'function') {
+            console.log('[ai-analytics tab] Verwende raw socket vom Elternfenster (parent.socketIo.socket).');
+            return rawSocket;
+        }
     }
     if (typeof io !== 'undefined') {
         console.log('[ai-analytics tab] Verwende eigenes io.connect() (same-origin).');
         return io.connect();
     }
     return null;
+}
+
+function emitSendTo(command, message, timeoutMs) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            reject(new Error(`Keine Antwort auf '${command}' nach ${timeoutMs} ms`));
+        }, timeoutMs);
+        try {
+            socket.emit('sendTo', namespace, command, message, (response) => {
+                clearTimeout(timer);
+                resolve(response);
+            });
+        } catch (error) {
+            clearTimeout(timer);
+            reject(error);
+        }
+    });
+}
+
+function bridgeEmitRequest(requestId, command, message) {
+    return new Promise((resolve, reject) => {
+        try {
+            socket.emit(
+                'setState',
+                `${namespace}.admin.bridge`,
+                { val: JSON.stringify({ id: requestId, command, message }), ack: false },
+                (err) => {
+                    if (err) {
+                        reject(new Error(`Bridge-Zugriff verweigert: ${typeof err === 'string' ? err : JSON.stringify(err)}`));
+                    } else {
+                        resolve();
+                    }
+                }
+            );
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+function bridgeReadState() {
+    return new Promise((resolve) => {
+        try {
+            socket.emit('getState', `${namespace}.admin.bridge`, (err, state) => {
+                resolve(err ? null : state);
+            });
+        } catch (error) {
+            resolve(null);
+        }
+    });
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+let bridgeQueue = Promise.resolve();
+
+/**
+ * Ein Befehl ueber den State-Bridge-Kanal. Anfragen werden serialisiert, damit sich
+ * Request/Response-Austausch an dem einen Bridge-State nicht ueberlappen.
+ * Liefert das Ergebnisobjekt oder wirft bei {ok:false} bzw. Zeitueberschreitung.
+ */
+function bridgeCall(command, message, timeoutMs) {
+    const run = bridgeQueue.then(async () => {
+        const requestId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await bridgeEmitRequest(requestId, command, message);
+
+        const deadline = Date.now() + timeoutMs;
+        while (Date.now() < deadline) {
+            const state = await bridgeReadState();
+            let parsed = null;
+            if (state && typeof state.val === 'string') {
+                try {
+                    parsed = JSON.parse(state.val);
+                } catch (parseError) {
+                    parsed = null;
+                }
+            }
+            if (parsed && parsed.id === requestId) {
+                if (parsed.ok) {
+                    return parsed.result;
+                }
+                throw new Error(parsed.error || 'Unbekannter Fehler (State-Bridge)');
+            }
+            await sleep(BRIDGE_POLL_INTERVAL_MS);
+        }
+        throw new Error(`Keine Antwort auf '${command}' über die State-Bridge nach ${timeoutMs} ms`);
+    });
+    bridgeQueue = run.catch(() => {});
+    return run;
+}
+
+/**
+ * Zentraler Transport fuer alle Adapter-Befehle:
+ * 1. sendTo (idiomatisch, schnell) — mit kurzem Timeout.
+ * 2. Bei Ausbleiben: State-Bridge (getState/setState sind im Legacy-Tab bewusst
+ *    funktionsfaehig; sendTo dort nachweislich nicht).
+ * Langlaufende Befehle (LLM-Latenz!) gehen direkt per Bridge, damit kein Doppel-Aufruf
+ * entsteht, wenn sendTo spaet statt nie antwortet.
+ */
+async function callAdapter(command, message) {
+    if (!socket) {
+        throw new Error('Keine Verbindung zu ioBroker.');
+    }
+
+    const bridgeTimeoutMs = SLOW_COMMANDS.includes(command) ? BRIDGE_TIMEOUT_SLOW_MS : BRIDGE_TIMEOUT_FAST_MS;
+
+    if (!SLOW_COMMANDS.includes(command)) {
+        const response = await emitSendTo(command, message, SENDTO_TIMEOUT_MS);
+        console.log(`[ai-analytics tab] '${command}' über sendTo beantwortet.`);
+        return response;
+    }
+
+    console.log(`[ai-analytics tab] '${command}' über State-Bridge.`);
+    return bridgeCall(command, message, bridgeTimeoutMs);
 }
 
 function init() {

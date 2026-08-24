@@ -25,5 +25,7 @@ Der Adapter läuft als einzelner Node.js-Prozess innerhalb der bestehenden ioBro
 
 Bestätigt im Abnahmetest (2026-08-21): Adapter läuft fehlerfrei auf einer Instanz mit Redis-basiertem States-/Objects-Backend (js-controller 7.2.2, Node.js 22.23.2) — kein spezifisches Backend vorausgesetzt, da nur die generische Adapter-API genutzt wird.
 
+Hinweis zur UI-Kommunikation: Befehle aus dem Admin-Tab erreichen den Adapter über den `sendTo`-Message-Bus und — als Ausweichkanal, falls `sendTo` aus dem Legacy-Tab-Kontext nicht zustellt — über State-Schreibzugriffe auf `ai-analytics.<instanz>.admin.bridge` durch die States-/Objects-DB, siehe [ADR-0023](../adr/0023-state-bridge-ausweichkanal-admin-tab.md).
+
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [6. Laufzeitsicht](06-laufzeitsicht.md) · weiter zu [8. Querschnittliche Konzepte](08-querschnittliche-konzepte.md)

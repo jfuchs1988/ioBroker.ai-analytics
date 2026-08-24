@@ -34,7 +34,7 @@
 
 | Schnittstelle | Partner | Protokoll/Format |
 |---|---|---|
-| Chat-Frage/-Antwort | Admin-Chat-Tab (Browser) | ioBroker-Socket (`sendTo`, `getState`) |
+| Chat-Frage/-Antwort, Admin-Befehle | Admin-Chat-Tab (Browser) | ioBroker-Socket: `sendTo`/`getState`, bei Nichtzustellung von `sendTo` zusätzlich State-Bridge `admin.bridge` (`setState`/Polling, siehe [ADR-0023](../adr/0023-state-bridge-ausweichkanal-admin-tab.md)) |
 | Historische Daten | influxdb-/history-/sql-Adapterinstanz | ioBroker `sendTo` Message-API, Kommando `getHistory` |
 | LLM-Aufrufe | Anthropic Messages API / OpenAI-kompatible Chat-Completions API | HTTPS/REST, JSON, `fetch` |
 | Konfiguration | ioBroker Admin (JSON Config) | `io-package.json` `native`-Felder |

@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Hinzugefügt
+- Neues ADR-0023 dokumentiert den State-Bridge-Ausweichkanal für Admin-Tab-Befehle, siehe [ADR-0023](docs/adr/0023-state-bridge-ausweichkanal-admin-tab.md).
+
+### Behoben
+- Admin-Tab: Befehle aus dem Tab (Chat-Frage, Geräteliste, Re-Scan, Prüfung, Katalog-Änderungen) erreichen den Adapter jetzt auch dann, wenn `sendTo` aus dem Legacy-Tab-Kontext nicht ankommt (React-Admin v7 stellt Legacy-HTML-Tabs keinen privilegierten Socket bereit; Lesezugriffe funktionieren dort nachweislich). Neu: State-Bridge über den State `ai-analytics.<instanz>.admin.bridge` (`lib/adminBridge.js`) — schnelle Befehle laufen weiterhin zuerst per `sendTo` mit Timeout und weichen automatisch aus; langlaufende Befehle (Chat, Re-Scan, Prüfung) gehen direkt per Bridge, um Doppel-Ausführung zu vermeiden.
+- Admin-Tab: still hängende UI-Zustände beseitigt — ein ausbleibender Callback ließ die Senden-Schaltfläche dauerhaft deaktiviert und die Geräteliste stumm leer. Jetzt führt jeder Transport-/Verarbeitungsfehler sichtbar zur Fehleranzeige (Chat-Fehlerbubble bzw. Statuszeile im Geräte-Tab), und die Senden-Schaltfläche wird in jedem Fall wieder freigegeben.
+- Admin-Tab: `chat.history` mit ungültigem JSON-Inhalt wirft keinen Laufzeitfehler mehr beim Öffnen des Tabs.
+
 ## [0.0.1-beta.5] - 2026-08-23
 
 ### Hinzugefügt
