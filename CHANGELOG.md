@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.17] - 2026-09-03
+
+### Geändert
+- Sponsor-Links in Einstellungen und Custom-Tab optisch vereinheitlicht und als GitHub Sponsors beschriftet.
+
 ## [0.0.1-beta.16] - 2026-09-03
 
 ### Behoben
