@@ -1,5 +1,7 @@
 # Chat Fixes & Safeguards Implementation Plan
 
+> **Status: umgesetzt (2026-08-24).** Chat-Gedächtnis, Katalog-Schreibwerkzeug, Token-Budget, Logging und die Admin-Transport-Fallbacks sind umgesetzt. Der Plan bleibt als historische Umsetzungsspezifikation erhalten.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Fix the broken admin chat tab, let the chat agent resolve its own onboarding rückfragen, give the chat agent short-term conversation memory, add a daily LLM token budget safeguard, and add `silly`-level logging across discovery/onboarding/agent/main so real usage is observable.

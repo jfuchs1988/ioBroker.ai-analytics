@@ -1,5 +1,7 @@
 # Geräte-Tab, Tab-Verbindungsfix, manuelle Trigger, Budget-Anzeige — Implementierungsplan
 
+> **Status: abgeschlossen (2026-09-02).** Geräteverwaltung, manuelle Trigger, Budgetanzeige, State-Bridge und die Verlagerung der Geräteübersicht in die Adapter-Einstellungen sind umgesetzt. Die verbleibende Live-Abnahme ist in den Risiken dokumentiert.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Erkannte (historisierte) Objekte im Admin-UI verwalten können (Kategorie/Raum ändern, ignorieren, entfernen), plus manuelle Trigger für Re-Scan und proaktive Prüfung, plus eine Token-Budget-Anzeige — alles über einen reparierten, um Sub-Navigation erweiterten Custom-Admin-Tab, mit `silly`-Logging für jede Aktion.

@@ -1,5 +1,7 @@
 # Token-Kosten-Tab Implementation Plan
 
+> **Status: abgeschlossen (2026-08-23).** Verbrauchshistorie, getrennte Onboarding-Verbrauchserfassung, manuelle Preisfelder, Kostenanzeige und Limit-Empfehlung sind umgesetzt und in `0.0.1-beta.5` dokumentiert. Die Checkboxen darunter stammen aus dem ursprünglichen TDD-Arbeitsplan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Der bestehende Budget-Bereich im Geräte-Tab zeigt zusätzlich eine Verbrauchs-Historie (Balkendiagramm, wählbar 30 Tage/gesamt), berechnete Kosten (Chat/Prüfung + Onboarding getrennt, aus manuell gepflegten Preisen) und eine heuristische Tages-/Stunden-Limit-Empfehlung. Onboarding-Token-Verbrauch, der bisher gar nicht erfasst wurde, fließt jetzt korrekt ins Tagesbudget und die Historie ein.

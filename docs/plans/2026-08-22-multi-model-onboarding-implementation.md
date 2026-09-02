@@ -1,5 +1,7 @@
 # Multi-Model-Onboarding + Start-Selbstprüfung Implementation Plan
 
+> **Status: abgeschlossen (2026-08-22).** Getrennte Provider für Onboarding und Chat/Prüfung, Start-Selbstprüfung und granularer Fehlerpfad sind umgesetzt und in `0.0.1-beta.4` dokumentiert. Die Checkboxen darunter stammen aus dem ursprünglichen TDD-Arbeitsplan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Onboarding kann ein eigenes, vom Chat/Prüfungs-Provider unabhängiges LLM-Modell nutzen; beim Adapter-Start wird die Erreichbarkeit beider konfigurierten Provider geprüft, und ein fehlgeschlagener Check blockiert nur die betroffene Funktion (Onboarding-Klassifikation bzw. Chat/proaktive Prüfung), nicht den ganzen Adapter.
