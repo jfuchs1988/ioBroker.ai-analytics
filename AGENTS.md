@@ -52,7 +52,7 @@ Siehe [docs/architecture/11-risiken-und-schulden.md](docs/architecture/11-risike
 Vollständig in [CONTRIBUTING.md](CONTRIBUTING.md) dokumentiert. Kernpunkte:
 
 - **Branching**: Für jeden Task wird ein neuer Task-Branch vom aktuellen Integrationsstand angelegt. Nach Abschluss wird jeder Task lokal per `git merge --no-ff` nach `master` gemergt. Push, Release und Tags erfolgen nur auf ausdrücklichen Nutzerwunsch.
-- **Spec + Plan vor Code** bei neuen Features/Verhaltensänderungen (`docs/specs/`, `docs/plans/`); **eigene ADR** (`docs/adr/`) bei architekturrelevanten Entscheidungen; Bugfixes/Tippfehler/kleine Refactorings direkt auf `develop`.
+- **Spec + Plan vor Code** bei neuen Features/Verhaltensänderungen (`docs/specs/`, `docs/plans/`); **eigene ADR** (`docs/adr/`) bei architekturrelevanten Entscheidungen.
 - **TDD**: pro Task Test zuerst (rot), dann Implementierung (grün), dann Commit. Neue `lib/*`-Module bekommen eigene Unit-Tests mit gemockter Adapter-API.
 - **Dokumentation im selben Commit/PR aktuell halten**: neues Modul/geänderte Schnittstelle → [05-bausteinsicht.md](docs/architecture/05-bausteinsicht.md); neuer/gelöster Mangel → [11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md); Architekturentscheidung → neue ADR + [adr-index.md](docs/adr/adr-index.md); Release → [CHANGELOG.md](CHANGELOG.md).
 - **Modellwahl**: günstiges/schnelles Modell für Implementierung (sofern der Plan schon detailliert genug ist), teuerstes verfügbares Modell für Review/Denken/Architekturentscheidungen (siehe [ADR-0011](docs/adr/0011-subagent-driven-development.md)).
