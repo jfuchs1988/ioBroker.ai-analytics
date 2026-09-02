@@ -28,6 +28,15 @@
           "lg": 3,
           "xl": 3
         },
+        "settingsCsv": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/SettingsCsvComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
+          "newLine": true,
+          "label": "Settings sichern / importieren"
+        },
         "topDivider": {
           "type": "divider",
           "newLine": true

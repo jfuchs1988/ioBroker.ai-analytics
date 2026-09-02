@@ -1,4 +1,4 @@
-import CatalogDevicesComponent from './Components.jsx';
+import CatalogDevicesComponent, { SettingsCsvComponent } from './Components.jsx';
 
-export { CatalogDevicesComponent };
-export default { CatalogDevicesComponent };
+export { CatalogDevicesComponent, SettingsCsvComponent };
+export default { CatalogDevicesComponent, SettingsCsvComponent };

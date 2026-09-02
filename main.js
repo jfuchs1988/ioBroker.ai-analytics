@@ -7,7 +7,7 @@ const { getAllCatalogEntries, setCatalogEntry, markInactive } = require('./lib/c
 const { createProvider } = require('./lib/providers');
 const { checkProviderReachable, ensureReachabilityStates, CHAT_STATE, ONBOARDING_STATE } = require('./lib/providerHealthCheck');
 const { buildTools } = require('./lib/tools');
-const { runAgent } = require('./lib/agent');
+const { runAgent, MAX_ITERATIONS } = require('./lib/agent');
 const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
@@ -337,34 +337,45 @@ class AiAnalytics extends utils.Adapter {
      */
     async runProactiveCheck() {
         this.log.silly('Proaktive Pruefung: Lauf gestartet');
+        await this.updateCatalogSyncState({ running: true, phase: 'check', processed: 0, total: MAX_ITERATIONS, message: 'Prüfung der Geräte läuft ...', error: null });
 
         if (!this.chatProviderOk) {
             this.log.warn('Proaktive Pruefung uebersprungen, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
+            await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Modell nicht erreichbar.' });
             return { skipped: true, reason: 'chatProviderUnreachable' };
         }
 
         if (await isBudgetExceeded(this)) {
             this.log.warn('Proaktive Pruefung: Tagesbudget an Tokens ist erschoepft, Lauf wird uebersprungen.');
+            await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Budget erschöpft.' });
             return { skipped: true, reason: 'budgetExceeded' };
         }
 
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
         const timeAndLocation = await buildTimeAndLocationContext(this);
-        const { finalText, usage } = await runAgent({
-            provider: this.chatProvider,
-            tools: this.tools,
-            systemPrompt:
-                timeAndLocation +
-                'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
-                'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
-                'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
-                'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
-                'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
-                'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
-                'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
-            userMessage: 'Fuehre die periodische Pruefung durch.',
-        });
+        let finalText;
+        let usage;
+        try {
+            ({ finalText, usage } = await runAgent({
+                provider: this.chatProvider,
+                tools: this.tools,
+                systemPrompt:
+                    timeAndLocation +
+                    'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
+                    'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
+                    'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
+                    'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
+                    'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
+                    'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
+                    'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
+                userMessage: 'Fuehre die periodische Pruefung durch.',
+                onProgress: progress => this.updateCatalogSyncState({ phase: 'check', processed: progress.processed, total: progress.total, message: `Prüfung läuft ... ${Math.round((progress.processed / progress.total) * 100)}%` }),
+            }));
+        } catch (error) {
+            await this.updateCatalogSyncState({ running: false, phase: 'error', message: `Prüfung fehlgeschlagen: ${error.message}`, error: error.message, finishedAt: new Date().toISOString() });
+            throw error;
+        }
 
         await recordUsage(this, usage, 'chat');
 
@@ -372,10 +383,12 @@ class AiAnalytics extends utils.Adapter {
         this.log.silly(`Proaktive Pruefung: Lauf beendet, Ergebnis: ${isNothingFound ? 'keine Auffaelligkeiten' : 'Auffaelligkeit gefunden'}`);
 
         if (isNothingFound && silentIfNothingFound) {
+            await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
             return { skipped: false };
         }
 
         await appendChatMessage(this, 'assistant', finalText);
+        await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
         return { skipped: false };
     }
 
