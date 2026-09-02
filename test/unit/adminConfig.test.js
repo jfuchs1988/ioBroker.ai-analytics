@@ -6,14 +6,12 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const SPONSOR_URL = 'https://github.com/sponsors/jfuchs1988';
 
 describe('admin configuration links and model discovery', () => {
-    it('uses provider-backed autocomplete with manual fallback for both model fields', () => {
+    it('uses a plain manual text field for both model fields', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         const settings = config.items.settingsTab ? config.items.settingsTab.items : config.items;
 
         for (const field of ['model', 'onboardingModel']) {
-            expect(settings[field].type).to.equal('autocompleteSendTo');
-            expect(settings[field].command).to.equal('listProviderModels');
-            expect(settings[field].freeSolo).to.equal(true);
+            expect(settings[field].type).to.equal('text');
         }
     });
 
