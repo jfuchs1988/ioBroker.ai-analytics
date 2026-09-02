@@ -30,5 +30,12 @@
 
 Noch nicht im Abnahmetest geprüft (Testlauf würde bis zu 24h nach Adapterstart dauern, oder erfordert einen manuellen Trigger, den es aktuell nicht gibt — siehe [Offene Architekturentscheidungen](../adr/backlog.md)).
 
+## 6.4 Modellvorschläge in der Admin-Konfiguration
+
+1. Das `autocompleteSendTo`-Feld sendet Provider-Typ, API-Key und optionale Basis-URL direkt an `listProviderModels`.
+2. `providers.listModels` ruft den Modell-Endpunkt des gewählten Providers mit einem 15-Sekunden-Timeout auf. Der API-Key wird nur für diesen Aufruf verwendet und nicht geloggt oder persistiert.
+3. OpenRouter verwendet standardmäßig `https://openrouter.ai/api/v1/models` und liefert nur Modelle zurück, deren Live-Metadaten kostenlose Ein-/Ausgabe und Tool-Calling ausweisen. Andere Provider liefern ihre verfügbaren Modelle ohne Kostenklassifikation.
+4. Bei Fehlern erhält die UI eine leere Vorschlagsliste. `freeSolo:true` erlaubt weiterhin die manuelle Eingabe einer Modell-ID.
+
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [5. Bausteinsicht](05-bausteinsicht.md) · weiter zu [7. Verteilungssicht](07-verteilungssicht.md)

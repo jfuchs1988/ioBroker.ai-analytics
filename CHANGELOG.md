@@ -3,12 +3,19 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.10] - 2026-09-02
 
 ### Hinzugefügt
 - `valueKind`-Klassifizierung aus Metadaten und History-Datenprobe, sichtbar und manuell korrigierbar im Geräte-Tab.
 - Typbewusste Werkzeuge `getPeriodTotal` und `comparePeriods`, die für Zähler, Schalter und Momentanwerte die passende Aggregation verwenden.
 - Optionaler Backfill für bestehende Katalogeinträge.
+- Dynamische Modellvorschläge in der Admin-Konfiguration; OpenRouter zeigt automatisch nur aktuell kostenlose Modelle mit Tool-Calling, andere Provider und lokale Endpunkte ihre gemeldeten Modelle. Manuelle Modell-IDs bleiben möglich.
+- Direkte Einstiegslinks zu OpenRouter und OpenCode Zen sowie GitHub-Sponsors-Links in Konfiguration und Custom-Tab.
+- `.github/FUNDING.yml` und npm-`funding`-Metadaten für den GitHub-Sponsor-Button.
+- Geräteübersicht als dynamische Custom-Komponente in den Adapter-Einstellungen; der separate Custom-Tab ist dadurch auf Chat und Budget reduziert.
+
+### Behoben
+- OpenRouter verwendete ohne manuell gesetzte Basis-URL fälschlich den OpenAI-Endpunkt; Standard ist jetzt `https://openrouter.ai/api/v1`.
 
 ## [0.0.1-beta.9] - 2026-08-24
 

@@ -1,9 +1,13 @@
 // test/unit/providers.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { createAnthropicProvider } = require('../../lib/providers/anthropic');
-const { createOpenAiCompatibleProvider } = require('../../lib/providers/openaiCompatible');
-const { createProvider } = require('../../lib/providers');
+const { createAnthropicProvider, listAnthropicModels } = require('../../lib/providers/anthropic');
+const {
+    createOpenAiCompatibleProvider,
+    listOpenAiCompatibleModels,
+    resolveOpenAiBaseUrl,
+} = require('../../lib/providers/openaiCompatible');
+const { createProvider, listModels } = require('../../lib/providers');
 
 describe('anthropic provider', () => {
     afterEach(() => sinon.restore());
@@ -106,6 +110,23 @@ describe('anthropic provider', () => {
 
         expect(result.usage).to.deep.equal({ inputTokens: 0, outputTokens: 0 });
     });
+
+    it('lists Anthropic models with their display names', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({ data: [{ id: 'claude-b', display_name: 'Claude B' }, { id: 'claude-a' }] }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const models = await listAnthropicModels({ apiKey: 'secret' });
+
+        expect(fetchStub.firstCall.args[0]).to.equal('https://api.anthropic.com/v1/models?limit=1000');
+        expect(fetchStub.firstCall.args[1].headers['x-api-key']).to.equal('secret');
+        expect(models).to.deep.equal([
+            { id: 'claude-b', name: 'Claude B', isFree: false },
+            { id: 'claude-a', name: 'claude-a', isFree: false },
+        ]);
+    });
 });
 
 describe('openai-compatible provider', () => {
@@ -168,6 +189,75 @@ describe('openai-compatible provider', () => {
         expect(fetchStub.firstCall.args[0]).to.equal('http://localhost:1234/v1/chat/completions');
     });
 
+    it('uses the OpenRouter API by default for the openrouter provider', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const provider = createOpenAiCompatibleProvider({ type: 'openrouter', apiKey: 'key', model: 'free-model' });
+        await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(fetchStub.firstCall.args[0]).to.equal('https://openrouter.ai/api/v1/chat/completions');
+    });
+
+    it('normalizes custom base URLs and requires one for local providers', () => {
+        expect(resolveOpenAiBaseUrl('openai', '')).to.equal('https://api.openai.com/v1');
+        expect(resolveOpenAiBaseUrl('openrouter', '')).to.equal('https://openrouter.ai/api/v1');
+        expect(resolveOpenAiBaseUrl('local', 'http://localhost:1234/v1/')).to.equal('http://localhost:1234/v1');
+        expect(() => resolveOpenAiBaseUrl('local', '')).to.throw('Basis-URL');
+    });
+
+    it('lists only free OpenRouter models that support tools', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({
+                data: [
+                    {
+                        id: 'vendor/free-tools:free',
+                        name: 'Free Tools',
+                        supported_parameters: ['tools'],
+                        pricing: { prompt: '0', completion: '0', request: '0' },
+                    },
+                    {
+                        id: 'vendor/free-no-tools:free',
+                        supported_parameters: [],
+                        pricing: { prompt: '0', completion: '0' },
+                    },
+                    {
+                        id: 'vendor/paid-tools',
+                        supported_parameters: ['tools'],
+                        pricing: { prompt: '0.000001', completion: '0' },
+                    },
+                ],
+            }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const models = await listOpenAiCompatibleModels({ type: 'openrouter', apiKey: 'secret' });
+
+        expect(fetchStub.firstCall.args[0]).to.equal('https://openrouter.ai/api/v1/models');
+        expect(models).to.deep.equal([{ id: 'vendor/free-tools:free', name: 'Free Tools', isFree: true }]);
+    });
+
+    it('lists models from a local endpoint without sending an empty bearer token', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({ data: [{ id: 'z-model' }, { id: 'a-model' }] }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const models = await listOpenAiCompatibleModels({ type: 'local', baseUrl: 'http://localhost:1234/v1/' });
+
+        expect(fetchStub.firstCall.args[0]).to.equal('http://localhost:1234/v1/models');
+        expect(fetchStub.firstCall.args[1].headers).not.to.have.property('authorization');
+        expect(models).to.deep.equal([
+            { id: 'z-model', name: 'z-model', isFree: false },
+            { id: 'a-model', name: 'a-model', isFree: false },
+        ]);
+    });
+
     it('extracts usage from the response', async () => {
         sinon.stub(global, 'fetch').resolves({
             ok: true,
@@ -206,13 +296,25 @@ describe('createProvider', () => {
 
     it('routes openai/openrouter/local to the OpenAI-compatible client', () => {
         for (const type of ['openai', 'openrouter', 'local']) {
-            const provider = createProvider({ type, apiKey: 'k' });
+            const provider = createProvider({
+                type,
+                apiKey: 'k',
+                baseUrl: type === 'local' ? 'http://localhost:1234/v1' : undefined,
+            });
             expect(provider).to.have.property('chat').that.is.a('function');
         }
     });
 
     it('throws on unknown provider type', () => {
         expect(() => createProvider({ type: 'unknown' })).to.throw('Unknown provider type: unknown');
+    });
+
+    it('routes model discovery through the selected provider', async () => {
+        sinon.stub(global, 'fetch').resolves({ ok: true, json: async () => ({ data: [{ id: 'model-a' }] }) });
+
+        const models = await listModels({ type: 'openai', apiKey: 'k' });
+
+        expect(models).to.deep.equal([{ id: 'model-a', name: 'model-a', isFree: false }]);
     });
 
     it('retries a failing chat() call and returns the result once it succeeds', async () => {

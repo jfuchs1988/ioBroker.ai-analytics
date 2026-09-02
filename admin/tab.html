@@ -8,6 +8,7 @@
         #nav { display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid #ddd; }
         .nav-btn { padding: 6px 14px; border: 1px solid #ccc; background: #f5f5f5; cursor: pointer; }
         .nav-btn.active { background: #1976d2; color: #fff; border-color: #1976d2; }
+        .sponsor-link { margin-left: auto; padding: 6px 12px; color: #7a4b00; background: #fff4cc; border: 1px solid #e1bd55; border-radius: 4px; text-decoration: none; }
         .section[hidden] { display: none; }
         #chat-messages { height: 70vh; overflow-y: auto; padding: 12px; box-sizing: border-box; }
         .chat-message { display: flex; flex-direction: column; margin-bottom: 8px; }
@@ -40,8 +41,8 @@
 <body>
     <div id="nav">
         <button class="nav-btn active" data-section="chat">Chat</button>
-        <button class="nav-btn" data-section="devices">Geräte</button>
-        <button class="nav-btn" data-section="budget">Budget</button>
+                <button class="nav-btn" data-section="budget">Budget</button>
+        <a class="sponsor-link" href="https://github.com/sponsors/jfuchs1988" target="_blank" rel="noopener noreferrer">Projekt unterstützen</a>
     </div>
 
     <div id="section-chat" class="section">
@@ -50,21 +51,6 @@
             <input id="chat-input" type="text" placeholder="Frage stellen..." />
             <button id="chat-send">Senden</button>
         </div>
-    </div>
-
-    <div id="section-devices" class="section" hidden>
-        <div id="devices-toolbar">
-            <button id="devices-rescan">Geräte neu einlesen</button>
-            <button id="devices-check-now">Prüfung jetzt ausführen</button>
-            <input id="devices-filter" type="text" placeholder="Filtern nach Kategorie, Raum, Status..." />
-        </div>
-        <div id="devices-status"></div>
-        <table id="devices-table">
-            <thead>
-                <tr><th>Objekt-ID</th><th>Beschreibung</th><th>Kategorie</th><th>Verhalten</th><th>Einheit</th><th>Raum</th><th>Status</th><th>Aktionen</th></tr>
-            </thead>
-            <tbody id="devices-tbody"></tbody>
-        </table>
     </div>
 
     <div id="section-budget" class="section" hidden>

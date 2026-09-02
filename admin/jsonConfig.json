@@ -1,6 +1,10 @@
 {
-  "type": "panel",
+  "type": "tabs",
   "items": {
+    "settingsTab": {
+      "type": "panel",
+      "label": "Einstellungen",
+      "items": {
     "providerType": {
       "type": "select",
       "label": "LLM-Provider",
@@ -15,9 +19,27 @@
       "type": "password",
       "label": "API-Key"
     },
+    "openRouterSignup": {
+      "type": "staticLink",
+      "label": "OpenRouter API-Key erstellen (empfohlen fuer automatisch erkannte kostenlose Tool-Modelle)",
+      "href": "https://openrouter.ai/settings/keys",
+      "button": true,
+      "variant": "outlined"
+    },
+    "openCodeZenSignup": {
+      "type": "staticLink",
+      "label": "OpenCode Zen ansehen (alternative, teilweise zeitlich begrenzt kostenlose API)",
+      "href": "https://opencode.ai/auth",
+      "button": true,
+      "variant": "text"
+    },
     "model": {
-      "type": "text",
-      "label": "Modell"
+      "type": "autocompleteSendTo",
+      "label": "Modell (OpenRouter zeigt kostenlose Tool-Modelle)",
+      "command": "listProviderModels",
+      "jsonData": "{\"providerType\":\"${data.providerType}\",\"apiKey\":\"${data.apiKey}\",\"baseUrl\":\"${data.baseUrl}\"}",
+      "alsoDependsOn": ["providerType", "apiKey", "baseUrl"],
+      "freeSolo": true
     },
     "baseUrl": {
       "type": "text",
@@ -55,8 +77,12 @@
       "label": "API-Key (Onboarding)"
     },
     "onboardingModel": {
-      "type": "text",
-      "label": "Modell (Onboarding)"
+      "type": "autocompleteSendTo",
+      "label": "Modell (Onboarding; OpenRouter zeigt kostenlose Tool-Modelle)",
+      "command": "listProviderModels",
+      "jsonData": "{\"providerType\":\"${data.onboardingProviderType}\",\"apiKey\":\"${data.onboardingApiKey}\",\"baseUrl\":\"${data.onboardingBaseUrl}\"}",
+      "alsoDependsOn": ["onboardingProviderType", "onboardingApiKey", "onboardingBaseUrl"],
+      "freeSolo": true
     },
     "onboardingBaseUrl": {
       "type": "text",
@@ -95,6 +121,40 @@
       "type": "checkbox",
       "label": "Bestehende Datenpunkte nachtraeglich auf Auspraegung (valueKind) pruefen",
       "default": false
+    },
+    "sponsorLink": {
+      "type": "staticLink",
+      "label": "Projekt ueber GitHub Sponsors unterstuetzen",
+      "href": "https://github.com/sponsors/jfuchs1988",
+      "button": true,
+      "variant": "contained",
+      "color": "primary"
+    }
+      }
+    },
+    "devicesTab": {
+      "type": "panel",
+      "label": "Geräte",
+      "items": {
+        "devicesHint": {
+          "type": "staticText",
+          "text": "Hier werden alle historisierten und katalogisierten Datenpunkte verwaltet. Änderungen werden direkt im Katalog gespeichert."
+        },
+        "devicesSponsorLink": {
+          "type": "staticLink",
+          "label": "Projekt ueber GitHub Sponsors unterstuetzen",
+          "href": "https://github.com/sponsors/jfuchs1988",
+          "button": true,
+          "variant": "outlined"
+        },
+        "catalogDevices": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/CatalogDevicesComponent",
+          "guiApi": 2,
+          "bundlerType": "module"
+        }
+      }
     }
   }
 }

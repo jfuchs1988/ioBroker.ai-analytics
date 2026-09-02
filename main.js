@@ -310,6 +310,7 @@ class AiAnalytics extends utils.Adapter {
         }
 
         const adminCommandHandlers = {
+            listProviderModels: () => adminCommands.listProviderModels(this, message),
             listCatalogEntries: () => adminCommands.listCatalogEntries(this),
             updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, message),
             removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, message),
@@ -326,7 +327,12 @@ class AiAnalytics extends utils.Adapter {
 
     async onMessage(obj) {
         if (!obj || !obj.command) return;
-        if (obj.command !== 'chatQuestion' && !adminBridge.ALLOWED_COMMANDS.includes(obj.command)) return;
+        if (
+            obj.command !== 'chatQuestion' &&
+            obj.command !== 'listProviderModels' &&
+            !adminBridge.ALLOWED_COMMANDS.includes(obj.command)
+        )
+            return;
 
         try {
             const result = await this.dispatchAdapterCommand(obj.command, obj.message);

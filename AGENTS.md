@@ -26,7 +26,7 @@ Der Adapter ist als kleine Menge fokussierter `lib/*`-Module aufgebaut, die `mai
 - `lib/discovery.js` — findet Objekte mit aktiviertem History-Logging (`common.custom[...].enabled`) → `findHistorizedObjects(adapter)`
 - `lib/catalog.js` — CRUD auf semantischen Katalogeinträgen, persistiert als Adapter-States unter `ai-analytics.0.catalog.<sourceId>`
 - `lib/dataAccess.js` — Rohdatenabruf (`getHistory`) und Zeitraumvergleich über die generische History-API
-- `lib/providers/` — einheitliche LLM-Schnittstelle (`createProvider(config) => {chat({system,messages,tools})}`) mit Retry-mit-Backoff in `index.js`; konkrete Clients für Anthropic (`anthropic.js`) und OpenAI-kompatible Endpunkte/OpenRouter/lokal (`openaiCompatible.js`)
+- `lib/providers/` — einheitliche LLM-Schnittstelle (`createProvider(config) => {chat({system,messages,tools})}`) mit Retry-mit-Backoff sowie `listModels(config)` für Modellvorschläge; konkrete Clients für Anthropic (`anthropic.js`) und OpenAI-kompatible Endpunkte/OpenRouter/lokal (`openaiCompatible.js`), wobei OpenRouter kostenlose Tool-Modelle anhand seiner Live-Metadaten filtert
 - `lib/tools.js` — bindet Katalog + Datenzugriff als vom Agenten aufrufbare Werkzeuge (JSON-Schema-Definitionen + Dispatcher)
 - `lib/agent.js` — provider-agnostischer, iterativer Tool-Use-Loop bis zur finalen Antwort
 - `lib/chatLog.js` — gedeckelte Chat-Historie (State-Speicher, max. 200 Einträge)

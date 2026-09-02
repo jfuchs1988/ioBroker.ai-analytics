@@ -407,14 +407,13 @@ function loadBudget() {
 }
 
 function showSection(section) {
-    ['chat', 'devices', 'budget'].forEach((name) => {
+    ['chat', 'budget'].forEach((name) => {
         const el = document.getElementById(`section-${name}`);
         if (el) el.hidden = name !== section;
     });
     document.querySelectorAll('.nav-btn').forEach((button) => {
         button.classList.toggle('active', button.dataset.section === section);
     });
-    if (section === 'devices') loadDevices();
     if (section === 'budget') loadBudget();
 }
 
@@ -649,9 +648,6 @@ function init() {
     document.querySelectorAll('.nav-btn').forEach((button) => {
         button.addEventListener('click', () => showSection(button.dataset.section));
     });
-    document.getElementById('devices-rescan').addEventListener('click', triggerRescan);
-    document.getElementById('devices-check-now').addEventListener('click', triggerProactiveCheck);
-    document.getElementById('devices-filter').addEventListener('input', renderDevicesTable);
     document.getElementById('budget-range-30').addEventListener('click', showBudgetRange30);
     document.getElementById('budget-range-all').addEventListener('click', showBudgetRangeAll);
 }

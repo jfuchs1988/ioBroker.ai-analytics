@@ -2,13 +2,53 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function loadAdminCommandsWithStubs({ getAllCatalogEntries, setCatalogEntry, removeCatalogEntry }) {
-    return proxyquire('../../lib/adminCommands', {
+function loadAdminCommandsWithStubs({ getAllCatalogEntries, setCatalogEntry, removeCatalogEntry, listModels } = {}) {
+    const stubs = {
         './catalog': { getAllCatalogEntries, setCatalogEntry, removeCatalogEntry },
-    });
+    };
+    if (listModels) stubs['./providers'] = { listModels };
+    return proxyquire('../../lib/adminCommands', stubs);
 }
 
 describe('adminCommands', () => {
+    describe('listProviderModels', () => {
+        it('returns sorted autocomplete options and labels free models', async () => {
+            const listModels = sinon.stub().resolves([
+                { id: 'z-model', name: 'Zulu', isFree: false },
+                { id: 'a-model', name: 'Alpha', isFree: true },
+            ]);
+            const { listProviderModels } = loadAdminCommandsWithStubs({ listModels });
+
+            const result = await listProviderModels({ log: { warn: sinon.stub() } }, {
+                providerType: 'openrouter',
+                apiKey: 'secret',
+                baseUrl: '',
+            });
+
+            expect(listModels.calledOnceWith({ type: 'openrouter', apiKey: 'secret', baseUrl: '' })).to.equal(true);
+            expect(result).to.deep.equal([
+                { value: 'a-model', label: 'Alpha (kostenlos)' },
+                { value: 'z-model', label: 'Zulu' },
+            ]);
+        });
+
+        it('returns an empty list and never logs the API key when discovery fails', async () => {
+            const warn = sinon.stub();
+            const { listProviderModels } = loadAdminCommandsWithStubs({
+                listModels: sinon.stub().rejects(new Error('Request with secret-key failed')),
+            });
+
+            const result = await listProviderModels({ log: { warn } }, {
+                providerType: 'openrouter',
+                apiKey: 'secret-key',
+            });
+
+            expect(result).to.deep.equal([]);
+            expect(warn.calledOnce).to.equal(true);
+            expect(warn.firstCall.args[0]).not.to.include('secret-key');
+        });
+    });
+
     describe('listCatalogEntries', () => {
         it('returns all catalog entries unfiltered', async () => {
             const entries = [{ sourceId: 'a' }, { sourceId: 'b', ignored: true, active: false }];
