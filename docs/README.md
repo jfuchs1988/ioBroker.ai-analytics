@@ -19,8 +19,8 @@ Diese Seite ist der zentrale Einstiegspunkt (Map of Content) in die gesamte Proj
 ## Pläne
 
 - [2026-08-21 — ai-analytics Implementierung](plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde (Status: abgeschlossen)
-- [2026-09-02 — Provider-Modellerkennung und Sponsoring](plans/2026-09-02-provider-model-discovery-and-sponsoring.md) — TDD-Plan für Modelllisten und GitHub Sponsors
-- [2026-09-02 — Geräteübersicht in den Adapter-Einstellungen](plans/2026-09-02-geraete-in-einstellungen.md) — Custom-Config-Komponente und Verlagerung aus dem Custom-Tab
+- [2026-09-02 — Provider-Modellerkennung und Sponsoring](plans/2026-09-02-provider-model-discovery-and-sponsoring.md) — **abgeschlossen**, Modelllisten und GitHub Sponsors
+- [2026-09-02 — Geräteübersicht in den Adapter-Einstellungen](plans/2026-09-02-geraete-in-einstellungen.md) — **umgesetzt**, Custom-Config-Komponente und Verlagerung aus dem Custom-Tab
 
 ## Prozess
 

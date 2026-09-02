@@ -1,5 +1,7 @@
 # Datenpunkt-Klassifizierung (`valueKind`) — Implementierungsplan
 
+> **Status: abgeschlossen (2026-08-24).** Die zweistufige Klassifizierung, der optionale Backfill, manuelle Korrekturen, die Geräteanzeige sowie `getPeriodTotal`/`comparePeriods` sind umgesetzt. Die Checkboxen darunter stammen aus dem ursprünglichen TDD-Arbeitsplan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Jeder katalogisierte Datenpunkt bekommt eine erkannte `valueKind`-Ausprägung (Momentanwert / Schalter / Tageszähler mit Reset / Lebenszeit-Zähler / Summenwert), damit zwei neue Werkzeuge (`getPeriodTotal`, `comparePeriods`) die für den jeweiligen Datenpunkt-Typ korrekte Rechenoperation anwenden, statt dass die KI rohe Werte selbst (und teils falsch) verrechnet.

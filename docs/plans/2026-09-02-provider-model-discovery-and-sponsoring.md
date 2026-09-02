@@ -1,5 +1,7 @@
 # Implementierungsplan: Provider-Modellerkennung und Sponsoring
 
+> **Status: abgeschlossen (2026-09-02).** Die Modellauflistung, OpenRouter-Gratisfilterung, Admin-Autocomplete-Felder, Anbieter-/Sponsoring-Links und `.github/FUNDING.yml` sind umgesetzt. Die Checkboxen darunter sind der ursprüngliche Arbeitsplan; maßgeblich für den aktuellen Stand sind Code, Changelog und Architektur-Dokumentation.
+
 1. Unit-Tests für Provider-URL-Auflösung, Modelllisten, OpenRouter-Gratisfilter und Fehlerfälle ergänzen.
 2. Unit-Tests für das Admin-Kommando und strukturelle Tests für Admin-Konfiguration, Sponsoring-Links und Funding-Datei ergänzen.
 3. OpenAI-kompatible und Anthropic-Modellabfragen implementieren; OpenRouter-Default-URL dabei korrigieren.

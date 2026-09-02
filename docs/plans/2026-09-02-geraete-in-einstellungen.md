@@ -1,5 +1,7 @@
 # Geräteübersicht in Einstellungen — Implementierungsplan
 
+> **Status: umgesetzt (2026-09-02).** Die Geräteübersicht liegt als dynamische Custom-Komponente in den Adapter-Einstellungen. Offen bleibt ausschließlich die manuelle Prüfung in einer echten ioBroker-Admin-Instanz.
+
 ## Tasks
 
 - [x] JSON-Konfiguration von Panel auf Tabs erweitern und Geräte-Custom-Komponente einhängen.
