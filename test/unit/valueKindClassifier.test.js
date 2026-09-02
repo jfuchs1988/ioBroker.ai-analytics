@@ -119,7 +119,7 @@ describe('classifyValueKind', () => {
         expect(getHistory.called).to.equal(false);
     });
 
-    it('confirms a daily_reset_counter from the first (48h) sample window', async () => {
+    it('confirms a daily_reset_counter from the first sample window on InfluxDB using bucketed average data', async () => {
         const resetPoints = [
             { ts: 1, val: 0 }, { ts: 2, val: 10 }, { ts: 3, val: 20 }, { ts: 4, val: 0.2 }, { ts: 5, val: 5 },
         ];
@@ -129,6 +129,16 @@ describe('classifyValueKind', () => {
         const result = await classifyValueKind({}, obj, 'influxdb.0');
 
         expect(result).to.deep.equal({ valueKind: 'daily_reset_counter', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        expect(getHistory.calledOnce).to.equal(true);
+        expect(getHistory.firstCall.args[5]).to.equal('average');
+    });
+
+    it('keeps raw none sampling for non-Influx history adapters', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 1, val: 20 }, { ts: 2, val: 18 }, { ts: 3, val: 22 }, { ts: 4, val: 19 }]);
+        const { classifyValueKind } = loadClassifierWithStubs({ getHistory });
+
+        await classifyValueKind({}, obj, 'history.0');
+
         expect(getHistory.calledOnce).to.equal(true);
         expect(getHistory.firstCall.args[5]).to.equal('none');
     });

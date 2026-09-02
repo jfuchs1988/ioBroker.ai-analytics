@@ -139,6 +139,39 @@ describe('runOnboarding', () => {
         });
     });
 
+    it('reports onboarding progress through the optional callback', async () => {
+        const discovered = [
+            { id: 'javascript.0.verbrauch.gesamt', historyInstance: 'influxdb.0', common: { name: 'Gesamtverbrauch' } },
+        ];
+        const progressSpy = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry: sinon.stub().resolves(),
+        });
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    {
+                        sourceId: 'javascript.0.verbrauch.gesamt',
+                        description: 'Gesamtstromverbrauch Haus',
+                        unit: 'kWh',
+                        category: 'consumption',
+                        room: 'gesamt',
+                        confidence: 'high',
+                    },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+
+        await runOnboarding({}, provider, discovered, progressSpy);
+
+        expect(progressSpy.called).to.equal(true);
+        expect(progressSpy.lastCall.args[0]).to.include({ processed: 1, total: 1, currentSourceId: 'javascript.0.verbrauch.gesamt' });
+    });
+
     it('skips objects that are already in the catalog', async () => {
         const discovered = [
             { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
