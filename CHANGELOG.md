@@ -3,13 +3,20 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.11] - 2026-09-02
+
+### Hinzugefügt
+- Live-Fortschrittsanzeige im Geräte-Tab für Re-Scan und Backfill, inklusive laufender Aktualisierung der Geräteliste.
+
+### Behoben
+- InfluxDB-History-Samples für die `valueKind`-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (`bool != float`) durch bucketed Sampling.
+
 ## [0.0.1-beta.10] - 2026-09-02
 
 ### Hinzugefügt
 - `valueKind`-Klassifizierung aus Metadaten und History-Datenprobe, sichtbar und manuell korrigierbar im Geräte-Tab.
 - Typbewusste Werkzeuge `getPeriodTotal` und `comparePeriods`, die für Zähler, Schalter und Momentanwerte die passende Aggregation verwenden.
 - Optionaler Backfill für bestehende Katalogeinträge.
-- Live-Fortschrittsanzeige für den Geräte-Sync im Geräte-Tab, inklusive laufender Aktualisierung des Kataloglistenstands während Re-Scan und Backfill.
 - Dynamische Modellvorschläge in der Admin-Konfiguration; OpenRouter zeigt automatisch nur aktuell kostenlose Modelle mit Tool-Calling, andere Provider und lokale Endpunkte ihre gemeldeten Modelle. Manuelle Modell-IDs bleiben möglich.
 - Direkte Einstiegslinks zu OpenRouter und OpenCode Zen sowie GitHub-Sponsors-Links in Konfiguration und Custom-Tab.
 - `.github/FUNDING.yml` und npm-`funding`-Metadaten für den GitHub-Sponsor-Button.
@@ -17,7 +24,6 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 
 ### Behoben
 - OpenRouter verwendete ohne manuell gesetzte Basis-URL fälschlich den OpenAI-Endpunkt; Standard ist jetzt `https://openrouter.ai/api/v1`.
-- InfluxDB-History-Samples für die `valueKind`-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (`bool != float`) durch bucketed Sampling.
 
 ## [0.0.1-beta.9] - 2026-08-24
 
