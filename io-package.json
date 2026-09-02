@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.15",
+    "version": "0.0.1-beta.16",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.16": {
+        "en": "Fixed the Settings CSV import so it updates the complete native configuration object instead of writing isolated fields. The import/export buttons now keep the visible settings in sync with the saved values.",
+        "de": "Den Settings-CSV-Import behoben, sodass jetzt das komplette native Konfigurationsobjekt aktualisiert wird statt isolierter Felder. Die Import-/Export-Buttons halten die sichtbaren Einstellungen jetzt synchron zu den gespeicherten Werten."
+      },
       "0.0.1-beta.15": {
         "en": "Documented the standard feature and bugfix workflow with dedicated branches, live WIP/TODO/DONE handoff status, mandatory tests, merge, and GitHub release verification.",
         "de": "Den Standardablauf für Features und Bugfixes mit eigenen Branches, live gepflegtem WIP/TODO/DONE-Übergabestand, verpflichtenden Tests, Merge und GitHub-Release-Prüfung dokumentiert."
