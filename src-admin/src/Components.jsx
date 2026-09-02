@@ -3,11 +3,64 @@ import { ConfigGeneric } from '@iobroker/json-config';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
+const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview'];
+const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored'];
+
+function csvEscape(value) {
+    const str = value === null || value === undefined ? '' : String(value);
+    if (/[",\n\r]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}
+
+/** Minimal RFC4180-ish CSV parser: handles quoted fields with embedded commas/quotes/newlines. */
+function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (inQuotes) {
+            if (char === '"') {
+                if (text[i + 1] === '"') {
+                    field += '"';
+                    i++;
+                } else {
+                    inQuotes = false;
+                }
+            } else {
+                field += char;
+            }
+        } else if (char === '"') {
+            inQuotes = true;
+        } else if (char === ',') {
+            row.push(field);
+            field = '';
+        } else if (char === '\n' || char === '\r') {
+            if (char === '\r' && text[i + 1] === '\n') i++;
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = '';
+        } else {
+            field += char;
+        }
+    }
+    if (field.length > 0 || row.length > 0) {
+        row.push(field);
+        rows.push(row);
+    }
+    return rows.filter((r) => r.length > 1 || (r.length === 1 && r[0] !== ''));
+}
 
 export default class CatalogDevicesComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
         this.state = { ...this.state, entries: [], filter: '', loading: true, status: '' };
+        this.fileInputRef = React.createRef();
     }
 
     async componentDidMount() {
@@ -59,6 +112,82 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         }
     }
 
+    exportCsv() {
+        const lines = [CSV_COLUMNS.join(',')];
+        this.state.entries.forEach((entry) => {
+            lines.push(CSV_COLUMNS.map((key) => csvEscape(entry[key])).join(','));
+        });
+        const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `ai-analytics-katalog-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    triggerCsvImport() {
+        if (this.fileInputRef.current) {
+            this.fileInputRef.current.value = '';
+            this.fileInputRef.current.click();
+        }
+    }
+
+    async handleCsvFileSelected(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const text = await file.text();
+        const rows = parseCsv(text);
+        if (!rows.length) {
+            this.setState({ status: 'Fehler: CSV-Datei ist leer.' });
+            return;
+        }
+
+        const header = rows[0];
+        const sourceIdIndex = header.indexOf('sourceId');
+        if (sourceIdIndex === -1) {
+            this.setState({ status: 'Fehler: CSV-Header enthaelt keine sourceId-Spalte.' });
+            return;
+        }
+        const fieldIndexes = CSV_EDITABLE_COLUMNS.map((field) => ({ field, index: header.indexOf(field) })).filter(
+            (entry) => entry.index !== -1
+        );
+
+        const dataRows = rows.slice(1);
+        let updatedCount = 0;
+        let errorCount = 0;
+        for (let i = 0; i < dataRows.length; i++) {
+            const row = dataRows[i];
+            const sourceId = row[sourceIdIndex];
+            if (!sourceId) continue;
+
+            const values = {};
+            fieldIndexes.forEach(({ field, index }) => {
+                if (row[index] === undefined || row[index] === '') return;
+                values[field] = field === 'ignored' ? row[index].toLowerCase() === 'true' : row[index];
+            });
+
+            this.setState({ status: `CSV-Import laeuft (${i + 1}/${dataRows.length}) ...` });
+            try {
+                await this.callAdapter('updateCatalogEntryAdmin', { sourceId, ...values });
+                updatedCount++;
+            } catch (error) {
+                errorCount++;
+            }
+        }
+
+        this.setState({
+            status:
+                errorCount > 0
+                    ? `CSV-Import abgeschlossen: ${updatedCount} aktualisiert, ${errorCount} fehlgeschlagen.`
+                    : `CSV-Import abgeschlossen: ${updatedCount} Eintraege aktualisiert.`,
+        });
+        await this.loadEntries();
+    }
+
     renderRow(entry) {
         const update = values => this.updateEntry(entry, values);
         return (
@@ -92,7 +221,17 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
                     <button onClick={() => this.runCommand('runDiscoveryNow', 'Re-Scan läuft ...', 'Re-Scan abgeschlossen.')}>Geräte neu einlesen</button>
+                    <button onClick={() => this.runCommand('runDiscoveryOnly', 'Sync läuft ...', 'Sync abgeschlossen.')}>Nur Updates einlesen</button>
                     <button onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
+                    <button onClick={() => this.exportCsv()}>Als CSV exportieren</button>
+                    <button onClick={() => this.triggerCsvImport()}>CSV importieren</button>
+                    <input
+                        ref={this.fileInputRef}
+                        type="file"
+                        accept=".csv,text/csv"
+                        style={{ display: 'none' }}
+                        onChange={event => this.handleCsvFileSelected(event)}
+                    />
                     <input placeholder="Filtern ..." value={this.state.filter} onChange={event => this.setState({ filter: event.target.value })} />
                 </div>
                 {this.state.status ? <div style={{ marginBottom: 8 }}>{this.state.status}</div> : null}

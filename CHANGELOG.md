@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Hinzugefügt
+- Geräte-Tab: CSV-Export des Katalogs und CSV-Import zum Bulk-Bearbeiten von Beschreibung/Kategorie/Raum/Auspraegung/Ignoriert-Status bestehender Eintraege.
+- Geräte-Tab: Button "Nur Updates einlesen" — synchronisiert aktiv/inaktiv-Status und neue Objekte, ohne die (Token-kostende) KI-Klassifizierung neuer Objekte auszuloesen.
+- Einstellungen- und Geräte-Tab: kompakte Kopfzeile mit Live-Budgetanzeige und Sponsor-Link statt vollbreitem Button.
+
+### Geändert
+- Einstellungen-Seite: Modell-Feld (Chat und Onboarding) ist jetzt ein einfaches Textfeld statt einer dynamischen Modell-Autocomplete, die einen bereits gesetzten Wert teils nicht anzeigte. Felder haben jetzt responsive Breiten statt 100% Seitenbreite, die OpenRouter-/OpenCode-Zen-Links sind kompakter und stehen oben in der Chat-Modell-Gruppe, Feldreihenfolge je Provider-Gruppe ist jetzt Provider → URL → Modell → API-Key → Preise.
+
 ## [0.0.1-beta.12] - 2026-09-03
 
 ### Hinzugefügt

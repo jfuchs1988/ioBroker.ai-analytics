@@ -283,6 +283,28 @@ describe('adminCommands', () => {
         });
     });
 
+    describe('runDiscoveryOnly', () => {
+        function makeLog() {
+            return { silly: sinon.stub(), info: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
+        }
+
+        it('calls adapter.syncCatalog({ skipClassification: true }), logs before/after, and returns its summary', async () => {
+            const log = makeLog();
+            const summary = { foundCount: 5, newCount: 0, reactivatedCount: 2, skipped: 'classification' };
+            const adapter = {
+                log,
+                syncCatalog: sinon.stub().resolves(summary),
+            };
+            const { runDiscoveryOnly } = require('../../lib/adminCommands');
+
+            const result = await runDiscoveryOnly(adapter);
+
+            expect(result).to.deep.equal(summary);
+            expect(adapter.syncCatalog.calledOnceWith({ skipClassification: true })).to.equal(true);
+            expect(log.silly.calledTwice).to.equal(true);
+        });
+    });
+
     describe('runProactiveCheckNow', () => {
         function makeLog() {
             return { silly: sinon.stub(), info: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
