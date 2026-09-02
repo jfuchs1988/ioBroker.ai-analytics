@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.16] - 2026-09-03
+
+### Behoben
+- Settings-CSV-Import aktualisiert jetzt das komplette native Konfigurationsobjekt, damit die sichtbaren Felder korrekt gefüllt werden.
+
 ## [0.0.1-beta.15] - 2026-09-03
 
 ### Geändert

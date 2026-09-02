@@ -4,12 +4,12 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Kein laufender Task.
+- Branch: `fix/settings-csv-import-object-update`
+- Ziel: Settings-CSV-Import auf objektweises Update umstellen und live prüfen.
 
 ## TODO
 
-- Beim nächsten Task Branch (`feature/*` oder `fix/*`) und Ziel festlegen.
-- Relevante Tests, Build und gegebenenfalls Live-Abnahme ausführen.
+- Release `0.0.1-beta.16` bauen und Live-Seite prüfen.
 
 ## DONE
 

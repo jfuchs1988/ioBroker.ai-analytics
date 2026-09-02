@@ -341,6 +341,7 @@ export class SettingsCsvComponent extends ConfigGeneric {
         }
         const header = rows[0];
         const values = rows[1];
+        const nextData = { ...(this.props.data || {}) };
         let imported = 0;
         SETTINGS_COLUMNS.forEach(key => {
             const index = header.indexOf(key);
@@ -348,9 +349,10 @@ export class SettingsCsvComponent extends ConfigGeneric {
             let value = values[index];
             if (SETTINGS_NUMBER_COLUMNS.has(key)) value = value === '' ? 0 : Number(value);
             if (SETTINGS_BOOLEAN_COLUMNS.has(key)) value = value.toLowerCase() === 'true';
-            this.props.onChange(key, value);
+            nextData[key] = value;
             imported++;
         });
+        this.onChange(nextData);
         this.setState({ status: `${imported} Settings importiert. Bitte mit Speichern übernehmen.` });
     }
 
