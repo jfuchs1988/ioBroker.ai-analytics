@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.0.1-beta.13] - 2026-09-03
 
 ### Hinzugefügt
 - Geräte-Tab: CSV-Export des Katalogs und CSV-Import zum Bulk-Bearbeiten von Beschreibung/Kategorie/Raum/Auspraegung/Ignoriert-Status bestehender Eintraege.

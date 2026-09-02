@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.12",
+    "version": "0.0.1-beta.13",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.13": {
+        "en": "Settings page: model field (chat + onboarding) is now a plain text field instead of a dynamic autocomplete that sometimes failed to show an already-set value; fields now have responsive widths instead of stretching to 100%, field order per provider group is provider -> URL -> model -> API key -> prices, and the OpenRouter/OpenCode Zen links are compact and sit above the model fields. Settings and Devices tabs both now have a compact header row with a live budget summary and a compact sponsor link instead of a full-width sponsor button. Devices tab: CSV export/import for bulk-editing existing catalog entries, and a new \"sync only\" button that refreshes device status without spending tokens on classifying newly found objects. Also fixed the release pipeline (tarball build failed in CI) and excluded local dev files from the published npm package.",
+        "de": "Einstellungen-Seite: Modell-Feld (Chat + Onboarding) ist jetzt ein einfaches Textfeld statt einer dynamischen Autocomplete, die einen bereits gesetzten Wert teils nicht anzeigte; Felder haben jetzt responsive Breiten statt 100% Seitenbreite, Feldreihenfolge je Provider-Gruppe ist Provider → URL → Modell → API-Key → Preise, und die OpenRouter-/OpenCode-Zen-Links sind kompakt und stehen oberhalb der Modell-Felder. Einstellungen- und Geräte-Tab haben jetzt beide eine kompakte Kopfzeile mit Live-Budgetanzeige und kompaktem Sponsor-Link statt vollbreitem Sponsor-Button. Geräte-Tab: CSV-Export/-Import zum Bulk-Bearbeiten bestehender Katalogeinträge, sowie ein neuer Button \"Nur Updates einlesen\", der den Geräte-Status aktualisiert, ohne Tokens für die Klassifizierung neu gefundener Objekte auszugeben. Außerdem die Release-Pipeline repariert (Tarball-Build scheiterte in CI) und lokale Entwicklungsdateien vom veröffentlichten npm-Paket ausgeschlossen."
+      },
       "0.0.1-beta.12": {
         "en": "Settings page reorganized into grouped sections (chat/check model, onboarding model, operations & budget). Budget is no longer its own tab: a live summary now sits above the chat (auto-refreshing, with a collapsible details panel), and is also shown live on the settings page. Fixed: the Devices tab failed to load (Module Federation component was missing its default export). Fixed: the usage chart rendered as a solid color block instead of a bar chart when only a few days of history existed.",
         "de": "Einstellungen-Seite in gruppierte Abschnitte unterteilt (Chat-/Prüfungsmodell, Onboarding-Modell, Betrieb & Budget). Budget ist kein eigener Tab mehr: eine live aktualisierte Kurzanzeige sitzt jetzt über dem Chat (mit aufklappbaren Details), zusätzlich live sichtbar auf der Einstellungen-Seite. Behoben: der Geräte-Tab lud nicht (Modul-Federation-Komponente ohne Default-Export). Behoben: das Verbrauchsdiagramm zeigte bei wenigen Tagen Historie nur eine einfarbige Fläche statt eines Balkendiagramms."
