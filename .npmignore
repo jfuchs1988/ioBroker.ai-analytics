@@ -1,0 +1,7 @@
+iobroker-access-key.txt
+test-output.txt
+dist/
+.obsidian/
+*.base
+*.log
+.env

@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build:admin": "vite build --config src-admin/vite.config.mjs",
-    "pack:release": "npm pack --pack-destination dist",
+    "pack:release": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npm pack --pack-destination dist",
     "test:unit": "mocha test/unit/**/*.test.js",
     "test:adapter": "mocha test/adapter.test.js",
     "test": "npm run test:unit && npm run test:adapter"
