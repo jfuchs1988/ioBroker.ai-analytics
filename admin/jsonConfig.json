@@ -90,6 +90,11 @@
       "label": "Taegliches Token-Budget (0 = kein Limit)",
       "default": 0,
       "min": 0
+    },
+    "enableValueKindBackfill": {
+      "type": "checkbox",
+      "label": "Bestehende Datenpunkte nachtraeglich auf Auspraegung (valueKind) pruefen",
+      "default": false
     }
   }
 }

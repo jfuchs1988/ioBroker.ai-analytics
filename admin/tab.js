@@ -19,6 +19,7 @@ function resolveNamespaceFromQuery(searchString) {
 }
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
+const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
 
 function filterEntries(entries, query) {
     const q = (query || '').trim().toLowerCase();
@@ -172,6 +173,27 @@ function renderDeviceRow(entry) {
     categoryCell.appendChild(categorySelect);
     row.appendChild(categoryCell);
 
+    const valueKindSelect = document.createElement('select');
+    const unclassifiedOption = document.createElement('option');
+    unclassifiedOption.value = '';
+    unclassifiedOption.textContent = '– nicht klassifiziert –';
+    if (!entry.valueKind) unclassifiedOption.selected = true;
+    valueKindSelect.appendChild(unclassifiedOption);
+    VALUE_KINDS.forEach((kind) => {
+        const option = document.createElement('option');
+        option.value = kind;
+        option.textContent = kind;
+        if (kind === entry.valueKind) option.selected = true;
+        valueKindSelect.appendChild(option);
+    });
+    const valueKindCell = document.createElement('td');
+    valueKindCell.appendChild(valueKindSelect);
+    row.appendChild(valueKindCell);
+
+    const unitCell = document.createElement('td');
+    unitCell.textContent = entry.unit || '';
+    row.appendChild(unitCell);
+
     const roomInput = document.createElement('input');
     roomInput.type = 'text';
     roomInput.value = entry.room || '';
@@ -198,6 +220,7 @@ function renderDeviceRow(entry) {
                 category: categorySelect.value,
                 room: roomInput.value,
                 description: descInput.value,
+                ...(valueKindSelect.value ? { valueKind: valueKindSelect.value } : {}),
             });
             loadDevices();
         } catch (error) {

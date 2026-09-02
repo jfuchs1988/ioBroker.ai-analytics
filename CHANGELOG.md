@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Hinzugefügt
+- `valueKind`-Klassifizierung aus Metadaten und History-Datenprobe, sichtbar und manuell korrigierbar im Geräte-Tab.
+- Typbewusste Werkzeuge `getPeriodTotal` und `comparePeriods`, die für Zähler, Schalter und Momentanwerte die passende Aggregation verwenden.
+- Optionaler Backfill für bestehende Katalogeinträge.
+
 ## [0.0.1-beta.9] - 2026-08-24
 
 ### Behoben

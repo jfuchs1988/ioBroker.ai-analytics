@@ -3,21 +3,27 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
-function loadToolsWithStubs({ getAllCatalogEntries, getHistory, compareTimeframes, setCatalogEntry }) {
+function loadToolsWithStubs({ getAllCatalogEntries, getHistory, compareTimeframes, setCatalogEntry, getLocalDayBoundaries, getLocalTimeZone }) {
     return proxyquire('../../lib/tools', {
-        './catalog': { getAllCatalogEntries, setCatalogEntry },
+        './catalog': { getAllCatalogEntries, setCatalogEntry, CATEGORIES: ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'] },
         './dataAccess': { getHistory, compareTimeframes },
+        './promptContext': {
+            getLocalDayBoundaries: getLocalDayBoundaries || sinon.stub(),
+            getLocalTimeZone: getLocalTimeZone || sinon.stub().returns('UTC'),
+        },
     });
 }
 
 describe('buildTools', () => {
-    it('exposes listCatalog, getHistory, compareTimeframes and updateCatalogEntry definitions', () => {
+    it('exposes catalog, history and valueKind-aware tool definitions', () => {
         const { buildTools } = require('../../lib/tools');
         const { definitions } = buildTools({});
         expect(definitions.map((d) => d.name)).to.deep.equal([
             'listCatalog',
             'getHistory',
             'compareTimeframes',
+            'getPeriodTotal',
+            'comparePeriods',
             'updateCatalogEntry',
         ]);
     });
@@ -249,5 +255,57 @@ describe('buildTools', () => {
             threw = true;
         }
         expect(threw).to.equal(true);
+    });
+
+    it('uses the maximum value for a daily reset counter', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 1, val: 5 }, { ts: 2, val: 12 }, { ts: 3, val: 8 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'meter.0.daily', historyInstance: 'influxdb.0', valueKind: 'daily_reset_counter' }]),
+            getHistory,
+        });
+        const result = await buildTools({}).execute('getPeriodTotal', { sourceId: 'meter.0.daily', periods: [{ start: 0, end: 10 }] });
+        expect(result.periods).to.deep.equal([{ start: 0, end: 10, total: 12 }]);
+        expect(getHistory.calledOnceWith({}, 'influxdb.0', 'meter.0.daily', 0, 10, 'minmax')).to.equal(true);
+    });
+
+    it('calculates on-duration and switch count for boolean states', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 100, val: true }, { ts: 400, val: false }, { ts: 700, val: true }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'switch.0.x', historyInstance: 'history.0', valueKind: 'boolean_state' }]),
+            getHistory,
+        });
+        const result = await buildTools({}).execute('getPeriodTotal', { sourceId: 'switch.0.x', periods: [{ start: 0, end: 1000 }] });
+        expect(result.periods[0]).to.deep.equal({ start: 0, end: 1000, onDurationMs: 600, switchCount: 3 });
+        expect(getHistory.calledOnceWith({}, 'history.0', 'switch.0.x', 0, 1000, 'onchange')).to.equal(true);
+    });
+
+    it('resolves dayOffset using local calendar boundaries', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 1, val: 7 }]);
+        const boundaries = sinon.stub().returns({ start: 1000, end: 87400000 });
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'meter.0.daily', historyInstance: 'history.0', valueKind: 'daily_reset_counter' }]),
+            getHistory,
+            getLocalDayBoundaries: boundaries,
+            getLocalTimeZone: sinon.stub().returns('Europe/Berlin'),
+        });
+        const result = await buildTools({}).execute('getPeriodTotal', { sourceId: 'meter.0.daily', periods: [{ dayOffset: -1 }] });
+        expect(result.periods[0]).to.deep.equal({ start: 1000, end: 87400000, total: 7 });
+        expect(boundaries.calledOnce).to.equal(true);
+    });
+
+    it('compares period values against the selected baseline', async () => {
+        const getHistory = sinon.stub();
+        getHistory.onFirstCall().resolves([{ ts: 1, val: 40 }]);
+        getHistory.onSecondCall().resolves([{ ts: 1, val: 50 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'meter.0.daily', historyInstance: 'history.0', valueKind: 'daily_reset_counter' }]),
+            getHistory,
+        });
+        const result = await buildTools({}).execute('comparePeriods', {
+            sourceId: 'meter.0.daily',
+            periods: [{ start: 0, end: 10 }, { start: 10, end: 20 }],
+        });
+        expect(result.periods[0]).to.deep.include({ total: 40, deltaTotal: 0, deltaPercent: 0 });
+        expect(result.periods[1]).to.deep.include({ total: 50, deltaTotal: 10, deltaPercent: 25 });
     });
 });
