@@ -9,6 +9,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 - `valueKind`-Klassifizierung aus Metadaten und History-Datenprobe, sichtbar und manuell korrigierbar im Geräte-Tab.
 - Typbewusste Werkzeuge `getPeriodTotal` und `comparePeriods`, die für Zähler, Schalter und Momentanwerte die passende Aggregation verwenden.
 - Optionaler Backfill für bestehende Katalogeinträge.
+- Live-Fortschrittsanzeige für den Geräte-Sync im Geräte-Tab, inklusive laufender Aktualisierung des Kataloglistenstands während Re-Scan und Backfill.
 - Dynamische Modellvorschläge in der Admin-Konfiguration; OpenRouter zeigt automatisch nur aktuell kostenlose Modelle mit Tool-Calling, andere Provider und lokale Endpunkte ihre gemeldeten Modelle. Manuelle Modell-IDs bleiben möglich.
 - Direkte Einstiegslinks zu OpenRouter und OpenCode Zen sowie GitHub-Sponsors-Links in Konfiguration und Custom-Tab.
 - `.github/FUNDING.yml` und npm-`funding`-Metadaten für den GitHub-Sponsor-Button.
@@ -16,6 +17,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 
 ### Behoben
 - OpenRouter verwendete ohne manuell gesetzte Basis-URL fälschlich den OpenAI-Endpunkt; Standard ist jetzt `https://openrouter.ai/api/v1`.
+- InfluxDB-History-Samples für die `valueKind`-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (`bool != float`) durch bucketed Sampling.
 
 ## [0.0.1-beta.9] - 2026-08-24
 

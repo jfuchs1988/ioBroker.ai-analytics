@@ -18,6 +18,7 @@ const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
+const CATALOG_SYNC_STATE = 'catalogSync';
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -30,6 +31,7 @@ class AiAnalytics extends utils.Adapter {
         // Fail-closed: solange onReady die Pruefung nicht abgeschlossen hat, gilt kein Provider als erreichbar.
         this.chatProviderOk = false;
         this.onboardingProviderOk = false;
+        this.catalogSyncState = { running: false, phase: 'idle', processed: 0, total: 0, message: '' };
     }
 
     /**
@@ -67,10 +69,31 @@ class AiAnalytics extends utils.Adapter {
         return checkProviderReachable(provider);
     }
 
+    async ensureCatalogSyncState() {
+        await this.setObjectNotExistsAsync(CATALOG_SYNC_STATE, {
+            type: 'state',
+            common: {
+                name: 'Catalog sync progress',
+                type: 'string',
+                role: 'json',
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
+        await this.setStateAsync(CATALOG_SYNC_STATE, { val: JSON.stringify(this.catalogSyncState), ack: true });
+    }
+
+    async updateCatalogSyncState(partial) {
+        this.catalogSyncState = { ...this.catalogSyncState, ...partial };
+        await this.setStateAsync(CATALOG_SYNC_STATE, { val: JSON.stringify(this.catalogSyncState), ack: true });
+    }
+
     async onReady() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
         await ensureReachabilityStates(this);
+        await this.ensureCatalogSyncState();
         await adminBridge.ensureBridgeState(this);
         await this.subscribeStatesAsync(adminBridge.BRIDGE_STATE);
 
@@ -128,56 +151,137 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async syncCatalog() {
-        const discovered = await findHistorizedObjects(this);
-        const existing = await getAllCatalogEntries(this);
-        const existingById = new Map(existing.map((entry) => [entry.sourceId, entry]));
-        const discoveredIds = new Set(discovered.map((obj) => obj.id));
+        await this.updateCatalogSyncState({
+            running: true,
+            phase: 'discover',
+            processed: 0,
+            total: 0,
+            message: 'Suche historisierte Datenpunkte...',
+            startedAt: new Date().toISOString(),
+            finishedAt: null,
+            error: null,
+        });
 
-        for (const entry of existing) {
-            if (!discoveredIds.has(entry.sourceId) && entry.active !== false) {
-                await markInactive(this, entry.sourceId);
+        try {
+            const discovered = await findHistorizedObjects(this);
+            const existing = await getAllCatalogEntries(this);
+            const existingById = new Map(existing.map((entry) => [entry.sourceId, entry]));
+            const discoveredIds = new Set(discovered.map((obj) => obj.id));
+
+            await this.updateCatalogSyncState({
+                phase: 'reactivate',
+                message: `Pruefe ${discovered.length} gefundene Datenpunkte...`,
+                total: discovered.length,
+                processed: 0,
+            });
+
+            for (const entry of existing) {
+                if (!discoveredIds.has(entry.sourceId) && entry.active !== false) {
+                    await markInactive(this, entry.sourceId);
+                }
             }
-        }
 
-        let reactivatedCount = 0;
-        for (const obj of discovered) {
-            const entry = existingById.get(obj.id);
-            if (entry && (entry.active === false || entry.historyInstance !== obj.historyInstance)) {
-                await setCatalogEntry(this, {
-                    ...entry,
-                    active: true,
-                    historyInstance: obj.historyInstance,
-                    lastSeen: new Date().toISOString(),
+            let reactivatedCount = 0;
+            for (let index = 0; index < discovered.length; index++) {
+                const obj = discovered[index];
+                const entry = existingById.get(obj.id);
+                if (entry && (entry.active === false || entry.historyInstance !== obj.historyInstance)) {
+                    await setCatalogEntry(this, {
+                        ...entry,
+                        active: true,
+                        historyInstance: obj.historyInstance,
+                        lastSeen: new Date().toISOString(),
+                    });
+                    reactivatedCount += 1;
+                }
+                await this.updateCatalogSyncState({
+                    phase: 'reactivate',
+                    processed: index + 1,
+                    total: discovered.length,
+                    message: `Reaktiviere und pruefe ${index + 1}/${discovered.length} Datenpunkte...`,
                 });
-                reactivatedCount += 1;
             }
-        }
 
         if (!this.onboardingProviderOk) {
             this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
             // `skipped` unterscheidet "nichts Neues gefunden" von "gar nicht erst geschaut".
-            return { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'onboardingProvider' };
+            const skippedResult = { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'onboardingProvider' };
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'done',
+                processed: discovered.length,
+                total: discovered.length,
+                currentSourceId: null,
+                message: 'Sync abgeschlossen, aber das Onboarding-Modell war nicht erreichbar.',
+                finishedAt: new Date().toISOString(),
+                error: null,
+            });
+            return skippedResult;
         }
 
-        const { classifiedCount, needsReview } = await runOnboarding(this, this.onboardingProvider, discovered);
+            await this.updateCatalogSyncState({
+                phase: 'onboarding',
+                processed: 0,
+                total: discovered.length,
+                message: `Klassifiziere ${discovered.length} Datenpunkte...`,
+            });
 
-        try {
-            if (needsReview.length > 0) {
-                const question = needsReview
-                    .map((entry) => `- ${entry.sourceId}: wofuer steht dieser Wert?`)
-                    .join('\n');
-                await appendChatMessage(this, 'assistant', `Ich bin mir bei folgenden Objekten unsicher:\n${question}`);
+            const { classifiedCount, needsReview } = await runOnboarding(this, this.onboardingProvider, discovered, async (progress) => {
+                await this.updateCatalogSyncState({
+                    phase: 'onboarding',
+                    processed: progress.processed,
+                    total: progress.total,
+                    message: progress.message || `Klassifiziere ${progress.processed}/${progress.total} Datenpunkte...`,
+                    currentSourceId: progress.currentSourceId || null,
+                });
+            });
+
+            try {
+                if (needsReview.length > 0) {
+                    const question = needsReview
+                        .map((entry) => `- ${entry.sourceId}: wofuer steht dieser Wert?`)
+                        .join('\n');
+                    await appendChatMessage(this, 'assistant', `Ich bin mir bei folgenden Objekten unsicher:\n${question}`);
+                }
+            } catch (error) {
+                this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
             }
+
+            if (this.config.enableValueKindBackfill) {
+                const currentEntries = await getAllCatalogEntries(this);
+                await this.updateCatalogSyncState({
+                    phase: 'backfill',
+                    processed: 0,
+                    total: currentEntries.length,
+                    currentSourceId: null,
+                    message: `Pruefe Auspraegungen fuer ${currentEntries.length} bestehende Datenpunkte...`,
+                });
+                await this.backfillValueKinds(currentEntries);
+            }
+
+            const result = { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount, skipped: null };
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'done',
+                processed: discovered.length,
+                total: discovered.length,
+                currentSourceId: null,
+                message: `Sync abgeschlossen: ${classifiedCount} neu, ${reactivatedCount} reaktiviert.`,
+                finishedAt: new Date().toISOString(),
+                error: null,
+            });
+            return result;
         } catch (error) {
-            this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'error',
+                currentSourceId: null,
+                message: `Sync fehlgeschlagen: ${error.message}`,
+                finishedAt: new Date().toISOString(),
+                error: error.message,
+            });
+            throw error;
         }
-
-        if (this.config.enableValueKindBackfill) {
-            const currentEntries = await getAllCatalogEntries(this);
-            await this.backfillValueKinds(currentEntries);
-        }
-
-        return { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount, skipped: null };
     }
 
     async backfillValueKinds(entries) {
@@ -185,7 +289,8 @@ class AiAnalytics extends utils.Adapter {
             .filter((entry) => entry.active !== false && !entry.ignored && !entry.valueKind)
             .slice(0, VALUE_KIND_BACKFILL_BATCH_SIZE);
 
-        for (const entry of pending) {
+        for (let index = 0; index < pending.length; index++) {
+            const entry = pending[index];
             try {
                 const sourceObj = await this.getForeignObjectAsync(entry.sourceId);
                 const obj = { id: entry.sourceId, common: (sourceObj && sourceObj.common) || {} };
@@ -199,6 +304,14 @@ class AiAnalytics extends utils.Adapter {
                     this.log.error(`valueKind-Backfill fuer ${entry.sourceId} fehlgeschlagen: ${error.message}`);
                 }
             }
+
+            await this.updateCatalogSyncState({
+                phase: 'backfill',
+                processed: index + 1,
+                total: pending.length,
+                currentSourceId: entry.sourceId,
+                message: `Pruefe Auspraegungen ${index + 1}/${pending.length}...`,
+            });
         }
 
         return { backfilledCount: pending.length };
