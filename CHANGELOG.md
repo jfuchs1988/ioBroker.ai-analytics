@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.15] - 2026-09-03
+
+### Geändert
+- Verbindlicher Entwicklungsablauf dokumentiert: eigener Feature-/Bugfix-Branch, live gepflegter WIP/TODO/DONE-Worklog, Tests, Push, Merge nach `master` und GitHub-Release.
+- `WORKLOG.md` als Übergabepunkt für Abbrüche, Blocker und Wiederaufnahme ergänzt.
+
 ## [0.0.1-beta.14] - 2026-09-03
 
 ### Hinzugefügt

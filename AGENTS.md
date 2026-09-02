@@ -51,22 +51,23 @@ Siehe [docs/architecture/11-risiken-und-schulden.md](docs/architecture/11-risike
 
 Vollständig in [CONTRIBUTING.md](CONTRIBUTING.md) dokumentiert. Kernpunkte:
 
-- **Branching**: Für jeden Task wird ein neuer Task-Branch vom aktuellen Integrationsstand angelegt. Nach Abschluss wird jeder Task lokal per `git merge --no-ff` nach `master` gemergt. Push, Release und Tags erfolgen nur auf ausdrücklichen Nutzerwunsch.
+- **Branching und Release**: Für jeden Bugfix wird ein `fix/<kurzbeschreibung>`-Branch und für jedes Feature bzw. jede Prozessänderung ein `feature/<kurzbeschreibung>`-Branch vom aktuellen `master` angelegt. Nach Abschluss wird der Branch gepusht, lokal per `git merge --no-ff` nach `master` gemergt und der Branch gelöscht. Danach wird standardmäßig ein versionierter GitHub-Release mit Tag erstellt; Push, Merge und Release sind Bestandteil des normalen Abschlusses und benötigen keine erneute Rückfrage.
 - **Spec + Plan vor Code** bei neuen Features/Verhaltensänderungen (`docs/specs/`, `docs/plans/`); **eigene ADR** (`docs/adr/`) bei architekturrelevanten Entscheidungen.
 - **TDD**: pro Task Test zuerst (rot), dann Implementierung (grün), dann Commit. Neue `lib/*`-Module bekommen eigene Unit-Tests mit gemockter Adapter-API.
-- **Dokumentation im selben Commit/PR aktuell halten**: neues Modul/geänderte Schnittstelle → [05-bausteinsicht.md](docs/architecture/05-bausteinsicht.md); neuer/gelöster Mangel → [11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md); Architekturentscheidung → neue ADR + [adr-index.md](docs/adr/adr-index.md); Release → [CHANGELOG.md](CHANGELOG.md).
+- **Dokumentation live aktuell halten**: Der Arbeitsstand wird während des Tasks in [WORKLOG.md](WORKLOG.md) mit `WIP`, `TODO` und `DONE` gepflegt. Neues Modul/geänderte Schnittstelle → [05-bausteinsicht.md](docs/architecture/05-bausteinsicht.md); neuer/gelöster Mangel → [11-risiken-und-schulden.md](docs/architecture/11-risiken-und-schulden.md); Architekturentscheidung → neue ADR + [adr-index.md](docs/adr/adr-index.md); Release → [CHANGELOG.md](CHANGELOG.md). Bei Abbruch muss der letzte Stand, die nächste Aktion und ein möglicher Blocker im Worklog stehen.
 - **Modellwahl**: günstiges/schnelles Modell für Implementierung (sofern der Plan schon detailliert genug ist), teuerstes verfügbares Modell für Review/Denken/Architekturentscheidungen (siehe [ADR-0011](docs/adr/0011-subagent-driven-development.md)).
 
 ### Verbindlicher Task-Ablauf
 
 Dieser Ablauf gilt für jeden neuen Task, auch in einem neuen Chat-Fenster:
 
-- Vor der Implementierung Branch, Status, letzte Commits und die relevanten Specs, Pläne, Architektur- und Risikodokumente prüfen.
-- Für jeden Task einen eigenen Branch anlegen und nach dem Merge nicht für weitere Tasks wiederverwenden.
-- Sinnvolle, thematisch geschlossene Zwischenstände als eigene Commits sichern. Tests, Implementierung, Hardening und Dokumentation dürfen getrennte Commits sein.
-- Dokumentation live aktualisieren: Spec/Plan, Architektur, Risiken, ADR-Index/Backlog und Changelog müssen vor dem Task-Abschluss den tatsächlichen Code-Stand widerspiegeln.
-- Vor dem Merge `git status`, `git diff`, `git log --oneline -10` und `npm test` ausführen; Fehler vor dem Merge beheben.
-- Nach erfolgreichem Test jeden Task lokal per `git merge --no-ff` nach `master` mergen und den Task-Branch löschen, sofern er nicht mehr benötigt wird.
-- Nach dem Merge den Arbeitsstand erneut prüfen. Keine Änderungen anderer Arbeiten verwerfen und keine fremden Commits amendieren.
+- Vor der Implementierung `WORKLOG.md` auf `WIP` setzen sowie Branch, Status, letzte Commits und relevante Specs, Pläne, Architektur- und Risikodokumente prüfen.
+- Für jeden Task einen eigenen `feature/*`- oder `fix/*`-Branch vom aktuellen `master` anlegen.
+- Lösung einbauen und sinnvolle, thematisch geschlossene Zwischenstände committen. Nach jedem relevanten Zwischenstand `WORKLOG.md` aktualisieren; bei längeren Tasks mindestens WIP, TODO und DONE pflegen.
+- Tests, Implementierung, Hardening und Dokumentation dürfen getrennte Commits sein. Dokumentation und Worklog müssen immer den tatsächlich erreichten Stand widerspiegeln.
+- Vor dem Abschluss `git status`, `git diff`, `git log --oneline -10` und `npm test` ausführen; Fehler vor dem Merge beheben.
+- Abschluss-Commit erstellen, Branch pushen, lokal per `git merge --no-ff` nach `master` mergen und den Task-Branch löschen.
+- Version, `CHANGELOG.md` und `io-package.json` aktualisieren, Release-Tag auf `master` setzen und pushen. Danach GitHub Actions und die Release-Assets prüfen.
+- Nach dem Release `WORKLOG.md` auf `DONE` setzen und den Arbeitsstand erneut prüfen. Keine Änderungen anderer Arbeiten verwerfen und keine fremden Commits amendieren.
 
 Zentraler Doku-Einstiegspunkt: [docs/README.md](docs/README.md).

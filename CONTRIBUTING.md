@@ -2,11 +2,13 @@
 
 Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründungen stehen in den einzelnen [ADRs](docs/adr/adr-index.md), insbesondere [ADR-0011](docs/adr/0011-subagent-driven-development.md), [ADR-0016](docs/adr/0016-git-branching-modell.md) und [ADR-0019](docs/adr/0019-feature-branch-pro-task.md).
 
-## Branching-Modell
+## Branching- und Release-Modell
 
-- Für jede Aufgabe wird ein eigener Branch angelegt (`feature/<kurzbeschreibung>` bzw. `fix/<kurzbeschreibung>`), vom aktuellen Integrationsstand abgezweigt.
-- Nach grünem `npm test` wird der Task lokal per `git merge --no-ff` nach `master` gemergt und der Branch gelöscht.
-- `master` ist damit der Integrations- und Abschlussstand für Aufgaben; Releases/Tags werden auf `master` gesetzt, wenn ein Merge gewünscht ist.
+- Der aktuelle Integrationsbranch heißt in diesem Repository `master` und ist damit der operative „Main“-Branch. Ältere Hinweise auf `develop` oder `main` sind historischer Kontext.
+- Für jedes Feature wird ein eigener `feature/<kurzbeschreibung>`-Branch, für jeden Bugfix ein eigener `fix/<kurzbeschreibung>`-Branch vom aktuellen `master` angelegt.
+- Die Lösung wird auf dem Task-Branch umgesetzt und in sinnvollen Zwischenständen committed.
+- Nach grünem `npm test` wird der Task-Branch gepusht, lokal per `git merge --no-ff` nach `master` gemergt und anschließend gelöscht.
+- Jeder abgeschlossene Task erhält auf `master` eine aktualisierte Version, einen Changelog-Eintrag, einen Release-Tag und einen GitHub-Release. Der vorhandene Release-Workflow baut und veröffentlicht den Tarball automatisch.
 
 ## Wann Spec / Plan / ADR nötig sind
 
@@ -37,12 +39,30 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 
 ## Dokumentation aktuell halten
 
+Der laufende Arbeitsstand wird während jedes Tasks in [WORKLOG.md](WORKLOG.md) gepflegt:
+
+- `WIP`: Was gerade bearbeitet wird und welcher Branch aktiv ist.
+- `TODO`: Offene nächste Schritte, Tests, Review- oder Release-Aktionen.
+- `DONE`: Bereits abgeschlossene Schritte und ihre Prüfergebnisse.
+- Bei Abbruch oder Fehlern: Blocker, letzter sicherer Commit und nächste Aktion eintragen.
+
 Bei jeder Änderung, die eines der folgenden betrifft, wird die entsprechende Doku im selben Commit/PR mit aktualisiert:
 
 - Neues Modul/geänderte Schnittstelle → [Bausteinsicht](docs/architecture/05-bausteinsicht.md)
 - Neuer bekannter Mangel/gelöste Lücke → [Risiken und technische Schulden](docs/architecture/11-risiken-und-schulden.md)
 - Architekturentscheidung getroffen → neue Datei in `docs/adr/`, Eintrag aus dem [Backlog](docs/adr/backlog.md) entfernen (falls dort vorhanden), [adr-index.md](docs/adr/adr-index.md) ergänzen
 - Release → [CHANGELOG.md](CHANGELOG.md)
+
+## Verbindlicher Ablauf
+
+1. `WORKLOG.md` auf `WIP` setzen und Branch/Status/Dokumentation prüfen.
+2. `feature/*` oder `fix/*` erstellen und Lösung implementieren.
+3. Worklog und betroffene Fach-/Architekturdokumentation live aktualisieren.
+4. Zwischenstände und am Ende den vollständigen Stand committen.
+5. `npm test`, Build und bei UI-Änderungen die Live-Abnahme durchführen.
+6. Branch pushen, nach `master` mergen und Branch löschen.
+7. Version/Changelog aktualisieren, Tag pushen und GitHub-Release-Workflow prüfen.
+8. `WORKLOG.md` auf `DONE` setzen und Status sauber hinterlassen.
 
 ## Commits
 

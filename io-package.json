@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.14",
+    "version": "0.0.1-beta.15",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.15": {
+        "en": "Documented the standard feature and bugfix workflow with dedicated branches, live WIP/TODO/DONE handoff status, mandatory tests, merge, and GitHub release verification.",
+        "de": "Den Standardablauf für Features und Bugfixes mit eigenen Branches, live gepflegtem WIP/TODO/DONE-Übergabestand, verpflichtenden Tests, Merge und GitHub-Release-Prüfung dokumentiert."
+      },
       "0.0.1-beta.14": {
         "en": "Settings can now be exported and imported as CSV. Fixed the Devices tab loading indefinitely by using the admin state bridge from the React configuration component. Added live percentage progress for device discovery, update-only sync, and proactive checks.",
         "de": "Einstellungen können jetzt als CSV exportiert und importiert werden. Behoben: Der Geräte-Tab lud dauerhaft, weil die React-Konfigurationskomponente die Admin-State-Bridge nicht nutzte. Ergänzt: Live-Fortschritt in Prozent für Geräteeinlesen, Nur-Updates-Synchronisierung und proaktive Prüfungen."

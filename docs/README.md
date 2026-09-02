@@ -25,6 +25,7 @@ Diese Seite ist der zentrale Einstiegspunkt (Map of Content) in die gesamte Proj
 ## Prozess
 
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — Branching-Modell, wann Spec/Plan/ADR nötig sind, TDD-/Review-Erwartung
+- [WORKLOG.md](../WORKLOG.md) — aktueller WIP/TODO/DONE-Arbeitsstand für Übergaben und Wiederaufnahme
 
 ## Änderungen
 
