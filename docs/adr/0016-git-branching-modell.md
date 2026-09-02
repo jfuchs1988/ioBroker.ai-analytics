@@ -2,6 +2,8 @@
 
 [← ADR-Übersicht](adr-index.md)
 
+> **Hinweis:** Diese ADR dokumentiert den früheren develop-first-Workflow als historische Entscheidungsgrundlage. Die aktuelle operative Arbeitsanweisung für neue Tasks steht in [AGENTS.md](../../AGENTS.md) und [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
 **Status:** Angenommen
 **Datum:** 2026-08-21
 
@@ -11,13 +13,13 @@ Nach Abschluss der initialen Implementierung (siehe [ADR-0012](0012-isolierter-g
 
 ## Entscheidung
 
-`develop` ist der dauerhafte Arbeits-Branch für alle Änderungen. `master` wird nur auf ausdrücklichen Wunsch des Nutzers aktualisiert (kein automatisches Mergen nach jedem Commit) — der Nutzer entscheidet bewusst, wann ein Stand in `master` landet.
+`develop` war der dauerhafte Arbeits-Branch für alle Änderungen. `master` wurde nur auf ausdrücklichen Wunsch des Nutzers aktualisiert (kein automatisches Mergen nach jedem Commit) — der Nutzer entschied bewusst, wann ein Stand in `master` landete.
 
 ## Konsequenzen
 
-- `master` spiegelt immer einen vom Nutzer bewusst freigegebenen Stand wider, nicht jeden Zwischenschritt.
-- Erfordert, dass explizit "merge nach master" angefragt wird — ohne diese Anfrage bleiben Änderungen auf `develop`.
-- Releases/Tags werden typischerweise auf `master` gesetzt, nachdem ein Merge angefragt wurde.
+- `master` spiegelte immer einen vom Nutzer bewusst freigegebenen Stand wider, nicht jeden Zwischenschritt.
+- Erforderte, dass explizit "merge nach master" angefragt wird — ohne diese Anfrage blieben Änderungen auf `develop`.
+- Releases/Tags wurden typischerweise auf `master` gesetzt, nachdem ein Merge angefragt wurde.
 
 ## Verworfene Alternativen
 

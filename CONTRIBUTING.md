@@ -4,10 +4,9 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 
 ## Branching-Modell
 
-- `develop` ist der Arbeits-Branch. Alle fertigen Änderungen landen hier.
-- `master` wird **nur auf ausdrücklichen Wunsch** aktualisiert (kein automatisches Mergen nach jedem Commit) — der Nutzer entscheidet bewusst, wann ein Stand freigegeben wird.
-- Releases/Tags werden auf `master` gesetzt, nachdem ein Merge angefragt wurde.
-- **Pro Plan-Task ein eigener Branch** (`feature/<kurzbeschreibung>` bzw. `fix/<kurzbeschreibung>`), von `develop` abgezweigt, TDD-Commits (rot/grün) darauf, nach grünem `npm test` lokal per `git merge --no-ff` zurück nach `develop`, danach Branch löschen. Details/Begründung: [ADR-0019](docs/adr/0019-feature-branch-pro-task.md). Gilt nicht für Spec/Plan-lose Bugfixes/Tippfehler (siehe Tabelle unten) — die bleiben direkt auf `develop`.
+- Für jede Aufgabe wird ein eigener Branch angelegt (`feature/<kurzbeschreibung>` bzw. `fix/<kurzbeschreibung>`), vom aktuellen Integrationsstand abgezweigt.
+- Nach grünem `npm test` wird der Task lokal per `git merge --no-ff` nach `master` gemergt und der Branch gelöscht.
+- `master` ist damit der Integrations- und Abschlussstand für Aufgaben; Releases/Tags werden auf `master` gesetzt, wenn ein Merge gewünscht ist.
 
 ## Wann Spec / Plan / ADR nötig sind
 
@@ -15,7 +14,7 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 |---|---|
 | Neues Feature, Verhaltensänderung | Spec (`docs/specs/`) + Implementierungsplan (`docs/plans/`) vor dem Code |
 | Architekturrelevante Entscheidung (Technologie, Datenmodell, Sicherheitsmodell) | Eigene ADR (`docs/adr/`) — offene Fragen vorher im [Backlog](docs/adr/backlog.md) sammeln |
-| Bugfix, Tippfehler, kleines Refactoring | Direkt auf `develop`, kein Spec/Plan nötig |
+| Bugfix, Tippfehler, kleines Refactoring | Eigener `fix/<kurzbeschreibung>`-Branch, wenn als Task bearbeitet; kleine Ad-hoc-Korrekturen nur nach Absprache direkt |
 
 ## Implementierungs-Workflow (bei Spec+Plan-pflichtigen Änderungen)
 
@@ -33,7 +32,7 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 
 ## Tests
 
-- `npm test` muss vor jedem Commit auf `develop` grün sein (aktuell: 42 Unit-Tests + 1 Adapter-Smoke-Test — Hinweis zur eingeschränkten Aussagekraft des Smoke-Tests in [Testkonzept](docs/architecture/08-querschnittliche-konzepte.md#84-testkonzept)).
+- `npm test` muss vor jedem Commit grün sein (aktuell: 222 Unit-Tests + 1 Adapter-Smoke-Test — Hinweis zur eingeschränkten Aussagekraft des Smoke-Tests in [Testkonzept](docs/architecture/08-querschnittliche-konzepte.md#84-testkonzept)).
 - Neue `lib/*`-Module bekommen eigene Unit-Tests mit gemockter Adapter-API.
 
 ## Dokumentation aktuell halten

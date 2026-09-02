@@ -16,7 +16,7 @@
 ## 2.2 Organisatorische Randbedingungen
 
 - Entwicklung erfolgt über einen Spec → Plan → TDD-Implementierung → Review-Workflow, dokumentiert in [CONTRIBUTING.md](../../CONTRIBUTING.md).
-- Git-Branching: `develop` ist der Arbeits-Branch, `master` wird nur auf ausdrücklichen Wunsch aktualisiert (siehe [ADR-0016](../adr/0016-git-branching-modell.md)).
+- Git-Branching: Für jeden Task wird ein eigener Branch angelegt und nach grünem `npm test` lokal per `git merge --no-ff` nach `master` gemergt; die ältere develop-first-Formulierung in [ADR-0016](../adr/0016-git-branching-modell.md) ist historischer Kontext.
 - Privates GitHub-Repository `jfuchs1988/ioBroker.ai-analytics`. Kein `npm publish`, keine Aufnahme in den offiziellen ioBroker-Adapter-Katalog — bewusste Entscheidung, siehe [ADR-0018](../adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) (Lizenzmodell: Beta frei, danach Sponsoring-Pflicht).
 
 ---

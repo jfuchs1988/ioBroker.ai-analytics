@@ -2,12 +2,14 @@
 
 [← ADR-Übersicht](adr-index.md)
 
+> **Hinweis:** Diese ADR beschreibt den früheren lokalen `develop`-Merge als historische Prozessentscheidung. Die aktuelle operative Arbeitsanweisung für neue Tasks steht in [AGENTS.md](../../AGENTS.md) und [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
 **Status:** Angenommen
 **Datum:** 2026-08-22
 
 ## Kontext
 
-[ADR-0016](0016-git-branching-modell.md) legt fest, dass `develop` der dauerhafte Arbeits-Branch ist und `master` nur auf ausdrücklichen Wunsch aktualisiert wird. Bisher landete dabei jeder Commit direkt auf `develop` — kein Branch-Layer zwischen einzelnem Task und `develop`. Der Nutzer möchte stattdessen pro Aufgabe einen eigenen Branch, der lokal nach `develop` gemergt wird, bevor irgendetwas gepusht wird.
+[ADR-0016](0016-git-branching-modell.md) legte fest, dass `develop` der dauerhafte Arbeits-Branch ist und `master` nur auf ausdrücklichen Wunsch aktualisiert wird. Bisher landete dabei jeder Commit direkt auf `develop` — kein Branch-Layer zwischen einzelnem Task und `develop`. Der Nutzer wollte stattdessen pro Aufgabe einen eigenen Branch, der lokal nach `develop` gemergt wird, bevor irgendetwas gepusht wird.
 
 ## Entscheidung
 
@@ -16,9 +18,9 @@ Granularität ist **ein Branch pro Task im Umsetzungsplan** (`docs/plans/*.md`),
 1. Für jeden Plan-Task wird von `develop` aus ein Branch erstellt (`feature/<kurzbeschreibung>` bzw. `fix/<kurzbeschreibung>` je nach Art des Tasks).
 2. Der TDD-Zyklus für diesen Task (roter Test-Commit, grüner Implementierungs-Commit, ggf. weitere) läuft vollständig auf diesem Branch.
 3. Nach Abschluss des Tasks (inkl. `npm test` grün) wird lokal nach `develop` gemergt (`git merge --no-ff`, damit die Task-Historie im Merge-Commit sichtbar bleibt) und der Branch anschließend gelöscht.
-4. Gepusht wird weiterhin nur auf ausdrücklichen Wunsch — dieses ADR ändert nichts an der `develop`/`master`-Freigabelogik aus ADR-0016, es fügt nur eine lokale Zwischenebene zwischen einzelnem Task und `develop` ein.
+4. Gepusht wurde weiterhin nur auf ausdrücklichen Wunsch — dieses ADR änderte nichts an der `develop`/`master`-Freigabelogik aus ADR-0016, es fügte nur eine lokale Zwischenebene zwischen einzelnem Task und `develop` ein.
 
-Bugfixes/Tippfehler/kleine Refactorings ohne Plan-Task (siehe [CONTRIBUTING.md](../../CONTRIBUTING.md), Zeile "Bugfix, Tippfehler, kleines Refactoring → direkt auf develop") bleiben von dieser Entscheidung unberührt — dafür bleibt es bei direkten Commits auf `develop`, ein Branch für eine Ein-Zeilen-Korrektur wäre unverhältnismäßiger Overhead.
+Bugfixes/Tippfehler/kleine Refactorings ohne Plan-Task (siehe [CONTRIBUTING.md](../../CONTRIBUTING.md)) blieben von dieser Entscheidung unberührt — dafür blieb es bei direkten Commits auf `develop`, ein Branch für eine Ein-Zeilen-Korrektur war unverhältnismäßiger Overhead.
 
 ## Konsequenzen
 
