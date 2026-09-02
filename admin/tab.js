@@ -7,6 +7,7 @@ const BRIDGE_POLL_INTERVAL_MS = 400;
 const BRIDGE_TIMEOUT_FAST_MS = 60000;
 const BRIDGE_TIMEOUT_SLOW_MS = 300000;
 const SLOW_COMMANDS = ['chatQuestion', 'runDiscoveryNow', 'runProactiveCheckNow'];
+const BUDGET_REFRESH_INTERVAL_MS = 20000;
 
 function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
@@ -328,14 +329,22 @@ async function triggerProactiveCheck() {
 
 function renderBudgetChart(rangeEntries) {
     const container = document.getElementById('budget-chart');
+    const emptyMsg = document.getElementById('budget-chart-empty');
     if (!container) return;
     container.innerHTML = '';
+    if (!rangeEntries || !rangeEntries.length) {
+        container.hidden = true;
+        if (emptyMsg) emptyMsg.hidden = false;
+        return;
+    }
+    container.hidden = false;
+    if (emptyMsg) emptyMsg.hidden = true;
     const totals = rangeEntries.map(sumDailyTokens);
     const max = Math.max(1, ...totals);
     rangeEntries.forEach((entry, index) => {
         const bar = document.createElement('div');
         bar.className = 'budget-bar';
-        bar.style.height = `${Math.round((totals[index] / max) * 100)}%`;
+        bar.style.height = `${Math.max(2, Math.round((totals[index] / max) * 100))}%`;
         bar.title = `${entry.date}: ${totals[index]} Tokens`;
         container.appendChild(bar);
     });
@@ -369,8 +378,15 @@ function showBudgetRangeAll() {
     renderBudgetExtras();
 }
 
+function toggleBudgetDetails() {
+    const details = document.getElementById('budget-details');
+    if (!details) return;
+    details.hidden = !details.hidden;
+    if (!details.hidden) renderBudgetExtras();
+}
+
 function loadBudget() {
-    const display = document.getElementById('budget-display');
+    const display = document.getElementById('budget-summary-bar');
     socket.emit('getState', `${namespace}.usage.today`, (usageErr, usageState) => {
         let usage = { tokensToday: 0 };
         if (!usageErr && usageState && usageState.val) {
@@ -404,17 +420,6 @@ function loadBudget() {
             });
         });
     });
-}
-
-function showSection(section) {
-    ['chat', 'budget'].forEach((name) => {
-        const el = document.getElementById(`section-${name}`);
-        if (el) el.hidden = name !== section;
-    });
-    document.querySelectorAll('.nav-btn').forEach((button) => {
-        button.classList.toggle('active', button.dataset.section === section);
-    });
-    if (section === 'budget') loadBudget();
 }
 
 function loadHistory() {
@@ -466,6 +471,7 @@ async function sendQuestion() {
         } else if (response && response.error) {
             appendChatError(response.error);
         }
+        loadBudget();
     } catch (error) {
         appendChatError(error.message);
     } finally {
@@ -641,15 +647,15 @@ function init() {
     }
 
     loadHistory();
+    loadBudget();
     document.getElementById('chat-send').addEventListener('click', sendQuestion);
     document.getElementById('chat-input').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') sendQuestion();
     });
-    document.querySelectorAll('.nav-btn').forEach((button) => {
-        button.addEventListener('click', () => showSection(button.dataset.section));
-    });
+    document.getElementById('budget-details-toggle').addEventListener('click', toggleBudgetDetails);
     document.getElementById('budget-range-30').addEventListener('click', showBudgetRange30);
     document.getElementById('budget-range-all').addEventListener('click', showBudgetRangeAll);
+    setInterval(loadBudget, BUDGET_REFRESH_INTERVAL_MS);
 }
 
 if (typeof window !== 'undefined') {

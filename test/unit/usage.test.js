@@ -1,7 +1,7 @@
 // test/unit/usage.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureUsageState, recordUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE } = require('../../lib/usage');
+const { ensureUsageState, recordUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, formatTodaySummary } = require('../../lib/usage');
 
 function makeAdapter(config) {
     return {
@@ -17,13 +17,14 @@ describe('usage', () => {
         expect(USAGE_STATE).to.equal('usage.today');
     });
 
-    it('ensureUsageState creates both state objects', async () => {
+    it('ensureUsageState creates all three state objects', async () => {
         const adapter = makeAdapter();
         await ensureUsageState(adapter);
-        expect(adapter.setObjectNotExistsAsync.calledTwice).to.equal(true);
+        expect(adapter.setObjectNotExistsAsync.calledThrice).to.equal(true);
         const ids = adapter.setObjectNotExistsAsync.getCalls().map((call) => call.args[0]);
         expect(ids).to.include(USAGE_STATE);
         expect(ids).to.include(HISTORY_STATE);
+        expect(ids).to.include(TODAY_SUMMARY_STATE);
     });
 
     it('recordUsage starts a fresh counter when no state exists', async () => {
@@ -82,6 +83,20 @@ describe('usage', () => {
         adapter.getStateAsync.resolves({ val: JSON.stringify({ date: today, tokensToday: 200 }) });
 
         expect(await isBudgetExceeded(adapter)).to.equal(false);
+    });
+
+    describe('formatTodaySummary', () => {
+        it('returns "150 Tokens heute (kein Limit)" when budget is 0', () => {
+            expect(formatTodaySummary(150, 0)).to.equal('150 Tokens heute (kein Limit)');
+        });
+
+        it('returns "150 Tokens heute (kein Limit)" when budget is undefined', () => {
+            expect(formatTodaySummary(150, undefined)).to.equal('150 Tokens heute (kein Limit)');
+        });
+
+        it('returns "150 / 1000 Tokens heute" when budget is 1000', () => {
+            expect(formatTodaySummary(150, 1000)).to.equal('150 / 1000 Tokens heute');
+        });
     });
 
     describe('getUsageHistory', () => {
@@ -175,6 +190,18 @@ describe('usage', () => {
                 chat: { inputTokens: 10, outputTokens: 5 },
                 onboarding: { inputTokens: 0, outputTokens: 0 },
             });
+        });
+
+        it('recordUsage also writes TODAY_SUMMARY_STATE with formatted string', async () => {
+            const adapter = makeAdapter({ dailyTokenBudget: 1000 });
+            adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
+
+            await recordUsage(adapter, { inputTokens: 100, outputTokens: 20 });
+
+            const summaryCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === TODAY_SUMMARY_STATE);
+            expect(summaryCall).to.exist;
+            expect(summaryCall.args[1].val).to.equal(formatTodaySummary(120, 1000));
         });
     });
 });

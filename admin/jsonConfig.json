@@ -5,6 +5,11 @@
       "type": "panel",
       "label": "Einstellungen",
       "items": {
+    "chatModelHeader": {
+      "type": "header",
+      "text": "Chat- und Prüfungsmodell",
+      "size": 3
+    },
     "providerType": {
       "type": "select",
       "label": "LLM-Provider",
@@ -18,20 +23,6 @@
     "apiKey": {
       "type": "password",
       "label": "API-Key"
-    },
-    "openRouterSignup": {
-      "type": "staticLink",
-      "label": "OpenRouter API-Key erstellen (empfohlen fuer automatisch erkannte kostenlose Tool-Modelle)",
-      "href": "https://openrouter.ai/settings/keys",
-      "button": true,
-      "variant": "outlined"
-    },
-    "openCodeZenSignup": {
-      "type": "staticLink",
-      "label": "OpenCode Zen ansehen (alternative, teilweise zeitlich begrenzt kostenlose API)",
-      "href": "https://opencode.ai/auth",
-      "button": true,
-      "variant": "text"
     },
     "model": {
       "type": "autocompleteSendTo",
@@ -56,6 +47,26 @@
       "label": "Preis pro 1 Mio. Output-Tokens (Chat, z.B. USD)",
       "default": 0,
       "min": 0
+    },
+    "chatModelDivider1": {
+      "type": "divider"
+    },
+    "openRouterSignup": {
+      "type": "staticLink",
+      "label": "OpenRouter API-Key erstellen (empfohlen fuer automatisch erkannte kostenlose Tool-Modelle)",
+      "href": "https://openrouter.ai/settings/keys",
+      "button": true,
+      "variant": "outlined"
+    },
+    "openCodeZenSignup": {
+      "type": "staticLink",
+      "label": "OpenCode Zen ansehen (alternative, teilweise zeitlich begrenzt kostenlose API)",
+      "href": "https://opencode.ai/auth",
+      "button": true,
+      "variant": "text"
+    },
+    "chatModelDivider2": {
+      "type": "divider"
     },
     "onboardingHeader": {
       "type": "header",
@@ -100,6 +111,14 @@
       "default": 0,
       "min": 0
     },
+    "onboardingDivider": {
+      "type": "divider"
+    },
+    "operationsHeader": {
+      "type": "header",
+      "text": "Betrieb: Proaktive Prüfung & Budget",
+      "size": 3
+    },
     "checkIntervalHours": {
       "type": "number",
       "label": "Intervall proaktive Pruefung (Stunden)",
@@ -121,6 +140,16 @@
       "type": "checkbox",
       "label": "Bestehende Datenpunkte nachtraeglich auf Auspraegung (valueKind) pruefen",
       "default": false
+    },
+    "budgetSummary": {
+      "type": "state",
+      "oid": "usage.todaySummary",
+      "control": "text",
+      "readOnly": true,
+      "label": "Aktuelles Budget (heute)"
+    },
+    "operationsDivider": {
+      "type": "divider"
     },
     "sponsorLink": {
       "type": "staticLink",
