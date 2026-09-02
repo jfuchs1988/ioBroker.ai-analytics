@@ -10,6 +10,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 
 ### Behoben
 - InfluxDB-History-Samples für die `valueKind`-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (`bool != float`) durch bucketed Sampling.
+- Geräte-Tab in den Adapter-Einstellungen lud nicht (Modul-Federation-Komponente ohne Default-Export).
 
 ## [0.0.1-beta.10] - 2026-09-02
 
