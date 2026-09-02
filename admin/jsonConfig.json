@@ -17,12 +17,12 @@
           "lg": 6,
           "xl": 6
         },
-        "sponsorLink": {
+         "sponsorLink": {
           "type": "staticLink",
-          "label": "Projekt unterstuetzen",
+          "label": "GitHub Sponsors",
           "href": "https://github.com/sponsors/jfuchs1988",
           "button": true,
-          "variant": "outlined",
+          "variant": "contained",
           "sm": 12,
           "md": 5,
           "lg": 3,

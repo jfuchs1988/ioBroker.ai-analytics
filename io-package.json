@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.16",
+    "version": "0.0.1-beta.17",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.17": {
+        "en": "Polished the sponsor links to use a clearer GitHub Sponsors label and cleaner button styling in the settings page and custom tab.",
+        "de": "Die Sponsor-Links wurden mit klarerem GitHub-Sponsors-Label und saubererer Button-Optik in Einstellungen und Custom-Tab überarbeitet."
+      },
       "0.0.1-beta.16": {
         "en": "Fixed the Settings CSV import so it updates the complete native configuration object instead of writing isolated fields. The import/export buttons now keep the visible settings in sync with the saved values.",
         "de": "Den Settings-CSV-Import behoben, sodass jetzt das komplette native Konfigurationsobjekt aktualisiert wird statt isolierter Felder. Die Import-/Export-Buttons halten die sichtbaren Einstellungen jetzt synchron zu den gespeicherten Werten."
