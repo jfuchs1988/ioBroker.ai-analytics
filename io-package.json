@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.10",
+    "version": "0.0.1-beta.12",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,14 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.12": {
+        "en": "Settings page reorganized into grouped sections (chat/check model, onboarding model, operations & budget). Budget is no longer its own tab: a live summary now sits above the chat (auto-refreshing, with a collapsible details panel), and is also shown live on the settings page. Fixed: the Devices tab failed to load (Module Federation component was missing its default export). Fixed: the usage chart rendered as a solid color block instead of a bar chart when only a few days of history existed.",
+        "de": "Einstellungen-Seite in gruppierte Abschnitte unterteilt (Chat-/Prüfungsmodell, Onboarding-Modell, Betrieb & Budget). Budget ist kein eigener Tab mehr: eine live aktualisierte Kurzanzeige sitzt jetzt über dem Chat (mit aufklappbaren Details), zusätzlich live sichtbar auf der Einstellungen-Seite. Behoben: der Geräte-Tab lud nicht (Modul-Federation-Komponente ohne Default-Export). Behoben: das Verbrauchsdiagramm zeigte bei wenigen Tagen Historie nur eine einfarbige Fläche statt eines Balkendiagramms."
+      },
+      "0.0.1-beta.11": {
+        "en": "Live progress indicator in the Devices tab for re-scan and backfill, with continuously updating device list. InfluxDB history sampling for valueKind classification now avoids raw-data type conflicts (bool != float) via bucketed sampling.",
+        "de": "Live-Fortschrittsanzeige im Geräte-Tab für Re-Scan und Backfill, inklusive laufender Aktualisierung der Geräteliste. InfluxDB-History-Samples für die valueKind-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (bool != float) durch bucketed Sampling."
+      },
       "0.0.1-beta.10": {
         "en": "Moves the dynamic catalog device management into a dedicated tab of the adapter settings. Adds provider-backed model suggestions, visible sponsor links, and fixes the OpenRouter default endpoint.",
         "de": "Verlagert die dynamische Katalogverwaltung in einen eigenen Geräte-Reiter der Adapter-Einstellungen. Ergänzt providerbasierte Modellvorschläge, sichtbare Sponsoring-Links und korrigiert den OpenRouter-Standardendpunkt."

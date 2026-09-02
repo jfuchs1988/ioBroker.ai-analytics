@@ -3,17 +3,23 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.12] - 2026-09-03
+
+### Hinzugefügt
+- Live-Budgetanzeige oberhalb des Chats (mit aufklappbaren Details) statt eigenem Budget-Tab; Budget zusätzlich live auf der Einstellungen-Seite sichtbar (`usage.todaySummary`).
+
+### Behoben
+- Geräte-Tab in den Adapter-Einstellungen lud nicht (Modul-Federation-Komponente ohne Default-Export).
+- Einstellungen-Seite in logische Gruppen (Chat-Modell / Onboarding / Betrieb & Budget) unterteilt.
+- Budget-Verbrauchsdiagramm zeigte bei wenigen Tagen Historie nur eine einfarbige Fläche statt eines Balkendiagramms.
+
 ## [0.0.1-beta.11] - 2026-09-02
 
 ### Hinzugefügt
 - Live-Fortschrittsanzeige im Geräte-Tab für Re-Scan und Backfill, inklusive laufender Aktualisierung der Geräteliste.
-- Live-Budgetanzeige oberhalb des Chats (mit aufklappbaren Details) statt eigenem Budget-Tab; Budget zusätzlich live auf der Einstellungen-Seite sichtbar (`usage.todaySummary`).
 
 ### Behoben
 - InfluxDB-History-Samples für die `valueKind`-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (`bool != float`) durch bucketed Sampling.
-- Geräte-Tab in den Adapter-Einstellungen lud nicht (Modul-Federation-Komponente ohne Default-Export).
-- Einstellungen-Seite in logische Gruppen (Chat-Modell / Onboarding / Betrieb & Budget) unterteilt.
-- Budget-Verbrauchsdiagramm zeigte bei wenigen Tagen Historie nur eine einfarbige Fläche statt eines Balkendiagramms.
 
 ## [0.0.1-beta.10] - 2026-09-02
 
