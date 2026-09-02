@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.14] - 2026-09-03
+
+### Hinzugefügt
+- Settings-CSV: Einstellungen können vollständig exportiert und wieder importiert werden.
+- Geräte-Tab: Live-Fortschritt in Prozent für Geräteeinlesen, Nur-Updates-Synchronisierung und proaktive Prüfungen.
+
+### Behoben
+- Geräte-Tab: Die React-Konfigurationskomponente nutzt jetzt die Admin-State-Bridge und bleibt nicht mehr dauerhaft bei „Geräte werden geladen ...“ hängen.
+
 ## [0.0.1-beta.13] - 2026-09-03
 
 ### Hinzugefügt
