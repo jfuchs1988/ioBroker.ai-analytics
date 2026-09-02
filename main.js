@@ -150,7 +150,7 @@ class AiAnalytics extends utils.Adapter {
         this.log.info('ai-analytics adapter ready');
     }
 
-    async syncCatalog() {
+    async syncCatalog(options = {}) {
         await this.updateCatalogSyncState({
             running: true,
             phase: 'discover',
@@ -201,6 +201,21 @@ class AiAnalytics extends utils.Adapter {
                     message: `Reaktiviere und pruefe ${index + 1}/${discovered.length} Datenpunkte...`,
                 });
             }
+
+        if (options.skipClassification) {
+            const result = { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'classification' };
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'done',
+                processed: discovered.length,
+                total: discovered.length,
+                currentSourceId: null,
+                message: `Sync abgeschlossen (nur Updates): ${reactivatedCount} reaktiviert, Klassifikation uebersprungen.`,
+                finishedAt: new Date().toISOString(),
+                error: null,
+            });
+            return result;
+        }
 
         if (!this.onboardingProviderOk) {
             this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
@@ -428,6 +443,7 @@ class AiAnalytics extends utils.Adapter {
             updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, message),
             removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, message),
             runDiscoveryNow: () => adminCommands.runDiscoveryNow(this),
+            runDiscoveryOnly: () => adminCommands.runDiscoveryOnly(this),
             runProactiveCheckNow: () => adminCommands.runProactiveCheckNow(this),
         };
 

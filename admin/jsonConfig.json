@@ -5,183 +5,305 @@
       "type": "panel",
       "label": "Einstellungen",
       "items": {
-    "chatModelHeader": {
-      "type": "header",
-      "text": "Chat- und Prüfungsmodell",
-      "size": 3
-    },
-    "providerType": {
-      "type": "select",
-      "label": "LLM-Provider",
-      "options": [
-        { "label": "Anthropic", "value": "anthropic" },
-        { "label": "OpenAI", "value": "openai" },
-        { "label": "OpenRouter", "value": "openrouter" },
-        { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
-      ]
-    },
-    "apiKey": {
-      "type": "password",
-      "label": "API-Key"
-    },
-    "model": {
-      "type": "autocompleteSendTo",
-      "label": "Modell (OpenRouter zeigt kostenlose Tool-Modelle)",
-      "command": "listProviderModels",
-      "jsonData": "{\"providerType\":\"${data.providerType}\",\"apiKey\":\"${data.apiKey}\",\"baseUrl\":\"${data.baseUrl}\"}",
-      "alsoDependsOn": ["providerType", "apiKey", "baseUrl"],
-      "freeSolo": true
-    },
-    "baseUrl": {
-      "type": "text",
-      "label": "Basis-URL (nur fuer OpenRouter/Lokal)"
-    },
-    "chatPricePerMillionInputTokens": {
-      "type": "number",
-      "label": "Preis pro 1 Mio. Input-Tokens (Chat, z.B. USD)",
-      "default": 0,
-      "min": 0
-    },
-    "chatPricePerMillionOutputTokens": {
-      "type": "number",
-      "label": "Preis pro 1 Mio. Output-Tokens (Chat, z.B. USD)",
-      "default": 0,
-      "min": 0
-    },
-    "chatModelDivider1": {
-      "type": "divider"
-    },
-    "openRouterSignup": {
-      "type": "staticLink",
-      "label": "OpenRouter API-Key erstellen (empfohlen fuer automatisch erkannte kostenlose Tool-Modelle)",
-      "href": "https://openrouter.ai/settings/keys",
-      "button": true,
-      "variant": "outlined"
-    },
-    "openCodeZenSignup": {
-      "type": "staticLink",
-      "label": "OpenCode Zen ansehen (alternative, teilweise zeitlich begrenzt kostenlose API)",
-      "href": "https://opencode.ai/auth",
-      "button": true,
-      "variant": "text"
-    },
-    "chatModelDivider2": {
-      "type": "divider"
-    },
-    "onboardingHeader": {
-      "type": "header",
-      "text": "Onboarding-Modell (optional, sonst wie oben)"
-    },
-    "onboardingProviderType": {
-      "type": "select",
-      "label": "LLM-Provider (Onboarding)",
-      "options": [
-        { "label": "Wie oben (Chat/Pruefung)", "value": "" },
-        { "label": "Anthropic", "value": "anthropic" },
-        { "label": "OpenAI", "value": "openai" },
-        { "label": "OpenRouter", "value": "openrouter" },
-        { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
-      ]
-    },
-    "onboardingApiKey": {
-      "type": "password",
-      "label": "API-Key (Onboarding)"
-    },
-    "onboardingModel": {
-      "type": "autocompleteSendTo",
-      "label": "Modell (Onboarding; OpenRouter zeigt kostenlose Tool-Modelle)",
-      "command": "listProviderModels",
-      "jsonData": "{\"providerType\":\"${data.onboardingProviderType}\",\"apiKey\":\"${data.onboardingApiKey}\",\"baseUrl\":\"${data.onboardingBaseUrl}\"}",
-      "alsoDependsOn": ["onboardingProviderType", "onboardingApiKey", "onboardingBaseUrl"],
-      "freeSolo": true
-    },
-    "onboardingBaseUrl": {
-      "type": "text",
-      "label": "Basis-URL (Onboarding, nur fuer OpenRouter/Lokal)"
-    },
-    "onboardingPricePerMillionInputTokens": {
-      "type": "number",
-      "label": "Preis pro 1 Mio. Input-Tokens (Onboarding, z.B. USD)",
-      "default": 0,
-      "min": 0
-    },
-    "onboardingPricePerMillionOutputTokens": {
-      "type": "number",
-      "label": "Preis pro 1 Mio. Output-Tokens (Onboarding, z.B. USD)",
-      "default": 0,
-      "min": 0
-    },
-    "onboardingDivider": {
-      "type": "divider"
-    },
-    "operationsHeader": {
-      "type": "header",
-      "text": "Betrieb: Proaktive Prüfung & Budget",
-      "size": 3
-    },
-    "checkIntervalHours": {
-      "type": "number",
-      "label": "Intervall proaktive Pruefung (Stunden)",
-      "default": 24,
-      "min": 1
-    },
-    "silentIfNothingFound": {
-      "type": "checkbox",
-      "label": "Bei keinem Fund keine Nachricht senden",
-      "default": false
-    },
-    "dailyTokenBudget": {
-      "type": "number",
-      "label": "Taegliches Token-Budget (0 = kein Limit)",
-      "default": 0,
-      "min": 0
-    },
-    "enableValueKindBackfill": {
-      "type": "checkbox",
-      "label": "Bestehende Datenpunkte nachtraeglich auf Auspraegung (valueKind) pruefen",
-      "default": false
-    },
-    "budgetSummary": {
-      "type": "state",
-      "oid": "usage.todaySummary",
-      "control": "text",
-      "readOnly": true,
-      "label": "Aktuelles Budget (heute)"
-    },
-    "operationsDivider": {
-      "type": "divider"
-    },
-    "sponsorLink": {
-      "type": "staticLink",
-      "label": "Projekt ueber GitHub Sponsors unterstuetzen",
-      "href": "https://github.com/sponsors/jfuchs1988",
-      "button": true,
-      "variant": "contained",
-      "color": "primary"
-    }
+        "budgetSummary": {
+          "type": "state",
+          "oid": "usage.todaySummary",
+          "control": "text",
+          "readOnly": true,
+          "narrow": true,
+          "label": "Aktuelles Budget (heute)",
+          "sm": 12,
+          "md": 7,
+          "lg": 6,
+          "xl": 6
+        },
+        "sponsorLink": {
+          "type": "staticLink",
+          "label": "Projekt unterstuetzen",
+          "href": "https://github.com/sponsors/jfuchs1988",
+          "button": true,
+          "variant": "outlined",
+          "sm": 12,
+          "md": 5,
+          "lg": 3,
+          "xl": 3
+        },
+        "topDivider": {
+          "type": "divider",
+          "newLine": true
+        },
+        "chatModelHeader": {
+          "type": "header",
+          "text": "Chat- und Prüfungsmodell",
+          "size": 3,
+          "newLine": true
+        },
+        "openRouterSignup": {
+          "type": "staticLink",
+          "label": "OpenRouter API-Key erstellen (kostenlose Tool-Modelle)",
+          "href": "https://openrouter.ai/settings/keys",
+          "button": true,
+          "variant": "outlined",
+          "newLine": true,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "openCodeZenSignup": {
+          "type": "staticLink",
+          "label": "OpenCode Zen ansehen (alternative Gratis-API)",
+          "href": "https://opencode.ai/auth",
+          "button": true,
+          "variant": "text",
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "chatModelDivider": {
+          "type": "divider",
+          "newLine": true
+        },
+        "providerType": {
+          "type": "select",
+          "label": "LLM-Provider",
+          "newLine": true,
+          "options": [
+            { "label": "Anthropic", "value": "anthropic" },
+            { "label": "OpenAI", "value": "openai" },
+            { "label": "OpenRouter", "value": "openrouter" },
+            { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
+          ],
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "baseUrl": {
+          "type": "text",
+          "label": "Basis-URL (nur fuer OpenRouter/Lokal)",
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "model": {
+          "type": "text",
+          "label": "Modell",
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "apiKey": {
+          "type": "password",
+          "label": "API-Key",
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "chatPricePerMillionInputTokens": {
+          "type": "number",
+          "label": "Preis pro 1 Mio. Input-Tokens (Chat, z.B. USD)",
+          "default": 0,
+          "min": 0,
+          "newLine": true,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "chatPricePerMillionOutputTokens": {
+          "type": "number",
+          "label": "Preis pro 1 Mio. Output-Tokens (Chat, z.B. USD)",
+          "default": 0,
+          "min": 0,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "onboardingDivider": {
+          "type": "divider",
+          "newLine": true
+        },
+        "onboardingHeader": {
+          "type": "header",
+          "text": "Onboarding-Modell (optional, sonst wie oben)",
+          "newLine": true
+        },
+        "onboardingProviderType": {
+          "type": "select",
+          "label": "LLM-Provider (Onboarding)",
+          "newLine": true,
+          "options": [
+            { "label": "Wie oben (Chat/Pruefung)", "value": "" },
+            { "label": "Anthropic", "value": "anthropic" },
+            { "label": "OpenAI", "value": "openai" },
+            { "label": "OpenRouter", "value": "openrouter" },
+            { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
+          ],
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "onboardingBaseUrl": {
+          "type": "text",
+          "label": "Basis-URL (Onboarding, nur fuer OpenRouter/Lokal)",
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "onboardingModel": {
+          "type": "text",
+          "label": "Modell (Onboarding)",
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "onboardingApiKey": {
+          "type": "password",
+          "label": "API-Key (Onboarding)",
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "onboardingPricePerMillionInputTokens": {
+          "type": "number",
+          "label": "Preis pro 1 Mio. Input-Tokens (Onboarding, z.B. USD)",
+          "default": 0,
+          "min": 0,
+          "newLine": true,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "onboardingPricePerMillionOutputTokens": {
+          "type": "number",
+          "label": "Preis pro 1 Mio. Output-Tokens (Onboarding, z.B. USD)",
+          "default": 0,
+          "min": 0,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "operationsDivider": {
+          "type": "divider",
+          "newLine": true
+        },
+        "operationsHeader": {
+          "type": "header",
+          "text": "Betrieb: Proaktive Prüfung & Budget",
+          "size": 3,
+          "newLine": true
+        },
+        "checkIntervalHours": {
+          "type": "number",
+          "label": "Intervall proaktive Pruefung (Stunden)",
+          "default": 24,
+          "min": 1,
+          "newLine": true,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "dailyTokenBudget": {
+          "type": "number",
+          "label": "Taegliches Token-Budget (0 = kein Limit)",
+          "default": 0,
+          "min": 0,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "silentIfNothingFound": {
+          "type": "checkbox",
+          "label": "Bei keinem Fund keine Nachricht senden",
+          "default": false,
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "enableValueKindBackfill": {
+          "type": "checkbox",
+          "label": "Bestehende Datenpunkte nachtraeglich auf Auspraegung (valueKind) pruefen",
+          "default": false,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        }
       }
     },
     "devicesTab": {
       "type": "panel",
       "label": "Geräte",
       "items": {
-        "devicesHint": {
-          "type": "staticText",
-          "text": "Hier werden alle historisierten und katalogisierten Datenpunkte verwaltet. Änderungen werden direkt im Katalog gespeichert."
+        "devicesBudgetSummary": {
+          "type": "state",
+          "oid": "usage.todaySummary",
+          "control": "text",
+          "readOnly": true,
+          "narrow": true,
+          "label": "Aktuelles Budget (heute)",
+          "sm": 12,
+          "md": 7,
+          "lg": 6,
+          "xl": 6
         },
         "devicesSponsorLink": {
           "type": "staticLink",
-          "label": "Projekt ueber GitHub Sponsors unterstuetzen",
+          "label": "Projekt unterstuetzen",
           "href": "https://github.com/sponsors/jfuchs1988",
           "button": true,
-          "variant": "outlined"
+          "variant": "outlined",
+          "sm": 12,
+          "md": 5,
+          "lg": 3,
+          "xl": 3
+        },
+        "devicesHint": {
+          "type": "staticText",
+          "text": "Hier werden alle historisierten und katalogisierten Datenpunkte verwaltet. Änderungen werden direkt im Katalog gespeichert.",
+          "newLine": true
         },
         "catalogDevices": {
           "type": "custom",
           "url": "custom/customComponents.js",
           "name": "AiAnalyticsConfig/Components/CatalogDevicesComponent",
           "guiApi": 2,
-          "bundlerType": "module"
+          "bundlerType": "module",
+          "newLine": true
         }
       }
     }
