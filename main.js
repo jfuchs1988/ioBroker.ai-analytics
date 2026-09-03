@@ -18,11 +18,23 @@ const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
 const { classifyDataQuality } = require('./lib/dataQualityClassifier');
 const { findAnomalyCandidates, isEligibleCatalogEntry } = require('./lib/anomalyDetector');
+const {
+    evaluateLicense,
+    canUseChat,
+    canRunProactive,
+    getTodayKey,
+    ensureLicenseStates,
+    LICENSE_STATUS_STATE,
+    LICENSE_CHAT_LAST_USED_STATE,
+} = require('./lib/license');
 const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
+const { version: PACKAGE_VERSION } = require('./package.json');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
 const DATA_QUALITY_BACKFILL_BATCH_SIZE = 20;
 const CATALOG_SYNC_STATE = 'catalogSync';
+// Filled with the public keys of the separate entitlement web application.
+const LICENSE_PUBLIC_KEYS = Object.freeze({});
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -36,6 +48,7 @@ class AiAnalytics extends utils.Adapter {
         this.chatProviderOk = false;
         this.onboardingProviderOk = false;
         this.catalogSyncState = { running: false, phase: 'idle', processed: 0, total: 0, message: '' };
+        this.licenseState = { status: 'beta', fullAccess: true };
     }
 
     /**
@@ -97,6 +110,9 @@ class AiAnalytics extends utils.Adapter {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
         await ensureHealthState(this);
+        await ensureLicenseStates(this);
+        this.licenseState = evaluateLicense({ version: PACKAGE_VERSION, token: this.config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS });
+        await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(this.licenseState), ack: true });
         await ensureReachabilityStates(this);
         await this.ensureCatalogSyncState();
         await adminBridge.ensureBridgeState(this);
@@ -401,6 +417,12 @@ class AiAnalytics extends utils.Adapter {
         this.log.silly('Proaktive Pruefung: Lauf gestartet');
         await this.updateCatalogSyncState({ running: true, phase: 'check', processed: 0, total: MAX_ITERATIONS, message: 'Prüfung der Geräte läuft ...', error: null });
 
+        if (this.licenseState && !canRunProactive(this.licenseState)) {
+            this.log.warn('Proaktive Pruefung uebersprungen, da kein gueltiges Sponsoring-Entitlement vorliegt.');
+            await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Sponsoring-Entitlement erforderlich.' });
+            return { skipped: true, reason: 'licenseLimited' };
+        }
+
         if (!this.chatProviderOk) {
             this.log.warn('Proaktive Pruefung uebersprungen, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
             await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Modell nicht erreichbar.' });
@@ -503,6 +525,13 @@ class AiAnalytics extends utils.Adapter {
      * als {error}-Antwort. Genau dieselben Guard-Texte wie vor dem Refactoring.
      */
     async processChatQuestion(question) {
+        const license = this.licenseState || { fullAccess: true };
+        const today = getTodayKey();
+        const lastChatState = !license.fullAccess && (await this.getStateAsync(LICENSE_CHAT_LAST_USED_STATE));
+        if (!canUseChat(license, lastChatState && lastChatState.val, today)) {
+            throw new Error('Das taegliche Chat-Kontingent ist bereits verbraucht. Gueltig ab morgen wieder.');
+        }
+
         if (!this.chatProviderOk) {
             this.log.warn('Chat: Frage nicht beantwortet, da das Chat/Pruefungs-Modell nicht erreichbar ist.');
             throw new Error('Chat-Modell derzeit nicht erreichbar, siehe Log/Admin-Konfiguration.');
@@ -543,7 +572,11 @@ class AiAnalytics extends utils.Adapter {
         await this.appendHistoryFailureReports();
         this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
 
-        return appendChatMessage(this, 'assistant', finalText);
+        const result = await appendChatMessage(this, 'assistant', finalText);
+        if (!license.fullAccess) {
+            await this.setStateAsync(LICENSE_CHAT_LAST_USED_STATE, { val: today, ack: true });
+        }
+        return result;
     }
 
     /**

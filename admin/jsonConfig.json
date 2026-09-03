@@ -252,6 +252,17 @@
           "lg": 2,
           "xl": 2
         },
+        "licenseToken": {
+          "type": "password",
+          "label": "Sponsoring-Entitlement-Token (ab Version 0.1.0)",
+          "help": "Token aus der Sponsoring-Webanwendung hier einfügen. Beta-Versionen benötigen kein Token.",
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 8,
+          "lg": 8,
+          "xl": 8
+        },
         "silentIfNothingFound": {
           "type": "checkbox",
           "label": "Bei keinem Fund keine Nachricht senden",

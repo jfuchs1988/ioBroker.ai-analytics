@@ -11,8 +11,10 @@
 
 ## Status
 
-Schritte 1 bis 3 sind spezifiziert. Schritt 4 bleibt bis zur Umsetzung der
-Ausstellungs-Webanwendung und der technischen Adapterprüfung offen.
+Schritte 1 bis 3 sind spezifiziert. Ein dormant-fähiges `lib/license.js`-
+Prüfmodul und die geschützte Token-Konfiguration sind als Vorbereitung
+umgesetzt. Die produktive Sperre bleibt bis zur Ausstellungs-Webanwendung und
+der Veröffentlichung von `0.1.0` deaktiviert.
 
 ## Festgelegte Entitlement-Regeln
 

@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const adminCommands = require('../../lib/adminCommands');
+const { getTodayKey } = require('../../lib/license');
 
 class AdapterStub {
     constructor() {}
@@ -35,6 +36,22 @@ describe('AiAnalytics command dispatch', () => {
         const result = await adapter.dispatchAdapterCommand('chatQuestion', { text: 'Was lief gestern?' });
 
         expect(result).to.deep.equal({ question: 'Was lief gestern?' });
+    });
+
+    it('rejects a second chat question on the same day in limited license mode', async () => {
+        const adapter = Object.create(AiAnalytics.prototype);
+        adapter.licenseState = { status: 'limited', fullAccess: false };
+        adapter.getStateAsync = sinon.stub().resolves({ val: getTodayKey() });
+
+        let error;
+        try {
+            await adapter.processChatQuestion('Noch eine Frage');
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error).to.be.an('error');
+        expect(error.message).to.include('taegliche Chat-Kontingent');
     });
 
     it('rejects unknown adapter commands', async () => {

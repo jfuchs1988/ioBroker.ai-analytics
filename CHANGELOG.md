@@ -9,6 +9,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.29] - 2026-09-03
+
+### Hinzugefügt
+- Offline prüfbares Ed25519-JWS-Entitlement-Modul mit Beta-Guard, 35-Tage-Token, 30-Tage-Grace und täglichem Chat-Fallback vorbereitet. Das leere öffentliche Schlüsselregister hält die technische Sperre bis zur Anbindung der Ausstellungs-Webanwendung dormant.
+- Geschütztes Tokenfeld und persistente Lizenzstatus-/Chat-Tages-States ergänzt.
+
 ## [0.0.1-beta.28] - 2026-09-03
 
 ### Dokumentation

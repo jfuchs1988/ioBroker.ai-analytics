@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Beta-Ende, JWS-Tokenformat und Ausstellungs-Webanwendung als verbindliche Entitlement-Architektur festlegen.
-- Letzter sicherer Commit: `fa1a21c merge: finalize entitlement architecture decisions`.
-- Aktueller Stand: Release `v0.0.1-beta.28` veröffentlicht; Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung dokumentiert; Feature-Branch gelöscht.
-- Nächster Schritt: keiner.
+- Branch: `feature/sponsoring-token-enforcement`
+- Ziel: Offline-Entitlement-Prüfung und geschützte Token-Konfiguration als Vorbereitung für `0.1.0` implementieren.
+- Letzter sicherer Commit: `c036a02 docs: mark beta.28 release complete`.
+- Aktueller Stand: `lib/license.js`, Beta-Guard, Lizenzstatus-States, geschütztes Tokenfeld und täglicher Chat-Fallback implementiert; 297 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.29` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.29` veröffentlichen.
 
 ## TODO
 
