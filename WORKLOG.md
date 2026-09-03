@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Katalogeinträge um automatisch berechnete Datenqualitäts-Felder erweitern (Schreibbarkeit, Schreibmuster/Update-Frequenz, Datenvollständigkeit) — erstes Teilprojekt aus der P3-Markt-Analyse (`docs/architecture/01-einfuehrung-und-ziele.md` §1.4, Punkt 15 "Semantische Datenqualität").
-- Letzter sicherer Commit: Merge von `feature/katalog-datenqualitaet` nach `master`.
-- Aktueller Stand: Implementierung, Tests, Dokumentation und Versionsvorbereitung abgeschlossen; Verifikation grün (269 Unit-Tests, 1 Adapter-Smoke-Test, ESLint, Admin-Build).
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.19` erstellen und danach den Branch löschen.
+- Letzter sicherer Commit: `dda1456 docs: record beta.19 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.19` veröffentlicht; Feature-Branch lokal und remote gelöscht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -26,7 +26,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - `master` als tatsächlichen Integrationsbranch dokumentiert; ältere `develop`-Regeln bleiben historische ADRs.
 - `npm test` erfolgreich: 229 Unit-Tests und 1 Adaptertest.
 - Release-Stand für `0.0.1-beta.15` vorbereitet.
-- Datenqualitäts-Feature in `master` integriert; Release `0.0.1-beta.19` steht noch aus.
+- Datenqualitäts-Feature in `master` integriert.
+- Datenqualitäts-Feature als `v0.0.1-beta.19` veröffentlicht; GitHub-Release erstellt und Branch bereinigt.
 
 ## Übergabehinweise
 
