@@ -29,6 +29,9 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
 - Tokens werden nicht an eine ioBroker-Instanz gebunden.
 - Die technische Prüfung erfolgt offline anhand des signierten Tokens; eine
   dauerhafte Online-Prüfung im Adapter ist nicht vorgesehen.
+- Die erste Adapterimplementierung darf während der Beta dormant bleiben,
+  solange das öffentliche Schlüsselregister noch nicht mit dem Schlüssel der
+  Ausstellungs-Webanwendung bestückt ist.
 
 ## Noch festzulegen
 
