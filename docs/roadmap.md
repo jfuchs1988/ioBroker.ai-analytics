@@ -44,7 +44,7 @@ den versprochenen Nutzen tatsächlich liefern.
 
 ### 1. Hybride Anomalieerkennung
 
-**Nutzen: sehr hoch · Risiko: mittel · Status: offen**
+**Nutzen: sehr hoch · Risiko: mittel · Status: Phase 1 umgesetzt**
 
 - statistische Voranalyse für Baselines, Trends, Streuung, Ausreißer,
   Staleness und Datenlücken
@@ -53,6 +53,10 @@ den versprochenen Nutzen tatsächlich liefern.
 
 Das ist der größte funktionale Schritt über den heutigen freien Prüf-Prompt
 hinaus und reduziert Kosten sowie Fehlinterpretationen.
+
+Phase 1 ist seit `v0.0.1-beta.23` umgesetzt. Sie umfasst numerische
+Gauge-Zeitreihen, robuste Abweichungen, Datenlücken-Kandidaten und das
+LLM-Gate. Zähler, Boolean-Zustände und Korrelationen bleiben Folgearbeiten.
 
 ### 2. Belege und Nachvollziehbarkeit pro Aussage
 

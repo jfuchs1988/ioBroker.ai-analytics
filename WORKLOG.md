@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Markt-/Bedarfsanalyse als globale, nach Nutzwert priorisierte Produkt-Roadmap und TODO-Liste dokumentieren.
-- Letzter sicherer Commit: `6692484 docs: record beta.22 release handoff`.
-- Aktueller Stand: Globale priorisierte Produkt-Roadmap integriert; Release `v0.0.1-beta.22` veröffentlicht; Feature-Branch gelöscht.
-- Nächster Schritt: keiner.
+- Branch: `feature/hybride-anomalieerkennung`
+- Ziel: Statistische Kandidatenstufe vor der proaktiven LLM-Prüfung implementieren.
+- Letzter sicherer Commit: `11ed349 docs: mark beta.22 release complete`.
+- Aktueller Stand: Phase 1 der hybriden Anomalieerkennung implementiert; 289 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.23` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.23` veröffentlichen.
 
 ## TODO
 
