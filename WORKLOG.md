@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Statistische Kandidatenstufe vor der proaktiven LLM-Prüfung implementieren.
-- Letzter sicherer Commit: `c1b014d docs: record beta.23 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.23` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
-- Nächster Schritt: keiner.
+- Branch: `fix/admin-config-progress`
+- Ziel: Ungültige Admin-JSON-Konfiguration und die bei 0% hängenbleibende Prüf-Fortschrittsanzeige korrigieren.
+- Letzter sicherer Commit: `999c2be docs: mark beta.23 release complete`.
+- Aktueller Stand: Beide Fixes implementiert; 290 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.24` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.24` veröffentlichen.
 
 ## TODO
 

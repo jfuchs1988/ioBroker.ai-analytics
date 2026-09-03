@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.24] - 2026-09-03
+
+### Behoben
+- Admin-JSON-Konfiguration validiert wieder korrekt: dem Onboarding-Header fehlte das Pflichtfeld `size`.
+- Die Fortschrittsanzeige der manuellen proaktiven Prüfung blieb bei `0%`, weil das Polling nach der schnellen Start-Antwort beendet wurde; sie läuft nun bis zum tatsächlichen Prüfungsende weiter.
+
 ## [0.0.1-beta.23] - 2026-09-03
 
 ### Hinzugefügt
