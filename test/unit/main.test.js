@@ -212,3 +212,89 @@ describe('AiAnalytics data-quality backfill', () => {
         expect(setCatalogEntry.firstCall.args[1].sourceId).to.equal('healthy');
     });
 });
+
+describe('AiAnalytics syncCatalog flow', () => {
+    it('discovers, onboards, and persists a new catalog entry through the real catalog state path', async () => {
+        const discovered = [
+            {
+                id: 'shelly.0.power.0',
+                historyInstance: 'influxdb.0',
+                common: { name: 'Leistung', role: 'value.power', unit: 'W', write: false },
+            },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                role: 'assistant',
+                content: JSON.stringify([
+                    {
+                        sourceId: 'shelly.0.power.0',
+                        description: 'Leistungsaufnahme',
+                        unit: 'W',
+                        category: 'consumption',
+                        room: 'Keller',
+                        confidence: 'high',
+                    },
+                ]),
+                toolCalls: [],
+                stopReason: 'end_turn',
+            }),
+        };
+        const onboarding = proxyquire('../../lib/onboarding', {
+            './usage': {
+                recordUsage: sinon.stub().resolves(),
+                isBudgetExceeded: sinon.stub().resolves(false),
+            },
+            './valueKindClassifier': {
+                classifyValueKind: sinon.stub().resolves({ valueKind: 'gauge', valueKindConfidence: 'high', valueKindSource: 'metadata' }),
+            },
+            './dataQualityClassifier': {
+                classifyDataQuality: sinon.stub().resolves({
+                    writable: false,
+                    writePattern: 'continuous',
+                    updateFrequency: 'minutes',
+                    dataCompleteness: 'complete',
+                }),
+            },
+        });
+        const findHistorizedObjects = sinon.stub().resolves(discovered);
+        const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
+            '@iobroker/adapter-core': { Adapter: class {} },
+            './lib/discovery': { findHistorizedObjects },
+            './lib/onboarding': onboarding,
+        });
+        const states = {};
+        const adapter = Object.create(TestAdapter.prototype);
+        adapter.namespace = 'ai-analytics.0';
+        adapter.config = { enableValueKindBackfill: false, enableDataQualityBackfill: false };
+        adapter.onboardingProvider = provider;
+        adapter.onboardingProviderOk = true;
+        adapter.log = { silly: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
+        adapter.getStatesAsync = sinon.stub().callsFake(async () =>
+            Object.fromEntries(Object.entries(states).filter(([id]) => id.startsWith(`${adapter.namespace}.catalog.`)))
+        );
+        adapter.getStateAsync = sinon.stub().callsFake(async id => states[`${adapter.namespace}.${id}`] || null);
+        adapter.setObjectNotExistsAsync = sinon.stub().resolves();
+        adapter.setStateAsync = sinon.stub().callsFake(async (id, state) => {
+            states[`${adapter.namespace}.${id}`] = state;
+        });
+        adapter.updateCatalogSyncState = AiAnalytics.prototype.updateCatalogSyncState;
+
+        const result = await adapter.syncCatalog();
+
+        expect(findHistorizedObjects.calledOnceWithExactly(adapter)).to.equal(true);
+        expect(provider.chat.calledOnce).to.equal(true);
+        expect(result).to.deep.equal({ foundCount: 1, newCount: 1, reactivatedCount: 0, skipped: null });
+        const storedState = states['ai-analytics.0.catalog.shelly.0.power.0'];
+        expect(storedState).to.exist;
+        expect(JSON.parse(storedState.val)).to.deep.include({
+            sourceId: 'shelly.0.power.0',
+            description: 'Leistungsaufnahme',
+            category: 'consumption',
+            room: 'Keller',
+            valueKind: 'gauge',
+            writePattern: 'continuous',
+            dataCompleteness: 'complete',
+            active: true,
+        });
+    });
+});
