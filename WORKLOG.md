@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/publication-consistency`
+- Branch: `master`
 - Ziel: Veröffentlichungs- und Tokenvertragskonsistenz nach dem Systemreview beheben.
-- Letzter sicherer Commit: `76c7a1e docs: sync publication README version`.
-- Aktueller Stand: Lockfile-/Metadaten-, JWS-Claim-, npm-Paket- und Artefaktbereinigung läuft; Release-Vorbereitung für `0.0.1-beta.31`.
-- Nächster Schritt: Fixes testen, committen und als konsistenten Release-Stand integrieren.
+- Letzter sicherer Commit: Merge von `fix/publication-consistency` nach `master`.
+- Aktueller Stand: Release `v0.0.1-beta.31` veröffentlicht; Lockfile, Admin-Metadaten, JWS-Claims, npm-Paket und lokale Artefaktregeln konsistent.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -51,6 +51,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.29` erstellt, nach `master` gemergt, als `v0.0.1-beta.29` getaggt, gepusht und auf GitHub veröffentlicht.
 - Veröffentlichungsanforderungen ohne npm-Publishing vorbereitet: README EN/DE, Icon, Metadaten und GitHub-Topics.
 - Release `0.0.1-beta.30` erstellt, nach `master` gemergt, als `v0.0.1-beta.30` getaggt, gepusht und auf GitHub veröffentlicht.
+- Systemreview-Fixes für Veröffentlichung und Entitlement-Vertrag integriert.
+- Release `0.0.1-beta.31` erstellt, nach `master` gemergt, als `v0.0.1-beta.31` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
