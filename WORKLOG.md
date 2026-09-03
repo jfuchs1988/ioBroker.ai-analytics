@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/publication-consistency`
+- Branch: `master`
 - Ziel: Repository-Checker-Befunde und Veröffentlichungs-/Tokenvertragskonsistenz beheben.
-- Letzter sicherer Commit: `16588d2 fix: align publication and entitlement consistency`.
-- Aktueller Stand: Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt; 297 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.32` läuft.
-- Nächster Schritt: Fixes testen, committen und als konsistenten Release-Stand integrieren.
+- Letzter sicherer Commit: `5663979 fix: resolve adapter checker findings`.
+- Aktueller Stand: Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt; 297 Unit-Tests, ESLint, Admin-Build und Pack-Prüfung grün. Release-Vorbereitung für `0.0.1-beta.32` läuft.
+- Nächster Schritt: Release `v0.0.1-beta.32` taggen und veröffentlichen.
 
 ## TODO
 
