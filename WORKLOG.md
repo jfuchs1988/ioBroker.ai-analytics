@@ -4,15 +4,15 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Fortschrittsstillstand während der statistischen Anomalievoranalyse beheben.
-- Letzter sicherer Commit: `a0cb2ac docs: record beta.25 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.25` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
-- Nächster Schritt: keiner.
+- Branch: `feature/evcc-hybrid-licensing`
+- Ziel: Hybrid-Lizenzmodell nach evcc mit vorbereiteten sponsor-required Komponenten.
+- Letzter sicherer Commit: `548638f docs: mark beta.25 release complete`.
+- Aktueller Stand: MIT-Kern und sponsor-required Abgrenzung dokumentiert; technische Entitlement-Prüfung noch offen.
+- Nächster Schritt: Lizenzmodell prüfen, testen und für den folgenden Entitlement-Task spezifizieren.
 
 ## TODO
 
-- Architekturentscheidung für die Release-Policy nach der Beta treffen.
+- Technische Entitlement-/Sponsor-Token-Spezifikation und Implementierungsplan erstellen.
 
 ## DONE
 

@@ -1,46 +1,27 @@
-Proprietary License — ioBroker.ai-analytics
+MIT License
 
-Copyright (c) 2026 Johannes Fuchs. Alle Rechte vorbehalten, soweit nachfolgend
-nicht ausdrücklich anders geregelt.
+Copyright (c) 2026 Johannes Fuchs
 
-## 1. Beta-Phase
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Für alle Versionen mit einem `-beta`-Suffix (z. B. `0.0.1-beta.2`) wird
-folgendes Nutzungsrecht eingeräumt: kostenlose Installation, Ausführung und
-Nutzung, privat wie kommerziell, ohne Einschränkung der Nutzungsdauer.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## 2. Nach der Beta-Phase
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Mit Veröffentlichung der ersten Version ohne `-beta`-Suffix endet das
-kostenlose Nutzungsrecht aus Abschnitt 1. Die fortgesetzte Nutzung dieser
-Software ist ab diesem Zeitpunkt an ein aktives Sponsoring in Höhe von
-mindestens 0,99 EUR pro Monat gebunden, zahlbar über die vom Urheber
-angegebenen Kanäle (aktuell: GitHub Sponsors, https://github.com/sponsors/jfuchs1988).
+## Scope
 
-Diese Bedingung ist zum Stand dieser Lizenzversion **vertraglich/rechtlich
-auferlegt, aber nicht technisch durchgesetzt** — die Software prüft
-Sponsoring-Status derzeit nicht selbst. Eine technische Durchsetzung
-(zeitlich begrenzter Betrieb, Freischaltung über ein Sponsoring-Token) ist
-für eine spätere Version geplant; siehe
-[ADR-0018](docs/adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md).
-
-## 3. Sonstige Rechte
-
-Modifikation und Weitergabe für den eigenen, nicht-kommerziellen Gebrauch
-sind gestattet. Der Weiterverkauf, die kommerzielle Weitervermarktung sowie
-die Veröffentlichung abgeleiteter Werke unter eigenem Namen sind ohne
-vorherige schriftliche Zustimmung des Urhebers nicht gestattet.
-
-## 4. Gewährleistungsausschluss
-
-Diese Software wird ohne jegliche Gewährleistung bereitgestellt, weder
-ausdrücklich noch stillschweigend, einschließlich, aber nicht beschränkt auf
-die Gewährleistung der Marktgängigkeit oder der Eignung für einen bestimmten
-Zweck. Der Urheber haftet nicht für Schäden, die aus der Nutzung dieser
-Software entstehen.
-
----
-
-Hinweis: Dieser Lizenztext wurde nicht von einem Rechtsanwalt geprüft. Vor
-tatsächlichem kommerziellem Einsatz oder Durchsetzung wird eine rechtliche
-Prüfung empfohlen.
+This MIT license applies only to components not identified as sponsor-required
+in `LICENSES/SPONSOR-REQUIRED.md`. Sponsor-required components are excluded
+from this license and are subject to the separate terms in that file.

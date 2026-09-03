@@ -2,7 +2,7 @@
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Angenommen (Phase 1 von 2 — siehe Konsequenzen)
+**Status:** Ersetzt für die Gesamt-Lizenzierung durch [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md)
 **Datum:** 2026-08-22
 
 ## Kontext

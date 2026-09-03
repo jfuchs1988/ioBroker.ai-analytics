@@ -17,7 +17,11 @@
 
 - Entwicklung erfolgt über einen Spec → Plan → TDD-Implementierung → Review-Workflow, dokumentiert in [CONTRIBUTING.md](../../CONTRIBUTING.md).
 - Git-Branching: Für jeden Task wird ein eigener Branch angelegt und nach grünem `npm test` lokal per `git merge --no-ff` nach `master` gemergt; die ältere develop-first-Formulierung in [ADR-0016](../adr/0016-git-branching-modell.md) ist historischer Kontext.
-- Privates GitHub-Repository `jfuchs1988/ioBroker.ai-analytics`. Kein `npm publish`, keine Aufnahme in den offiziellen ioBroker-Adapter-Katalog — bewusste Entscheidung, siehe [ADR-0018](../adr/0018-lizenzmodell-beta-frei-danach-sponsoring.md) (Lizenzmodell: Beta frei, danach Sponsoring-Pflicht).
+- GitHub-Repository `jfuchs1988/ioBroker.ai-analytics` mit MIT-lizenziertem
+  Kern und separat dokumentierten sponsor-pflichtigen KI-Komponenten, siehe
+  [ADR-0027](../adr/0027-hybrid-lizenzmodell-nach-evcc.md). Eine Aufnahme in
+  den offiziellen ioBroker-Adapter-Katalog wird erst nach Prüfung der
+  Katalogregeln und der Komponentenabgrenzung entschieden.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [1. Einführung und Ziele](01-einfuehrung-und-ziele.md) · weiter zu [3. Kontextabgrenzung](03-kontextabgrenzung.md)

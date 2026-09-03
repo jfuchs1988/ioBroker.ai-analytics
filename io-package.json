@@ -10,10 +10,10 @@
     },
     "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
     "keywords": ["ai", "analytics", "influxdb", "history"],
-    "license": "SEE LICENSE IN LICENSE",
+    "license": "MIT",
     "licenseInformation": {
-      "type": "limited",
-      "license": "Proprietär — Beta-Phase kostenlos, danach Sponsoring-Pflicht (Text siehe Link)",
+      "type": "commercial",
+      "license": "MIT; KI-Komponenten sponsor-pflichtig (siehe LICENSES/SPONSOR-REQUIRED.md)",
       "link": "/adapter/ai-analytics/LICENSE"
     },
     "platform": "Javascript/Node.js",
