@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Hybrid-Lizenzmodell nach evcc mit vorbereiteten sponsor-required Komponenten.
-- Letzter sicherer Commit: Merge von `feature/evcc-hybrid-licensing` nach `master`.
-- Aktueller Stand: MIT-Kern und sponsor-required Abgrenzung dokumentiert; technische Entitlement-Prüfung noch offen. Release-Vorbereitung für `0.0.1-beta.26` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch löschen und danach die Token-Regeln in der Entitlement-Spec festschreiben.
+- Branch: `feature/sponsoring-token-spec`
+- Ziel: Festgelegte Sponsoring-Token-Regeln in der bestehenden Entitlement-Spec und im Plan dokumentieren.
+- Letzter sicherer Commit: `0d6a317 docs: specify sponsoring entitlement rules`.
+- Aktueller Stand: Token-Regeln in Spec, Plan, ADR und Backlog dokumentiert; Release-Vorbereitung für `0.0.1-beta.27` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.27` veröffentlichen.
 
 ## TODO
 

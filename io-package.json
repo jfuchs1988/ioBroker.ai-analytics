@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.26",
+    "version": "0.0.1-beta.27",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.27": {
+        "en": "Specified sponsoring entitlement rules: 35-day tokens, 30-day sponsorship, 30-day grace period, no instance binding, offline verification, and one chat request per day after expiry.",
+        "de": "Sponsoring-Entitlement-Regeln spezifiziert: 35-Tage-Tokens, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Pruefung und eine Chat-Anfrage pro Tag nach Ablauf."
+      },
       "0.0.1-beta.26": {
         "en": "Established the hybrid MIT core and separately documented sponsor-required AI components as preparation for future entitlement enforcement.",
         "de": "Hybriden MIT-Kern und separat dokumentierte sponsor-pflichtige KI-Komponenten als Vorbereitung fuer die spaetere Entitlement-Pruefung eingefuehrt."

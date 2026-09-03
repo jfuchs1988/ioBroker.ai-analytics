@@ -21,14 +21,14 @@ above remain MIT-licensed.
 ## Sponsoring terms
 
 During the beta phase, the sponsor-required components may be used free of
-charge. After the first release without a `-beta` suffix, use requires an
-active sponsorship or another entitlement issued by the copyright holder.
+charge. After the still-to-be-decided beta end, use requires an active
+sponsorship or another entitlement issued by the copyright holder.
 The intended standard channel is GitHub Sponsors:
 https://github.com/sponsors/jfuchs1988
 
 The exact entitlement duration, token format, trial period, contributor
 entitlements and technical enforcement are deliberately specified separately
-before the first non-beta release. Until then, this condition is contractual
+before technical enforcement is activated. Until then, this condition is contractual
 and not technically enforced.
 
 No warranty is provided. The sponsor-required components are provided "as is"
