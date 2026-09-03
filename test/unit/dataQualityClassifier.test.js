@@ -1,4 +1,6 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 const {
     computeWritable,
     computeDeltas,
@@ -7,6 +9,12 @@ const {
     bucketUpdateFrequency,
     detectDataCompleteness,
 } = require('../../lib/dataQualityClassifier');
+
+function loadClassifierWithStubs({ getHistory }) {
+    return proxyquire('../../lib/dataQualityClassifier', {
+        './dataAccess': { getHistory },
+    });
+}
 
 describe('computeWritable', () => {
     it('returns true when common.write is true', () => {
@@ -169,5 +177,58 @@ describe('detectDataCompleteness', () => {
             now,
         });
         expect(result).to.equal('complete');
+    });
+});
+
+describe('classifyDataQuality', () => {
+    const obj = { id: 'shelly.0.power', common: { write: false } };
+
+    it('confirms continuous from the first (24h) sample window and returns writable from metadata', async () => {
+        const now = Date.now();
+        const points = [
+            { ts: now - 40000, val: 5 }, { ts: now - 30000, val: 5 }, { ts: now - 20000, val: 5 },
+            { ts: now - 10000, val: 5 }, { ts: now, val: 5 },
+        ];
+        const getHistory = sinon.stub().resolves(points);
+        const { classifyDataQuality } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyDataQuality({}, { id: 'shelly.0.power', common: { write: true } }, 'influxdb.0');
+
+        expect(result.writable).to.equal(true);
+        expect(result.writePattern).to.equal('continuous');
+        expect(result.updateFrequency).to.equal('seconds');
+        expect(result.dataCompleteness).to.equal('complete');
+        expect(getHistory.calledOnce).to.equal(true);
+        expect(getHistory.firstCall.args[5]).to.equal('none');
+    });
+
+    it('escalates to a 3-day window when the 24h sample is inconclusive', async () => {
+        const now = Date.now();
+        const tooFew24h = [{ ts: now - 1000, val: 1 }];
+        const conclusive3d = Array.from({ length: 6 }, (unused, i) => ({ ts: now - i * 3600 * 1000, val: i }));
+        const getHistory = sinon.stub();
+        getHistory.onFirstCall().resolves(tooFew24h);
+        getHistory.onSecondCall().resolves(conclusive3d);
+        const { classifyDataQuality } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyDataQuality({}, obj, 'influxdb.0');
+
+        expect(result.writePattern).to.not.equal('unknown');
+        expect(getHistory.calledTwice).to.equal(true);
+    });
+
+    it('falls back to unknown for everything but writable after exhausting all escalation steps', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 1, val: 1 }]);
+        const { classifyDataQuality } = loadClassifierWithStubs({ getHistory });
+
+        const result = await classifyDataQuality({}, obj, 'influxdb.0');
+
+        expect(result).to.deep.equal({
+            writable: false,
+            writePattern: 'unknown',
+            updateFrequency: 'unknown',
+            dataCompleteness: 'unknown',
+        });
+        expect(getHistory.callCount).to.equal(3);
     });
 });
