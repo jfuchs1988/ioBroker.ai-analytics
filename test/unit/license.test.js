@@ -38,7 +38,7 @@ describe('license evaluation', () => {
         const token = makeSignedToken({
             privateKey,
             payload: {
-                iss: 'ai-analytics-license',
+                iss: 'ai-analytics-license', aud: 'ioBroker.ai-analytics', tokenVersion: 1,
                 licenseId: 'license-123',
                 iat: now,
                 nbf: now,
@@ -64,7 +64,7 @@ describe('license evaluation', () => {
         const token = makeSignedToken({
             privateKey,
             payload: {
-                iss: 'ai-analytics-license', licenseId: 'license-123', iat: start, nbf: start,
+                iss: 'ai-analytics-license', aud: 'ioBroker.ai-analytics', tokenVersion: 1, licenseId: 'license-123', iat: start, nbf: start,
                 exp: start + 35 * 24 * 3600, sponsorUntil: start + 30 * 24 * 3600,
             },
         });
@@ -91,7 +91,7 @@ describe('license evaluation', () => {
         const now = 1_700_000_000;
         const token = makeSignedToken({
             privateKey,
-            payload: { iss: 'ai-analytics-license', licenseId: 'x', iat: now, nbf: now, exp: now + 1000, sponsorUntil: now + 1000 },
+            payload: { iss: 'ai-analytics-license', aud: 'ioBroker.ai-analytics', tokenVersion: 1, licenseId: 'x', iat: now, nbf: now, exp: now + 1000, sponsorUntil: now + 1000 },
         }).replace('e', 'f');
 
         const result = evaluateLicense({

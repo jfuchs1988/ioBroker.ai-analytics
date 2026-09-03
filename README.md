@@ -120,7 +120,7 @@ repository additionally contains proxyquire-based orchestrator and flow tests.
 
 ## Status
 
-Current development version: `0.0.1-beta.30`. The adapter is in beta and a
+Current development version: `0.0.1-beta.31`. The adapter is in beta and a
 manual acceptance test on a real ioBroker installation remains part of the
 release process.
 

@@ -5,3 +5,13 @@ dist/
 *.base
 *.log
 .env
+AGENTS.md
+CLAUDE.md
+WORKLOG.md
+CONTRIBUTING.md
+.github/
+docs/
+test/
+src-admin/
+.eslintrc.cjs
+.mocharc.json

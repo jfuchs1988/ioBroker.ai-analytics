@@ -33,6 +33,11 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
   solange das öffentliche Schlüsselregister noch nicht mit dem Schlüssel der
   Ausstellungs-Webanwendung bestückt ist.
 
+Das JWS-Payload enthält mindestens `tokenVersion: 1`, `iss: "ai-analytics-license"`,
+`aud: "ioBroker.ai-analytics"`, `licenseId`, `iat`, `nbf`, `exp` und
+`sponsorUntil`. Der Header enthält `alg: "EdDSA"`, `typ: "JWT"` und einen
+`kid` für Schlüsselrotation.
+
 ## Noch festzulegen
 
 - konkrete Webanwendung und ihr Sponsoring-Abgleich

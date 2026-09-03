@@ -20,7 +20,9 @@ der Veröffentlichung von `0.1.0` deaktiviert.
 
 - keine Instanzbindung
 - Token-Ausgabe über eine separate Webanwendung
-- Tokenformat: JWS/JWT mit `EdDSA`/Ed25519 und `kid` zur Schlüsselrotation
+- Tokenformat: JWS/JWT mit `EdDSA`/Ed25519, `kid` zur Schlüsselrotation und
+  den Claims `tokenVersion`, `iss`, `aud`, `licenseId`, `iat`, `nbf`, `exp` und
+  `sponsorUntil`
 - 35 Tage technische Token-Gültigkeit
 - 30 Tage offizielle Sponsoring-Periode
 - 30 Tage Grace-Period ab Sponsoring-Ablauf; die fünf zusätzlichen Token-Tage

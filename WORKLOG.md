@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Veröffentlichungsanforderungen ohne npm-Publishing vorbereiten.
-- Letzter sicherer Commit: `c033034 merge: prepare adapter repository publication`.
-- Aktueller Stand: Release `v0.0.1-beta.30` veröffentlicht; zweisprachige README, Icon und GitHub-Topics ergänzt; npm-Publishing bewusst offen.
-- Nächster Schritt: keiner.
+- Branch: `fix/publication-consistency`
+- Ziel: Veröffentlichungs- und Tokenvertragskonsistenz nach dem Systemreview beheben.
+- Letzter sicherer Commit: `76c7a1e docs: sync publication README version`.
+- Aktueller Stand: Lockfile-/Metadaten-, JWS-Claim-, npm-Paket- und Artefaktbereinigung läuft; Release-Vorbereitung für `0.0.1-beta.31`.
+- Nächster Schritt: Fixes testen, committen und als konsistenten Release-Stand integrieren.
 
 ## TODO
 
