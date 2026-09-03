@@ -18,12 +18,16 @@ Integrationen sponsor-pflichtig sind.
 - KI-Ausführung und KI-gestützte Analyse werden als sponsor-required
   Komponenten ausgenommen und in `LICENSES/SPONSOR-REQUIRED.md` festgehalten.
 - Beta-Versionen dürfen diese Komponenten kostenlos verwenden.
-- Ab der ersten Version ohne `-beta` ist für diese Komponenten ein aktives
+- Nach dem noch festzulegenden Beta-Ende ist für diese Komponenten ein aktives
   Sponsoring oder eine andere ausgestellte Entitlement erforderlich.
 - Der Sponsor-Link ist GitHub Sponsors unter
   `https://github.com/sponsors/jfuchs1988`.
 - Token, Trial, Contributor-Entitlements und technische Durchsetzung werden
   in einer folgenden Spec und einem eigenen Implementierungs-Task festgelegt.
+- Die geplante Entitlement-Spec legt als Richtung fest: Token-Ausgabe über
+  eine Webanwendung, 35 Tage technische Token-Gültigkeit, 30 Tage Sponsoring,
+  30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und nach
+  Ablauf eine Chat-Anfrage pro Tag statt proaktiver KI-Läufe.
 - Die aktuelle Umstellung ändert nur die Lizenzabgrenzung; sie sperrt noch
   keine Funktionen.
 
@@ -36,6 +40,7 @@ Integrationen sponsor-pflichtig sind.
   ergänzt und mit einem Lizenzheader versehen werden.
 - Die technische Freischaltung muss offline-fähig, testbar und unabhängig von
   der Speicherung von API-Schlüsseln umgesetzt werden.
+- Das Beta-Ende bleibt offen: fixes Datum oder erste stabile Version `0.1.0`.
 - Die Lizenztexte sind nicht anwaltlich geprüft.
 
 ## Abgrenzung zu ADR-0018
