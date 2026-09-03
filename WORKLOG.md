@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/admin-config-progress`
+- Branch: `master`
 - Ziel: Ungültige Admin-JSON-Konfiguration und die bei 0% hängenbleibende Prüf-Fortschrittsanzeige korrigieren.
-- Letzter sicherer Commit: `999c2be docs: mark beta.23 release complete`.
-- Aktueller Stand: Beide Fixes implementiert; 290 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.24` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.24` veröffentlichen.
+- Letzter sicherer Commit: Merge von `fix/admin-config-progress` nach `master`.
+- Aktueller Stand: Beide Fixes integriert; Release-Vorbereitung für `0.0.1-beta.24` abgeschlossen.
+- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.24` erstellen und Branch löschen.
 
 ## TODO
 
