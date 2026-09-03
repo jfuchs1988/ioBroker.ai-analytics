@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.19] - 2026-09-03
+
+### Hinzugefügt
+- Katalogeinträge bekommen automatisch berechnete Datenqualitäts-Felder: Schreibbarkeit, Schreibmuster (kontinuierlich/ereignisgetrieben), Update-Frequenz und Datenvollständigkeit — mit schreibmuster-bewusster Lückenerkennung, damit on-change-Objekte nicht fälschlich als lückenhaft gelten.
+- Geräte-Tab zeigt die neuen Felder als zusätzliche Spalten; optionaler Backfill für Bestandsobjekte.
+- Chat-Agent benennt in seinen Antworten, wenn die zugrundeliegenden Daten lückenhaft oder veraltet sind.
+
 ## [0.0.1-beta.18] - 2026-09-03
 
 ### Hinzugefügt
