@@ -123,7 +123,7 @@ das Repository Proxyquire-basierte Tests für Orchestrierung und Adapterfluss.
 
 ## Status
 
-Aktuelle Entwicklungsversion: `0.0.1-beta.31`. Der Adapter befindet sich in
+Aktuelle Entwicklungsversion: `0.0.1-beta.32`. Der Adapter befindet sich in
 der Beta-Phase; eine manuelle Abnahme auf einer echten ioBroker-Installation
 gehört weiterhin zum Releaseprozess.
 

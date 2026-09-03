@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Veröffentlichungs- und Tokenvertragskonsistenz nach dem Systemreview beheben.
-- Letzter sicherer Commit: Merge von `fix/publication-consistency` nach `master`.
-- Aktueller Stand: Release `v0.0.1-beta.31` veröffentlicht; Lockfile, Admin-Metadaten, JWS-Claims, npm-Paket und lokale Artefaktregeln konsistent.
-- Nächster Schritt: keiner.
+- Branch: `fix/publication-consistency`
+- Ziel: Repository-Checker-Befunde und Veröffentlichungs-/Tokenvertragskonsistenz beheben.
+- Letzter sicherer Commit: `16588d2 fix: align publication and entitlement consistency`.
+- Aktueller Stand: Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt; 297 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.32` läuft.
+- Nächster Schritt: Fixes testen, committen und als konsistenten Release-Stand integrieren.
 
 ## TODO
 

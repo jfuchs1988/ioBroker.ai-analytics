@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.31",
+    "version": "0.0.1-beta.32",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -10,158 +10,50 @@
     },
     "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
     "keywords": ["ai", "analytics", "influxdb", "history"],
-    "license": "MIT",
     "icon": "ai-analytics.svg",
     "extIcon": "https://raw.githubusercontent.com/jfuchs1988/ioBroker.ai-analytics/master/admin/ai-analytics.svg",
     "readme": "https://github.com/jfuchs1988/ioBroker.ai-analytics/blob/master/README.md",
     "licenseInformation": {
       "type": "commercial",
-      "license": "MIT; KI-Komponenten sponsor-pflichtig (siehe LICENSES/SPONSOR-REQUIRED.md)",
+      "license": "MIT",
       "link": "/adapter/ai-analytics/LICENSE"
     },
     "platform": "Javascript/Node.js",
+    "connectionType": "cloud",
+    "dataSource": "poll",
     "main": "main.js",
     "enabled": true,
     "type": "utility",
     "mode": "daemon",
     "compact": true,
-    "adminUI": {
-      "config": "json",
-      "tab": "html"
-    },
+    "adminUI": { "config": "json", "tab": "html" },
     "adminTab": {
       "singleton": true,
       "name": { "en": "AI Analytics", "de": "AI Analytics" }
     },
-    "dependencies": [{ "js-controller": ">=5.0.0" }],
+    "dependencies": [{ "js-controller": ">=5.0.19" }],
     "globalDependencies": [{ "admin": ">=7.0.0" }],
     "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "news": {
-      "0.0.1-beta.31": {
-        "en": "Fixed publication consistency: synchronized the lockfile, added the required Admin global dependency, tightened entitlement claims, and reduced development files in the npm package.",
-        "de": "Veröffentlichungskonsistenz behoben: Lockfile synchronisiert, erforderliche Admin-Global-Dependency ergänzt, Entitlement-Claims gehärtet und Entwicklungsdateien aus dem npm-Paket entfernt."
-      },
-      "0.0.1-beta.30": {
-        "en": "Prepared repository publication with complete bilingual README documentation and a dedicated adapter icon.",
-        "de": "Repository-Veröffentlichung mit vollständiger zweisprachiger README-Dokumentation und eigenem Adapter-Icon vorbereitet."
-      },
-      "0.0.1-beta.29": {
-        "en": "Added dormant offline Ed25519-JWS entitlement verification, protected token configuration, license status states, and the one-chat-per-day fallback for future 0.1.0 enforcement.",
-        "de": "Dormante Offline-Ed25519-JWS-Entitlement-Pruefung, geschuetzte Token-Konfiguration, Lizenzstatus-States und der Ein-Chat-pro-Tag-Fallback fuer die spaetere 0.1.0-Durchsetzung ergaenzt."
-      },
-      "0.0.1-beta.28": {
-        "en": "Finalized entitlement architecture: beta ends at 0.1.0, Ed25519-signed JWS tokens are issued by a separate web application, with 35-day tokens, 30-day sponsorship, 30-day grace, no instance binding, and one chat request per day after expiry.",
-        "de": "Entitlement-Architektur finalisiert: Beta-Ende bei 0.1.0, Ed25519-signierte JWS-Tokens aus einer separaten Webanwendung, 35-Tage-Tokens, 30 Tage Sponsoring, 30 Tage Grace, keine Instanzbindung und eine Chat-Anfrage pro Tag nach Ablauf."
-      },
-      "0.0.1-beta.27": {
-        "en": "Specified sponsoring entitlement rules: 35-day tokens, 30-day sponsorship, 30-day grace period, no instance binding, offline verification, and one chat request per day after expiry.",
-        "de": "Sponsoring-Entitlement-Regeln spezifiziert: 35-Tage-Tokens, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Pruefung und eine Chat-Anfrage pro Tag nach Ablauf."
-      },
-      "0.0.1-beta.26": {
-        "en": "Established the hybrid MIT core and separately documented sponsor-required AI components as preparation for future entitlement enforcement.",
-        "de": "Hybriden MIT-Kern und separat dokumentierte sponsor-pflichtige KI-Komponenten als Vorbereitung fuer die spaetere Entitlement-Pruefung eingefuehrt."
-      },
-      "0.0.1-beta.25": {
-        "en": "Added visible per-object progress updates during the statistical anomaly pre-analysis so manual proactive checks no longer appear stuck at 0 percent.",
-        "de": "Sichtbare Fortschrittsupdates pro Objekt waehrend der statistischen Anomalievoranalyse ergaenzt, damit manuelle Pruefungen nicht mehr bei 0 Prozent festzustecken scheinen."
-      },
-      "0.0.1-beta.24": {
-        "en": "Fixed invalid admin JSON configuration and kept the progress indicator polling while the manual proactive check runs in the background.",
-        "de": "Ungueltige Admin-JSON-Konfiguration behoben und die Fortschrittsanzeige bleibt waehrend der manuellen proaktiven Pruefung aktiv."
-      },
-      "0.0.1-beta.23": {
-        "en": "Added hybrid statistical anomaly pre-analysis for gauge time series, filtering unremarkable objects before the proactive LLM check.",
-        "de": "Hybride statistische Anomalievoranalyse fuer Gauge-Zeitreihen ergaenzt, die unauffaellige Objekte vor der proaktiven LLM-Pruefung herausfiltert."
-      },
-      "0.0.1-beta.22": {
-        "en": "Added a prioritized product roadmap covering the market gap, user needs, open product gaps, and the recommended next development steps.",
-        "de": "Priorisierte Produkt-Roadmap mit Marktluecke, Nutzerbedarf, offenen Produktluecken und empfohlenen naechsten Entwicklungsschritten ergaenzt."
-      },
-      "0.0.1-beta.21": {
-        "en": "Added an isolated fake-adapter flow test covering discovery, real onboarding, syncCatalog, and catalog state persistence.",
-        "de": "Isolierten Fake-Adapter-Durchflusstest fuer Discovery, echtes Onboarding, syncCatalog und Katalog-State-Persistenz ergaenzt."
-      },
-      "0.0.1-beta.20": {
-        "en": "Added proxyquire/Sinon coverage for main adapter orchestration, admin dispatch, state-bridge wiring, unload handling, and data-quality backfills.",
-        "de": "Proxyquire-/Sinon-Tests fuer zentrale main.js-Orchestratorpfade, Admin-Dispatcher, State-Bridge, Unload und Datenqualitaets-Backfills ergaenzt."
-      },
-      "0.0.1-beta.18": {
-        "en": "Added chat-based user-confirmed device catalog updates, safe onboarding defaults, persistent History health retries after repeated failures, and CI checks for tests, linting, builds, and dependencies.",
-        "de": "Chat-basierte, nutzerbestätigte Gerätepflege, sichere Onboarding-Defaults, persistente History-Retries nach wiederholten Fehlern sowie CI-Prüfungen für Tests, Linting, Builds und Abhängigkeiten ergänzt."
-      },
-      "0.0.1-beta.17": {
-        "en": "Polished the sponsor links to use a clearer GitHub Sponsors label and cleaner button styling in the settings page and custom tab.",
-        "de": "Die Sponsor-Links wurden mit klarerem GitHub-Sponsors-Label und saubererer Button-Optik in Einstellungen und Custom-Tab überarbeitet."
-      },
-      "0.0.1-beta.16": {
-        "en": "Fixed the Settings CSV import so it updates the complete native configuration object instead of writing isolated fields. The import/export buttons now keep the visible settings in sync with the saved values.",
-        "de": "Den Settings-CSV-Import behoben, sodass jetzt das komplette native Konfigurationsobjekt aktualisiert wird statt isolierter Felder. Die Import-/Export-Buttons halten die sichtbaren Einstellungen jetzt synchron zu den gespeicherten Werten."
-      },
-      "0.0.1-beta.15": {
-        "en": "Documented the standard feature and bugfix workflow with dedicated branches, live WIP/TODO/DONE handoff status, mandatory tests, merge, and GitHub release verification.",
-        "de": "Den Standardablauf für Features und Bugfixes mit eigenen Branches, live gepflegtem WIP/TODO/DONE-Übergabestand, verpflichtenden Tests, Merge und GitHub-Release-Prüfung dokumentiert."
-      },
-      "0.0.1-beta.14": {
-        "en": "Settings can now be exported and imported as CSV. Fixed the Devices tab loading indefinitely by using the admin state bridge from the React configuration component. Added live percentage progress for device discovery, update-only sync, and proactive checks.",
-        "de": "Einstellungen können jetzt als CSV exportiert und importiert werden. Behoben: Der Geräte-Tab lud dauerhaft, weil die React-Konfigurationskomponente die Admin-State-Bridge nicht nutzte. Ergänzt: Live-Fortschritt in Prozent für Geräteeinlesen, Nur-Updates-Synchronisierung und proaktive Prüfungen."
-      },
-      "0.0.1-beta.13": {
-        "en": "Settings page: model field (chat + onboarding) is now a plain text field instead of a dynamic autocomplete that sometimes failed to show an already-set value; fields now have responsive widths instead of stretching to 100%, field order per provider group is provider -> URL -> model -> API key -> prices, and the OpenRouter/OpenCode Zen links are compact and sit above the model fields. Settings and Devices tabs both now have a compact header row with a live budget summary and a compact sponsor link instead of a full-width sponsor button. Devices tab: CSV export/import for bulk-editing existing catalog entries, and a new \"sync only\" button that refreshes device status without spending tokens on classifying newly found objects. Also fixed the release pipeline (tarball build failed in CI) and excluded local dev files from the published npm package.",
-        "de": "Einstellungen-Seite: Modell-Feld (Chat + Onboarding) ist jetzt ein einfaches Textfeld statt einer dynamischen Autocomplete, die einen bereits gesetzten Wert teils nicht anzeigte; Felder haben jetzt responsive Breiten statt 100% Seitenbreite, Feldreihenfolge je Provider-Gruppe ist Provider → URL → Modell → API-Key → Preise, und die OpenRouter-/OpenCode-Zen-Links sind kompakt und stehen oberhalb der Modell-Felder. Einstellungen- und Geräte-Tab haben jetzt beide eine kompakte Kopfzeile mit Live-Budgetanzeige und kompaktem Sponsor-Link statt vollbreitem Sponsor-Button. Geräte-Tab: CSV-Export/-Import zum Bulk-Bearbeiten bestehender Katalogeinträge, sowie ein neuer Button \"Nur Updates einlesen\", der den Geräte-Status aktualisiert, ohne Tokens für die Klassifizierung neu gefundener Objekte auszugeben. Außerdem die Release-Pipeline repariert (Tarball-Build scheiterte in CI) und lokale Entwicklungsdateien vom veröffentlichten npm-Paket ausgeschlossen."
-      },
-      "0.0.1-beta.12": {
-        "en": "Settings page reorganized into grouped sections (chat/check model, onboarding model, operations & budget). Budget is no longer its own tab: a live summary now sits above the chat (auto-refreshing, with a collapsible details panel), and is also shown live on the settings page. Fixed: the Devices tab failed to load (Module Federation component was missing its default export). Fixed: the usage chart rendered as a solid color block instead of a bar chart when only a few days of history existed.",
-        "de": "Einstellungen-Seite in gruppierte Abschnitte unterteilt (Chat-/Prüfungsmodell, Onboarding-Modell, Betrieb & Budget). Budget ist kein eigener Tab mehr: eine live aktualisierte Kurzanzeige sitzt jetzt über dem Chat (mit aufklappbaren Details), zusätzlich live sichtbar auf der Einstellungen-Seite. Behoben: der Geräte-Tab lud nicht (Modul-Federation-Komponente ohne Default-Export). Behoben: das Verbrauchsdiagramm zeigte bei wenigen Tagen Historie nur eine einfarbige Fläche statt eines Balkendiagramms."
-      },
-      "0.0.1-beta.11": {
-        "en": "Live progress indicator in the Devices tab for re-scan and backfill, with continuously updating device list. InfluxDB history sampling for valueKind classification now avoids raw-data type conflicts (bool != float) via bucketed sampling.",
-        "de": "Live-Fortschrittsanzeige im Geräte-Tab für Re-Scan und Backfill, inklusive laufender Aktualisierung der Geräteliste. InfluxDB-History-Samples für die valueKind-Klassifizierung vermeiden jetzt Rohdaten-Typkonflikte (bool != float) durch bucketed Sampling."
-      },
-      "0.0.1-beta.10": {
-        "en": "Moves the dynamic catalog device management into a dedicated tab of the adapter settings. Adds provider-backed model suggestions, visible sponsor links, and fixes the OpenRouter default endpoint.",
-        "de": "Verlagert die dynamische Katalogverwaltung in einen eigenen Geräte-Reiter der Adapter-Einstellungen. Ergänzt providerbasierte Modellvorschläge, sichtbare Sponsoring-Links und korrigiert den OpenRouter-Standardendpunkt."
-      },
-      "0.0.1-beta.9": {
-        "en": "Fixed a silent data-loss risk: getHistory could silently cap results at 2000 values for raw queries, missing most of a day for densely-logged datapoints. It now always passes an explicit, appropriately-sized count and warns when a raw result likely got truncated.",
-        "de": "Stille Datenlücke behoben: getHistory konnte Ergebnisse bei rohen Abfragen standardmäßig auf 2000 Werte begrenzen und so bei dicht loggenden Datenpunkten den Großteil eines Tages verlieren. Übergibt jetzt immer ein explizites, passend berechnetes count und warnt, wenn ein Ergebnis wahrscheinlich abgeschnitten wurde."
-      },
-      "0.0.1-beta.8": {
-        "en": "Onboarding classification batches are now grouped by adapter type for more consistent AI context. The history query sent to the InfluxDB/History instance is now logged (silly). The AI now uses clean, German, catalog descriptions instead of raw datapoint IDs in chat answers, and descriptions are editable in the Devices tab. Fixed: the Devices tab (list/edit/remove) did not respond at all on some installations (sendTo timeout with no fallback) — it now falls back to the same state-bridge channel already used for chat.",
-        "de": "Onboarding-Klassifikations-Batches werden jetzt nach Adaptertyp gruppiert für konsistenteren KI-Kontext. Die an die InfluxDB-/History-Instanz gesendete Abfrage wird jetzt geloggt (silly). Die KI nutzt jetzt saubere, deutsche Katalog-Beschreibungen statt roher Datenpunkt-IDs im Chat, und Beschreibungen sind im Geräte-Tab editierbar. Behoben: der Geräte-Tab (Liste/Bearbeiten/Entfernen) reagierte auf manchen Installationen gar nicht (sendTo-Timeout ohne Fallback) — er fällt jetzt auf denselben State-Bridge-Kanal zurück, der schon für den Chat genutzt wird."
-      },
-      "0.0.1-beta.7": {
-        "en": "Chat answers (and Devices/Budget tab actions) now appear immediately instead of only after switching tabs: fixed a race condition and a response-shape bug in the admin tab's fallback transport. The AI now knows your location and local timezone (read from the ioBroker system config) instead of only UTC. The license dialog now shows the real license text.",
-        "de": "Chat-Antworten (und Aktionen im Geräte-/Budget-Tab) erscheinen jetzt sofort statt erst nach einem Tab-Wechsel: ein Timing- und ein Antwort-Format-Fehler im Ausweichkanal des Admin-Tabs wurden behoben. Die KI kennt jetzt Standort und lokale Zeitzone (aus der ioBroker-Systemkonfiguration) statt nur UTC. Der Lizenz-Dialog zeigt jetzt den echten Lizenztext."
-      },
-      "0.0.1-beta.6": {
-        "en": "Admin tab commands reach the adapter even when sendTo from the legacy HTML tab is not delivered (React Admin v7): new state-bridge fallback channel (admin.bridge) with automatic transport selection, and visible error messages instead of silently hanging UI.",
-        "de": "Admin-Tab-Befehle erreichen den Adapter auch dann, wenn sendTo aus dem Legacy-HTML-Tab nicht zugestellt wird (React Admin v7): neuer State-Bridge-Ausweichkanal (admin.bridge) mit automatischer Transportwahl und sichtbaren Fehlermeldungen statt still hängender UI."
-      },
-      "0.0.1-beta.5": {
-        "en": "Token-cost tab (usage history chart, cost calculation from manually maintained prices, daily/hourly limit recommendation) extending the existing budget section. Onboarding token usage is now tracked (was previously never recorded).",
-        "de": "Token-Kosten-Tab (Verbrauchs-Historie als Diagramm, Kostenberechnung aus manuell gepflegten Preisen, Tages-/Stunden-Limit-Empfehlung) als Erweiterung des bestehenden Budget-Bereichs. Onboarding-Token-Verbrauch wird jetzt erfasst (bisher nie aufgezeichnet)."
-      },
-      "0.0.1-beta.4": {
-        "en": "Onboarding can use its own LLM provider (independent from chat/checks). Startup reachability self-check for both providers, blocking only the affected function on failure.",
-        "de": "Onboarding kann jetzt einen eigenen LLM-Provider nutzen (unabhaengig von Chat/Pruefung). Start-Selbstpruefung der Erreichbarkeit beider Provider, blockiert bei Fehlschlag nur die betroffene Funktion."
-      },
-      "0.0.1-beta.3": {
-        "en": "Geräte tab (rename/ignore/remove devices, edit category/room, manual re-scan and check-now triggers), token-budget display. Admin tab connection root-caused (missing adminUI.tab declaration) with a fix applied — live confirmation on a redeployed instance still pending.",
-        "de": "Geräte-Tab (Geräte umbenennen/ignorieren/entfernen, Kategorie/Raum bearbeiten, manuelle Re-Scan- und Prüf-Trigger), Token-Budget-Anzeige. Admin-Tab-Verbindungsproblem auf Root Cause zurückgeführt (fehlende adminUI.tab-Deklaration) und Fix angewendet — endgültige Live-Bestätigung auf einer neu ausgerollten Instanz steht noch aus."
-      },
-      "0.0.1-beta.2": {
-        "en": "Chat tab connection fallback, onboarding follow-up answers via chat, conversation memory, daily token budget, and silly-level logging.",
-        "de": "Chat-Tab-Verbindungs-Fallback, Beantwortung von Onboarding-Rückfragen im Chat, Konversationsgedächtnis, tägliches Token-Budget und Silly-Level-Logging."
-      },
-      "0.0.1-beta.1": {
-        "en": "Documentation/process overhaul only, no functional code change: arc42 split into per-chapter files, decisions extracted as ADRs, Obsidian-friendly linking. See CONTRIBUTING.md for the development process.",
-        "de": "Reine Dokumentations-/Prozess-Version, kein funktionaler Code-Unterschied: arc42 in Einzelkapitel aufgeteilt, Entscheidungen als ADRs extrahiert, Obsidian-freundliche Verlinkung. Siehe CONTRIBUTING.md fuer den Entwicklungsprozess."
-      },
-      "0.0.1-beta": {
-        "en": "Initial beta release: chat Q&A and proactive checks over historized objects via a configurable LLM provider. Not yet verified against a real ioBroker Admin instance — see README/arc42 for known gaps.",
-        "de": "Erste Beta-Version: Chat-Q&A und proaktive Pruefungen ueber historisierte Objekte via konfigurierbarem LLM-Provider. Noch nicht gegen eine echte ioBroker-Admin-Instanz verifiziert — siehe README/arc42 fuer bekannte Luecken."
-      }
+      "0.0.1-beta.32": { "en": "Repository checker findings resolved and package metadata aligned.", "de": "Repository-Checker-Befunde behoben und Paketmetadaten synchronisiert." },
+      "0.0.1-beta.31": { "en": "Publication consistency and entitlement claims hardened.", "de": "Veröffentlichungs- und Entitlement-Konsistenz gehärtet." },
+      "0.0.1-beta.30": { "en": "Bilingual README and adapter icon added for repository publication.", "de": "Zweisprachige README und Adapter-Icon für die Repository-Veröffentlichung ergänzt." },
+      "0.0.1-beta.29": { "en": "Offline Ed25519-JWS entitlement foundation and daily chat fallback added.", "de": "Offline-Ed25519-JWS-Entitlement-Grundlage und täglicher Chat-Fallback ergänzt." },
+      "0.0.1-beta.28": { "en": "Entitlement architecture finalized: 0.1.0, 35-day tokens, 30-day grace, no instance binding.", "de": "Entitlement-Architektur finalisiert: 0.1.0, 35-Tage-Tokens, 30 Tage Grace, keine Instanzbindung." },
+      "0.0.1-beta.27": { "en": "Sponsoring entitlement rules specified.", "de": "Sponsoring-Entitlement-Regeln spezifiziert." },
+      "0.0.1-beta.26": { "en": "Hybrid MIT core and sponsor-required AI components documented.", "de": "Hybrider MIT-Kern und sponsor-pflichtige KI-Komponenten dokumentiert." },
+      "0.0.1-beta.25": { "en": "Per-object anomaly pre-analysis progress added.", "de": "Fortschritt der Anomalievoranalyse pro Objekt ergänzt." },
+      "0.0.1-beta.24": { "en": "Admin JSON validation and proactive progress polling fixed.", "de": "Admin-JSON-Validierung und Polling der Prüf-Fortschrittsanzeige behoben." },
+      "0.0.1-beta.23": { "en": "Hybrid statistical anomaly pre-analysis added.", "de": "Hybride statistische Anomalievoranalyse ergänzt." },
+      "0.0.1-beta.22": { "en": "Prioritized product roadmap added.", "de": "Priorisierte Produkt-Roadmap ergänzt." },
+      "0.0.1-beta.21": { "en": "Fake-adapter syncCatalog flow test added.", "de": "Fake-Adapter-Durchflusstest für syncCatalog ergänzt." },
+      "0.0.1-beta.20": { "en": "Main and admin orchestration test coverage added.", "de": "Testabdeckung für Main- und Admin-Orchestrierung ergänzt." },
+      "0.0.1-beta.18": { "en": "Catalog learning, onboarding defaults, History health retries, and CI added.", "de": "Kataloglernen, Onboarding-Defaults, History-Retries und CI ergänzt." },
+      "0.0.1-beta.17": { "en": "Sponsor links polished.", "de": "Sponsor-Links überarbeitet." },
+      "0.0.1-beta.16": { "en": "Settings CSV import fixed.", "de": "Settings-CSV-Import behoben." },
+      "0.0.1-beta.15": { "en": "Development and release workflow documented.", "de": "Entwicklungs- und Releaseprozess dokumentiert." },
+      "0.0.1-beta.14": { "en": "Settings CSV and live progress indicators added.", "de": "Settings-CSV und Live-Fortschrittsanzeigen ergänzt." }
     }
   },
   "native": {
@@ -179,7 +71,8 @@
     "onboardingPricePerMillionOutputTokens": 0,
     "checkIntervalHours": 24,
     "silentIfNothingFound": false,
-    "dailyTokenBudget": 0
+    "dailyTokenBudget": 0,
+    "licenseToken": ""
   },
   "objects": [],
   "instanceObjects": []

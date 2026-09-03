@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.32] - 2026-09-03
+
+### Behoben
+- Verbleibende Repository-Checker-Befunde behoben: Repository-/Keywords-Metadaten, SPDX-/Lizenzmetadaten, News-Anzahl, Connection-/DataSource-Metadaten, Mindestversionen und Paketinhalt.
+
 ## [0.0.1-beta.31] - 2026-09-03
 
 ### Behoben
