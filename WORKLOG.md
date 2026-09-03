@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Durchgängigen Proxyquire-Test für `runOnboarding` → `syncCatalog` → persistierten Katalog ergänzen.
-- Letzter sicherer Commit: `d94b6d8 docs: record beta.21 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.21` veröffentlicht; Feature-Branch gelöscht; lokale und GitHub-Verifikation erfolgreich.
-- Nächster Schritt: keiner.
+- Branch: `feature/docs-product-roadmap`
+- Ziel: Markt-/Bedarfsanalyse als globale, nach Nutzwert priorisierte Produkt-Roadmap und TODO-Liste dokumentieren.
+- Letzter sicherer Commit: `b411295 docs: mark beta.21 release complete`.
+- Aktueller Stand: Roadmap mit Positionierung, Nutzerbedarf, priorisierten Produktlücken, Nicht-Zielen und nächstem empfohlenem Task ergänzt. Release-Vorbereitung für `0.0.1-beta.22` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.22` veröffentlichen.
 
 ## TODO
 

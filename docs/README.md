@@ -9,6 +9,7 @@ Diese Seite ist der zentrale Einstiegspunkt (Map of Content) in die gesamte Proj
 - **[arc42-Architekturdokumentation](architecture/arc42-index.md)** — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Randbedingungen, Risiken
 - **[Architekturentscheidungen (ADRs)](adr/adr-index.md)** — jede Entscheidung einzeln, mit Kontext und Konsequenzen
 - **[Backlog offener Architekturentscheidungen](adr/backlog.md)** — architekturrelevante Fragen, die noch diskutiert werden müssen
+- **[Produkt-Roadmap und globale TODO-Liste](roadmap.md)** — priorisierte Nutzerwünsche, Produktlücken und empfohlene nächste Schritte
 
 ## Specs
 
