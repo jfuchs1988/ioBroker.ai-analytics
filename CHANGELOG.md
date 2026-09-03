@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.20] - 2026-09-03
+
+### Geändert
+- Proxyquire-/Sinon-Tests decken zentrale `main.js`-Orchestratorpfade ab: Admin-Dispatcher, Erfolgs-/Fehlerantworten, State-Bridge-Verdrahtung, Unload und Datenqualitäts-Backfills.
+- Die verbleibende Testlücke ist in der Architektur- und Risikodokumentation präzisiert: echter End-to-End-Test und DOM-Tests der Admin-UI stehen weiterhin aus.
+
 ## [0.0.1-beta.19] - 2026-09-03
 
 ### Hinzugefügt

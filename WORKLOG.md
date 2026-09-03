@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Katalogeinträge um automatisch berechnete Datenqualitäts-Felder erweitern (Schreibbarkeit, Schreibmuster/Update-Frequenz, Datenvollständigkeit) — erstes Teilprojekt aus der P3-Markt-Analyse (`docs/architecture/01-einfuehrung-und-ziele.md` §1.4, Punkt 15 "Semantische Datenqualität").
-- Letzter sicherer Commit: `dda1456 docs: record beta.19 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.19` veröffentlicht; Feature-Branch lokal und remote gelöscht.
-- Nächster Schritt: keiner.
+- Branch: `feature/test-main-admin-coverage`
+- Ziel: Proxyquire-basierte Testabdeckung für `main.js`-Lifecycle/Dispatcher und Admin-Kommandos ergänzen.
+- Letzter sicherer Commit: `7543d37 test: cover main adapter orchestration paths`.
+- Aktueller Stand: Proxyquire-/Sinon-Tests für Dispatch, Callback-/Fehlerpfade, Bridge-Verdrahtung, Unload und Datenqualitäts-Backfills ergänzt; 276 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.20` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.20` veröffentlichen.
 
 ## TODO
 

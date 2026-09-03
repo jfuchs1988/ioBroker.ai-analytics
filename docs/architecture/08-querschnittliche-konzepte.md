@@ -31,9 +31,9 @@ Jeder Provider-Client übersetzt dieses normalisierte Format in sein eigenes Wir
 
 ## 8.4 Testkonzept
 
-- Unit-Tests (mocha/chai/sinon) für jedes `lib/*`-Modul mit gemockter Adapter-API — kein echter DB- oder LLM-Zugriff nötig. Stand: 147 Unit-Tests + 1 Adapter-Smoke-Test, alle grün (Stand 2026-08-24).
+- Unit-Tests (mocha/chai/sinon) für jedes `lib/*`-Modul mit gemockter Adapter-API — kein echter DB- oder LLM-Zugriff nötig. Zusätzlich prüfen Proxyquire-/Sinon-Tests zentrale `main.js`-Orchestratorpfade. Stand: 276 Unit-Tests + 1 Adapter-Smoke-Test, alle grün (Stand 2026-09-03).
 - Admin-UI (JSON Config, Chat-Tab) hat keine automatisierten Tests — dafür ein manueller Abnahmetest an einer echten ioBroker-Instanz (läuft aktuell, siehe [Risiken](11-risiken-und-schulden.md)).
-- **Bekannte Lücke:** `test/adapter.test.js` nutzt `@iobroker/testing`s `tests.unit`, das in der installierten v4-Version ein deprecated No-Op ist (druckt nur eine Warnung, lädt `main.js` nie, ruft nie `onReady`/`onUnload` auf). `main.js` — der Orchestrator mit der gesamten Lifecycle-, Konfigurations- und Fehlerbehandlungslogik — hat dadurch effektiv **keine** automatisierte Testabdeckung; jedes `lib/*`-Modul ist nur isoliert getestet, nie im Zusammenspiel (`runOnboarding` → `syncCatalog` → Katalog-States als ein durchgängiger Test existiert nicht).
+- **Verbleibende Lücke:** `test/adapter.test.js` nutzt `@iobroker/testing`s `tests.unit`, das in der installierten v4-Version ein deprecated No-Op ist (druckt nur eine Warnung, lädt `main.js` nie, ruft nie `onReady`/`onUnload` auf). Ein echter End-to-End-Test von `runOnboarding` über `syncCatalog` bis zu Katalog-States sowie automatisierte DOM-Tests der Admin-UI existieren weiterhin nicht.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [7. Verteilungssicht](07-verteilungssicht.md) · weiter zu [9. Architekturentscheidungen](09-architekturentscheidungen.md)
