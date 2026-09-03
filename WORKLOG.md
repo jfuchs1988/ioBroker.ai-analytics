@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Festgelegte Sponsoring-Token-Regeln in der bestehenden Entitlement-Spec und im Plan dokumentieren.
-- Letzter sicherer Commit: `9498606 merge: specify sponsoring entitlement rules`.
-- Aktueller Stand: Release `v0.0.1-beta.27` veröffentlicht; Token-Regeln in Spec, Plan, ADR und Backlog dokumentiert; Feature-Branch gelöscht.
-- Nächster Schritt: keiner.
+- Branch: `feature/entitlement-architecture-decisions`
+- Ziel: Beta-Ende, JWS-Tokenformat und Ausstellungs-Webanwendung als verbindliche Entitlement-Architektur festlegen.
+- Letzter sicherer Commit: `3095f0a docs: finalize entitlement architecture decisions`.
+- Aktueller Stand: Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung sind dokumentiert; Release-Vorbereitung für `0.0.1-beta.28` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.28` veröffentlichen.
 
 ## TODO
 

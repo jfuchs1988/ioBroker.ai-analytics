@@ -21,7 +21,7 @@ above remain MIT-licensed.
 ## Sponsoring terms
 
 During the beta phase, the sponsor-required components may be used free of
-charge. After the still-to-be-decided beta end, use requires an active
+charge. Starting with version 0.1.0, use requires an active
 sponsorship or another entitlement issued by the copyright holder.
 The intended standard channel is GitHub Sponsors:
 https://github.com/sponsors/jfuchs1988
