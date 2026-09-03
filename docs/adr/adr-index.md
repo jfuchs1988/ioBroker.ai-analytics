@@ -31,3 +31,4 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0023](0023-state-bridge-ausweichkanal-admin-tab.md) | State-Bridge (`admin.bridge`) als Ausweichkanal für Admin-Tab-Befehle, wenn `sendTo` aus dem Tab nicht zustellt | Angenommen | 2026-08-24 |
 | [0024](0024-zweistufige-valuekind-klassifizierung.md) | Zweistufige `valueKind`-Klassifizierung (Metadaten + Datenprobe), kein LLM-Aufruf | Angenommen | 2026-08-24 |
 | [0025](0025-nutzerbestaetigte-katalogpflege-im-chat.md) | Nutzerbestätigte Katalogpflege im Chat | Angenommen | 2026-09-03 |
+| [0026](0026-schreibmuster-bewusste-datenvollstaendigkeit.md) | Schreibmuster-bewusste Datenvollständigkeits-Erkennung (`writable`/`writePattern`/`updateFrequency`/`dataCompleteness`) | Angenommen | 2026-09-03 |

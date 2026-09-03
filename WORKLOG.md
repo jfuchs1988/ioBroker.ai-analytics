@@ -4,8 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Release `0.0.1-beta.18` abgeschlossen.
+- Branch: `feature/katalog-datenqualitaet`
+- Ziel: Katalogeinträge um automatisch berechnete Datenqualitäts-Felder erweitern (Schreibbarkeit, Schreibmuster/Update-Frequenz, Datenvollständigkeit) — erstes Teilprojekt aus der P3-Markt-Analyse (`docs/architecture/01-einfuehrung-und-ziele.md` §1.4, Punkt 15 "Semantische Datenqualität").
+- Letzter sicherer Commit: `d98c157 docs: record ADR-0026 and update architecture docs for data-quality fields`.
+- Aktueller Stand: Implementierung, Tests und Dokumentation abgeschlossen; Verifikation grün (269 Unit-Tests, 1 Adapter-Smoke-Test, ESLint, Admin-Build).
+- Nächster Schritt: Version `0.0.1-beta.19` in `package.json` und `io-package.json` eintragen, danach Branch abschließen und Release durchführen.
 
 ## TODO
 

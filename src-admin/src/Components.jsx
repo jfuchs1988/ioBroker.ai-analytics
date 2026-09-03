@@ -3,21 +3,21 @@ import { ConfigGeneric } from '@iobroker/json-config';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
-const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview'];
+const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness'];
 const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored'];
 const SETTINGS_COLUMNS = [
     'providerType', 'baseUrl', 'model', 'apiKey',
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'onboardingProviderType', 'onboardingBaseUrl', 'onboardingModel', 'onboardingApiKey',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
-    'checkIntervalHours', 'dailyTokenBudget', 'silentIfNothingFound', 'enableValueKindBackfill',
+    'checkIntervalHours', 'dailyTokenBudget', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
 ];
 const SETTINGS_NUMBER_COLUMNS = new Set([
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
     'checkIntervalHours', 'dailyTokenBudget',
 ]);
-const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill']);
+const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
 
 function csvEscape(value) {
     const str = value === null || value === undefined ? '' : String(value);
@@ -260,6 +260,9 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     {VALUE_KINDS.map(kind => <option key={kind} value={kind}>{kind}</option>)}
                 </select></td>
                 <td>{entry.unit || ''}</td>
+                <td>{entry.writable === true ? '✓' : entry.writable === false ? '–' : ''}</td>
+                <td>{entry.updateFrequency || ''}</td>
+                <td>{entry.dataCompleteness || ''}</td>
                 <td><input defaultValue={entry.room || ''} onBlur={event => update({ room: event.target.value })} /></td>
                 <td>{entry.ignored ? 'ignoriert' : entry.active === false ? 'inaktiv' : entry.needsReview ? 'Prüfung nötig' : 'aktiv'}</td>
                 <td>
@@ -300,7 +303,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                 </div> : null}
                 {this.state.loading ? <div>Geräte werden geladen ...</div> : <div style={{ overflowX: 'auto', maxHeight: 600 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead><tr><th>Objekt-ID</th><th>Beschreibung</th><th>Kategorie</th><th>Verhalten</th><th>Einheit</th><th>Raum</th><th>Status</th><th>Aktionen</th></tr></thead>
+                        <thead><tr><th>Objekt-ID</th><th>Beschreibung</th><th>Kategorie</th><th>Verhalten</th><th>Einheit</th><th>Schreibbar</th><th>Update-Frequenz</th><th>Vollständigkeit</th><th>Raum</th><th>Status</th><th>Aktionen</th></tr></thead>
                         <tbody>{entries.map(entry => this.renderRow(entry))}</tbody>
                     </table>
                 </div>}

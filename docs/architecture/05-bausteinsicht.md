@@ -24,6 +24,7 @@ lib/
 ├── providerHealthCheck.js Erreichbarkeits-Selbstpruefung der konfigurierten Provider
 ├── promptContext.js        Standort (system.config) + lokale Zeitzone für Systemprompts
 ├── valueKindClassifier.js  Klassifiziert Datenpunkt-Verhalten für typbewusste Auswertung
+├── dataQualityClassifier.js Klassifiziert Schreibbarkeit/-muster/-frequenz/Vollstaendigkeit
 └── scheduler.js           Periodischer Trigger für proaktive Prüfung
 
 main.js                  Verdrahtet alles: Adapter-Lifecycle, Katalog-Sync,
@@ -54,10 +55,11 @@ admin/
 | `providerHealthCheck.js` | Minimaler Test-Call pro konfiguriertem Provider beim Start, persistiert Ergebnis als State | `checkProviderReachable(provider) => {reachable,error?}`, `ensureReachabilityStates(adapter)` |
 | `promptContext.js` | Liest Standort (`system.config.common.city/country/latitude/longitude`) und ermittelt die lokale Zeitzone des Host-Prozesses (`Intl`), formatiert beides zusammen mit aktueller UTC-/Unix-Zeit als Kontextblock für Agent-Systemprompts und berechnet lokale Kalendertag-Grenzen | `buildTimeAndLocationContext(adapter, now=new Date()) => string`, `getSystemLocation`, `getLocalTimeZone`, `formatLocalTime`, `getLocalDayBoundaries` |
 | `valueKindClassifier.js` | Zweistufige Klassifizierung aus Metadaten und Datenprobe mit Lookback 48h/7d/30d/365d; fuer InfluxDB-Samples werden bucketed `average`-Abfragen genutzt, um Rohdaten-Typkonflikte zu vermeiden | `classifyValueKind(adapter,obj,historyInstance)`, `classifyFromMetadata`, `detectPatternFromSamples`, `VALUE_KINDS` |
+| `dataQualityClassifier.js` | Erkennt Schreibmuster (`continuous`/`on_change`) aus der Regelmäßigkeit der Schreibabstände und bewertet Datenvollständigkeit dazu passend (Median-Abstand bei `continuous`, eigene historische Maximallücke bei `on_change`); `writable` kommt direkt aus `common.write` | `classifyDataQuality(adapter,obj,historyInstance)`, `computeWritable`, `detectWritePattern`, `bucketUpdateFrequency`, `detectDataCompleteness` |
 | `scheduler.js` | Ruft `runCheck` periodisch auf, fängt Fehler ab | `startProactiveScheduler(adapter,{intervalMs,runCheck}) => stopFn` |
 | `main.js` | Orchestriert alle Bausteine über den ioBroker-Adapter-Lifecycle; schreibt den `catalogSync`-State fuer den Live-Fortschritt des Geräte-Reiters | ioBroker-Standard (`onReady`, `onMessage`, `onUnload`) |
 
-Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (16 Module, jeweils fokussiert, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
+Das System bleibt bei Ebene 1 (Whitebox der `lib/*`-Module) — bei der aktuellen Größe (17 Module, jeweils fokussiert, siehe [Known Gaps](11-risiken-und-schulden.md) zu Wachstum von `main.js`) liefert eine Ebene-2-Zerlegung (z. B. Whitebox von `providers/`) keinen zusätzlichen Erkenntnisgewinn.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [4. Lösungsstrategie](04-loesungsstrategie.md) · weiter zu [6. Laufzeitsicht](06-laufzeitsicht.md)

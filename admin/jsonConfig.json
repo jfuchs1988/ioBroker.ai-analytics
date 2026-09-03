@@ -271,6 +271,16 @@
           "md": 6,
           "lg": 4,
           "xl": 4
+        },
+        "enableDataQualityBackfill": {
+          "type": "checkbox",
+          "label": "Bestehende Datenpunkte nachtraeglich auf Schreibbarkeit/Update-Frequenz/Vollstaendigkeit pruefen",
+          "default": false,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
         }
       }
     },
