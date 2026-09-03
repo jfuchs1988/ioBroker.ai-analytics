@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Proxyquire-basierte Testabdeckung für `main.js`-Lifecycle/Dispatcher und Admin-Kommandos ergänzen.
-- Letzter sicherer Commit: Merge von `feature/test-main-admin-coverage` nach `master`.
-- Aktueller Stand: Proxyquire-/Sinon-Tests ergänzt und Release-Vorbereitung für `0.0.1-beta.20` integriert.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.20` erstellen und Branch löschen.
+- Letzter sicherer Commit: `a51727f docs: record beta.20 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.20` veröffentlicht; Feature-Branch gelöscht; GitHub Actions CI erfolgreich.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -29,6 +29,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Datenqualitäts-Feature in `master` integriert.
 - Datenqualitäts-Feature als `v0.0.1-beta.19` veröffentlicht; GitHub-Release erstellt und Branch bereinigt.
 - Main-/Admin-Orchestrator-Tests ergänzt; 276 Unit-Tests, ESLint und Admin-Build erfolgreich.
+- Release `0.0.1-beta.20` erstellt, nach `master` gemergt, als `v0.0.1-beta.20` getaggt, gepusht und auf GitHub veröffentlicht.
+- GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
 
 ## Übergabehinweise
 
