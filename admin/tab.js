@@ -1,3 +1,4 @@
+/* global io */
 // admin/tab.js
 let socket;
 let namespace;
@@ -275,54 +276,6 @@ async function loadDevices() {
     } catch (error) {
         allDeviceEntries = [];
         renderDevicesTable();
-        showDevicesError(error.message);
-    }
-}
-
-async function triggerRescan() {
-    const status = document.getElementById('devices-status');
-    status.textContent = 'Re-Scan laeuft... (Klassifikation kann bei vielen neuen Objekten einige Minuten dauern)';
-    try {
-        const response = await callAdapter('runDiscoveryNow', {});
-        if (!response) {
-            showDevicesError('Keine Antwort vom Adapter erhalten.');
-            return;
-        }
-        if (response.error) {
-            showDevicesError(response.error);
-            return;
-        }
-        if (response.skipped) {
-            const reason = response.skipReason || 'Onboarding-Modell nicht erreichbar.';
-            status.textContent = `Re-Scan uebersprungen: ${reason} (${response.reactivatedCount} reaktiviert).`;
-        } else {
-            status.textContent = `Re-Scan fertig: ${response.newCount} neu, ${response.reactivatedCount} reaktiviert.`;
-        }
-        loadDevices();
-    } catch (error) {
-        showDevicesError(error.message);
-    }
-}
-
-async function triggerProactiveCheck() {
-    const status = document.getElementById('devices-status');
-    status.textContent = 'Pruefung wird gestartet...';
-    try {
-        const response = await callAdapter('runProactiveCheckNow', {});
-        if (!response) {
-            showDevicesError('Keine Antwort vom Adapter erhalten.');
-            return;
-        }
-        if (response.error) {
-            showDevicesError(response.error);
-            return;
-        }
-        if (!response.triggered) {
-            status.textContent = `Pruefung uebersprungen: ${response.reason || 'Chat-Modell nicht erreichbar.'}`;
-            return;
-        }
-        status.textContent = 'Pruefung gestartet, Ergebnis erscheint im Chat.';
-    } catch (error) {
         showDevicesError(error.message);
     }
 }

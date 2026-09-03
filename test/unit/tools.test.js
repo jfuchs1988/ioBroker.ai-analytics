@@ -25,6 +25,7 @@ describe('buildTools', () => {
             'getPeriodTotal',
             'comparePeriods',
             'updateCatalogEntry',
+            'updateCatalogEntries',
         ]);
     });
 
@@ -255,6 +256,86 @@ describe('buildTools', () => {
             threw = true;
         }
         expect(threw).to.equal(true);
+    });
+
+    it('updateCatalogEntries applies user-confirmed partial updates to multiple existing entries', async () => {
+        const entries = [
+            { sourceId: 'sun2000.0.meter.activePower', description: 'Netzleistung', category: 'consumption', room: '', needsReview: false },
+            { sourceId: 'hm-rpc.0.device.1.LEVEL', description: 'Homematic-Aktor', category: 'device_usage', room: '', needsReview: true },
+        ];
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves(entries),
+            setCatalogEntry,
+        });
+
+        const result = await buildTools({}).execute('updateCatalogEntries', {
+            entries: [
+                { sourceId: 'sun2000.0.meter.activePower', room: 'Keller' },
+                { sourceId: 'hm-rpc.0.device.1.LEVEL', description: 'Rollladen Büro', room: 'Büro' },
+            ],
+        });
+
+        expect(result.updated).to.have.lengthOf(2);
+        expect(setCatalogEntry.callCount).to.equal(2);
+        expect(setCatalogEntry.firstCall.args[1]).to.include({
+            sourceId: 'sun2000.0.meter.activePower',
+            description: 'Netzleistung',
+            room: 'Keller',
+            needsReview: false,
+            confidence: 'high',
+            classificationSource: 'user',
+        });
+        expect(setCatalogEntry.secondCall.args[1]).to.include({
+            sourceId: 'hm-rpc.0.device.1.LEVEL',
+            description: 'Rollladen Büro',
+            room: 'Büro',
+            needsReview: false,
+            confidence: 'high',
+            classificationSource: 'user',
+        });
+        expect(setCatalogEntry.firstCall.args[1].userConfirmedAt).to.be.a('string');
+    });
+
+    it('updateCatalogEntries validates the complete batch before writing', async () => {
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'known', category: 'consumption' }]),
+            setCatalogEntry,
+        });
+
+        let error;
+        try {
+            await buildTools({}).execute('updateCatalogEntries', {
+                entries: [
+                    { sourceId: 'known', room: 'Keller' },
+                    { sourceId: 'unknown', room: 'Keller' },
+                ],
+            });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.message).to.include('Unbekanntes Objekt: unknown');
+        expect(setCatalogEntry.called).to.equal(false);
+    });
+
+    it('updateCatalogEntries rejects changes without an editable field', async () => {
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'known', category: 'consumption' }]),
+            setCatalogEntry,
+        });
+
+        let error;
+        try {
+            await buildTools({}).execute('updateCatalogEntries', { entries: [{ sourceId: 'known' }] });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.message).to.include('Keine Aenderung');
+        expect(setCatalogEntry.called).to.equal(false);
     });
 
     it('uses the maximum value for a daily reset counter', async () => {
