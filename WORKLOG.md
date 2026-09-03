@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Ungültige Admin-JSON-Konfiguration und die bei 0% hängenbleibende Prüf-Fortschrittsanzeige korrigieren.
-- Letzter sicherer Commit: Merge von `fix/admin-config-progress` nach `master`.
-- Aktueller Stand: Beide Fixes integriert; Release-Vorbereitung für `0.0.1-beta.24` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.24` erstellen und Branch löschen.
+- Letzter sicherer Commit: `11ea4a1 docs: record beta.24 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.24` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -25,6 +25,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Globale Produkt-Roadmap mit priorisierten Findings und empfohlenem nächsten Entwicklungsschritt dokumentiert.
 - Phase 1 der hybriden Anomalieerkennung implementiert: robuste Voranalyse und LLM-Gate für Gauge-Zeitreihen.
 - Release `0.0.1-beta.23` erstellt, nach `master` gemergt, als `v0.0.1-beta.23` getaggt, gepusht und auf GitHub veröffentlicht.
+- Admin-JSON- und Prüf-Fortschrittsanzeige-Fix integriert.
+- Release `0.0.1-beta.24` erstellt, nach `master` gemergt, als `v0.0.1-beta.24` getaggt, gepusht und auf GitHub veröffentlicht.
 - Release `0.0.1-beta.22` erstellt, nach `master` gemergt, als `v0.0.1-beta.22` getaggt, gepusht und auf GitHub veröffentlicht.
 - Durchflusstest für Discovery → Onboarding → Katalog-State-Persistenz ergänzt.
 - Release `0.0.1-beta.21` erstellt, nach `master` gemergt, als `v0.0.1-beta.21` getaggt, gepusht und auf GitHub veröffentlicht.
