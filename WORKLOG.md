@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Offline-Entitlement-Prüfung und geschützte Token-Konfiguration als Vorbereitung für `0.1.0` implementieren.
-- Letzter sicherer Commit: `e700163 docs: record beta.29 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.29` veröffentlicht; offline prüfbare Entitlement-Grundlage integriert; Feature-Branch gelöscht.
-- Nächster Schritt: keiner.
+- Branch: `feature/publication-readiness`
+- Ziel: Veröffentlichungsanforderungen ohne npm-Publishing vorbereiten.
+- Letzter sicherer Commit: `594b54a docs: mark beta.29 release complete`.
+- Aktueller Stand: Zweisprachige README, Icon und GitHub-Topics ergänzt; 297 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.30` läuft.
+- Nächster Schritt: Veröffentlichungsstand committen, Branch nach `master` integrieren und `v0.0.1-beta.30` veröffentlichen.
 
 ## TODO
 

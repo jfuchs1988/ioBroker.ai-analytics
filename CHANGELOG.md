@@ -9,6 +9,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.30] - 2026-09-03
+
+### Dokumentation
+- Veröffentlichungsanforderungen vorbereitet: vollständige englische README, deutsche README, Installations-/Konfigurations-/Datenschutzdokumentation, Changelog-Verweise und Adapter-Icon ergänzt. GitHub-Topics wurden gesetzt.
+
 ## [0.0.1-beta.29] - 2026-09-03
 
 ### Hinzugefügt
