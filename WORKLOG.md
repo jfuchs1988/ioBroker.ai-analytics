@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/entitlement-architecture-decisions`
+- Branch: `master`
 - Ziel: Beta-Ende, JWS-Tokenformat und Ausstellungs-Webanwendung als verbindliche Entitlement-Architektur festlegen.
-- Letzter sicherer Commit: `3095f0a docs: finalize entitlement architecture decisions`.
-- Aktueller Stand: Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung sind dokumentiert; Release-Vorbereitung für `0.0.1-beta.28` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.28` veröffentlichen.
+- Letzter sicherer Commit: `fa1a21c merge: finalize entitlement architecture decisions`.
+- Aktueller Stand: Release `v0.0.1-beta.28` veröffentlicht; Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung dokumentiert; Feature-Branch gelöscht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -45,6 +45,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Hybrid-Lizenzgrundlage als MIT-Kern mit separat dokumentierten sponsor-pflichtigen KI-Komponenten veröffentlicht.
 - Sponsoring-Entitlement-Regeln dokumentiert: 35-Tage-Token, 30 Tage Sponsoring, 30 Tage Grace, keine Instanzbindung, Offline-Prüfung und eine Chat-Anfrage pro Tag.
 - Release `0.0.1-beta.27` erstellt, nach `master` gemergt, als `v0.0.1-beta.27` getaggt, gepusht und auf GitHub veröffentlicht.
+- Beta-Ende `0.1.0`, Ed25519-JWS, separate Token-Webanwendung und die finalen Grace-/Chat-Regeln festgelegt.
+- Release `0.0.1-beta.28` erstellt, nach `master` gemergt, als `v0.0.1-beta.28` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
