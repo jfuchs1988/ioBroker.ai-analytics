@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Statistische Kandidatenstufe vor der proaktiven LLM-Prüfung implementieren.
-- Letzter sicherer Commit: Merge von `feature/hybride-anomalieerkennung` nach `master`.
-- Aktueller Stand: Phase 1 der hybriden Anomalieerkennung integriert; Release-Vorbereitung für `0.0.1-beta.23` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.23` erstellen und Branch löschen.
+- Letzter sicherer Commit: `c1b014d docs: record beta.23 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.23` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -23,6 +23,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.18` erstellt, nach `master` gemergt, als `v0.0.1-beta.18` getaggt, gepusht und auf GitHub veröffentlicht.
 - GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
 - Globale Produkt-Roadmap mit priorisierten Findings und empfohlenem nächsten Entwicklungsschritt dokumentiert.
+- Phase 1 der hybriden Anomalieerkennung implementiert: robuste Voranalyse und LLM-Gate für Gauge-Zeitreihen.
+- Release `0.0.1-beta.23` erstellt, nach `master` gemergt, als `v0.0.1-beta.23` getaggt, gepusht und auf GitHub veröffentlicht.
 - Release `0.0.1-beta.22` erstellt, nach `master` gemergt, als `v0.0.1-beta.22` getaggt, gepusht und auf GitHub veröffentlicht.
 - Durchflusstest für Discovery → Onboarding → Katalog-State-Persistenz ergänzt.
 - Release `0.0.1-beta.21` erstellt, nach `master` gemergt, als `v0.0.1-beta.21` getaggt, gepusht und auf GitHub veröffentlicht.
