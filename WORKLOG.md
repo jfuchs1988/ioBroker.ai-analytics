@@ -4,8 +4,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Release `0.0.1-beta.18` abgeschlossen.
+- Branch: `feature/katalog-datenqualitaet`
+- Ziel: Katalogeinträge um automatisch berechnete Datenqualitäts-Felder erweitern (Schreibbarkeit, Schreibmuster/Update-Frequenz, Datenvollständigkeit) — erstes Teilprojekt aus der P3-Markt-Analyse (`docs/architecture/01-einfuehrung-und-ziele.md` §1.4, Punkt 15 "Semantische Datenqualität").
+- Nächster Schritt: Spec fertig, Implementierungsplan über writing-plans-Skill erstellen.
 
 ## TODO
 
