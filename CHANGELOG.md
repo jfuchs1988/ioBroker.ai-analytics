@@ -9,6 +9,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.27] - 2026-09-03
+
+### Dokumentation
+- Sponsoring-Entitlement-Regeln festgelegt: 35-Tage-Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Prüfung und eine Chat-Anfrage pro Tag nach Ablauf. Beta-Ende, Tokenformat und Webanwendung bleiben offen.
+
 ## [0.0.1-beta.26] - 2026-09-03
 
 ### Geändert

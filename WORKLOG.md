@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `feature/sponsoring-token-spec`
 - Ziel: Festgelegte Sponsoring-Token-Regeln in der bestehenden Entitlement-Spec und im Plan dokumentieren.
-- Letzter sicherer Commit: `fdb6a22 chore: prepare beta.26 release`.
-- Aktueller Stand: Hybrid-Lizenzgrundlage ist als `v0.0.1-beta.26` veröffentlicht; Token-Regeln werden jetzt ohne Instanzbindung spezifiziert.
-- Nächster Schritt: Spec, Plan, ADR und Backlog prüfen und als Entitlement-Planungsstand veröffentlichen.
+- Letzter sicherer Commit: `0d6a317 docs: specify sponsoring entitlement rules`.
+- Aktueller Stand: Token-Regeln in Spec, Plan, ADR und Backlog dokumentiert; Release-Vorbereitung für `0.0.1-beta.27` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.27` veröffentlichen.
 
 ## TODO
 
