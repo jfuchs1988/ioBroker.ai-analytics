@@ -298,3 +298,61 @@ describe('AiAnalytics syncCatalog flow', () => {
         });
     });
 });
+
+describe('AiAnalytics proactive anomaly gate', () => {
+    function loadMainWithProactiveStubs({ candidates, runAgent } = {}) {
+        const appendChatMessage = sinon.stub().resolves();
+        const recordUsage = sinon.stub().resolves();
+        const findAnomalyCandidates = sinon.stub().resolves(candidates || []);
+        const isBudgetExceeded = sinon.stub().resolves(false);
+        const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
+            '@iobroker/adapter-core': { Adapter: class {} },
+            './lib/anomalyDetector': { findAnomalyCandidates },
+            './lib/catalog': { getAllCatalogEntries: sinon.stub().resolves([]), setCatalogEntry: sinon.stub(), markInactive: sinon.stub() },
+            './lib/usage': { isBudgetExceeded, recordUsage },
+            './lib/chatLog': { appendChatMessage, ensureChatHistoryState: sinon.stub(), getRecentChatHistory: sinon.stub() },
+            './lib/historyHealth': { consumeFailureReports: sinon.stub().resolves([]), ensureHealthState: sinon.stub() },
+            './lib/promptContext': { buildTimeAndLocationContext: sinon.stub().resolves('Zeitkontext\n') },
+            './lib/agent': { MAX_ITERATIONS: 3, runAgent: runAgent || sinon.stub().resolves({ finalText: 'Auffaelligkeit gefunden.', usage: {} }) },
+        });
+        return { TestAdapter, appendChatMessage, findAnomalyCandidates, recordUsage, runAgent };
+    }
+
+    function makeAdapter(TestAdapter) {
+        const adapter = Object.create(TestAdapter.prototype);
+        adapter.config = { silentIfNothingFound: false };
+        adapter.chatProviderOk = true;
+        adapter.tools = {};
+        adapter.log = { silly: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
+        adapter.updateCatalogSyncState = sinon.stub().resolves();
+        adapter.appendHistoryFailureReports = sinon.stub().resolves();
+        return adapter;
+    }
+
+    it('does not call the LLM when the statistical pre-analysis finds no candidates', async () => {
+        const runAgent = sinon.stub();
+        const loaded = loadMainWithProactiveStubs({ runAgent });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.include({ skipped: false, anomalyCandidates: 0 });
+        expect(runAgent.notCalled).to.equal(true);
+        expect(loaded.appendChatMessage.calledOnceWith(adapter, 'assistant', 'Keine Auffaelligkeiten.')).to.equal(true);
+        expect(adapter.appendHistoryFailureReports.calledOnce).to.equal(true);
+    });
+
+    it('passes statistical candidates to the LLM for explanation', async () => {
+        const runAgent = sinon.stub().resolves({ finalText: 'Die Leistung war ungewoehnlich hoch.', usage: { inputTokens: 5 } });
+        const candidates = [{ sourceId: 'sensor.0.power', reason: 'deviation', robustZ: 8 }];
+        const loaded = loadMainWithProactiveStubs({ candidates, runAgent });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.equal({ skipped: false });
+        expect(runAgent.calledOnce).to.equal(true);
+        expect(runAgent.firstCall.args[0].systemPrompt).to.include(JSON.stringify(candidates));
+        expect(loaded.recordUsage.calledOnceWith(adapter, { inputTokens: 5 }, 'chat')).to.equal(true);
+    });
+});

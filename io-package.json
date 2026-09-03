@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.22",
+    "version": "0.0.1-beta.23",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.23": {
+        "en": "Added hybrid statistical anomaly pre-analysis for gauge time series, filtering unremarkable objects before the proactive LLM check.",
+        "de": "Hybride statistische Anomalievoranalyse fuer Gauge-Zeitreihen ergaenzt, die unauffaellige Objekte vor der proaktiven LLM-Pruefung herausfiltert."
+      },
       "0.0.1-beta.22": {
         "en": "Added a prioritized product roadmap covering the market gap, user needs, open product gaps, and the recommended next development steps.",
         "de": "Priorisierte Produkt-Roadmap mit Marktluecke, Nutzerbedarf, offenen Produktluecken und empfohlenen naechsten Entwicklungsschritten ergaenzt."

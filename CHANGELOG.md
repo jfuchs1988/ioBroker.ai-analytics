@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.23] - 2026-09-03
+
+### Hinzugefügt
+- Hybride statistische Anomalievoranalyse für numerische Gauge-Zeitreihen: robuste Median/MAD-Abweichungen, Datenlücken-Kandidaten und ein LLM-Gate, das unauffällige Objekte ohne Modellaufruf überspringt.
+
 ## [0.0.1-beta.22] - 2026-09-03
 
 ### Dokumentation

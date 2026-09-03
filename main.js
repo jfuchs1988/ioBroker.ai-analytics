@@ -17,6 +17,7 @@ const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
 const { classifyDataQuality } = require('./lib/dataQualityClassifier');
+const { findAnomalyCandidates } = require('./lib/anomalyDetector');
 const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
@@ -414,6 +415,29 @@ class AiAnalytics extends utils.Adapter {
 
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
+        let anomalyCandidates = [];
+        try {
+            const catalogEntries = await getAllCatalogEntries(this);
+            anomalyCandidates = await findAnomalyCandidates(this, catalogEntries);
+        } catch (error) {
+            this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
+        }
+
+        if (anomalyCandidates.length === 0) {
+            await this.appendHistoryFailureReports();
+            const finalText = 'Keine Auffaelligkeiten.';
+            if (!silentIfNothingFound) await appendChatMessage(this, 'assistant', finalText);
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'done',
+                processed: MAX_ITERATIONS,
+                total: MAX_ITERATIONS,
+                message: 'Prüfung abgeschlossen: keine statistischen Auffälligkeiten.',
+                finishedAt: new Date().toISOString(),
+            });
+            return { skipped: false, anomalyCandidates: 0 };
+        }
+
         const timeAndLocation = await buildTimeAndLocationContext(this);
         let finalText;
         let usage;
@@ -428,9 +452,10 @@ class AiAnalytics extends utils.Adapter {
                     'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                     'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
-                    'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
-                    'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
-                    'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
+                     'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
+                     'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
+                     `Die statistische Voranalyse hat nur diese Kandidaten gefunden: ${JSON.stringify(anomalyCandidates)}. Erklaere die Auffaelligkeiten anhand dieser Belege und erfinde keine weiteren statistischen Kandidaten. ` +
+                     'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
                 userMessage: 'Fuehre die periodische Pruefung durch.',
                 onProgress: progress => this.updateCatalogSyncState({ phase: 'check', processed: progress.processed, total: progress.total, message: `Prüfung läuft ... ${Math.round((progress.processed / progress.total) * 100)}%` }),
             }));
