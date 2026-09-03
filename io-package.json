@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.25",
+    "version": "0.0.1-beta.26",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.26": {
+        "en": "Established the hybrid MIT core and separately documented sponsor-required AI components as preparation for future entitlement enforcement.",
+        "de": "Hybriden MIT-Kern und separat dokumentierte sponsor-pflichtige KI-Komponenten als Vorbereitung fuer die spaetere Entitlement-Pruefung eingefuehrt."
+      },
       "0.0.1-beta.25": {
         "en": "Added visible per-object progress updates during the statistical anomaly pre-analysis so manual proactive checks no longer appear stuck at 0 percent.",
         "de": "Sichtbare Fortschrittsupdates pro Objekt waehrend der statistischen Anomalievoranalyse ergaenzt, damit manuelle Pruefungen nicht mehr bei 0 Prozent festzustecken scheinen."

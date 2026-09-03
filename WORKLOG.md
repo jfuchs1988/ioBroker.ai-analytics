@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/evcc-hybrid-licensing`
+- Branch: `master`
 - Ziel: Hybrid-Lizenzmodell nach evcc mit vorbereiteten sponsor-required Komponenten.
-- Letzter sicherer Commit: `548638f docs: mark beta.25 release complete`.
-- Aktueller Stand: MIT-Kern und sponsor-required Abgrenzung dokumentiert; technische Entitlement-Prüfung noch offen.
-- Nächster Schritt: Lizenzmodell prüfen, testen und für den folgenden Entitlement-Task spezifizieren.
+- Letzter sicherer Commit: Merge von `feature/evcc-hybrid-licensing` nach `master`.
+- Aktueller Stand: MIT-Kern und sponsor-required Abgrenzung dokumentiert; technische Entitlement-Prüfung noch offen. Release-Vorbereitung für `0.0.1-beta.26` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch löschen und danach die Token-Regeln in der Entitlement-Spec festschreiben.
 
 ## TODO
 
