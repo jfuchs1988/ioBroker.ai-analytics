@@ -16,9 +16,11 @@ const adminCommands = require('./lib/adminCommands');
 const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
+const { classifyDataQuality } = require('./lib/dataQualityClassifier');
 const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
+const DATA_QUALITY_BACKFILL_BATCH_SIZE = 20;
 const CATALOG_SYNC_STATE = 'catalogSync';
 
 class AiAnalytics extends utils.Adapter {
@@ -276,6 +278,18 @@ class AiAnalytics extends utils.Adapter {
                 await this.backfillValueKinds(currentEntries);
             }
 
+            if (this.config.enableDataQualityBackfill) {
+                const currentEntriesForDataQuality = await getAllCatalogEntries(this);
+                await this.updateCatalogSyncState({
+                    phase: 'backfill',
+                    processed: 0,
+                    total: currentEntriesForDataQuality.length,
+                    currentSourceId: null,
+                    message: `Pruefe Datenqualitaet fuer ${currentEntriesForDataQuality.length} bestehende Datenpunkte...`,
+                });
+                await this.backfillDataQuality(currentEntriesForDataQuality);
+            }
+
             const result = { foundCount: discovered.length, newCount: classifiedCount, reactivatedCount, skipped: null };
             await this.updateCatalogSyncState({
                 running: false,
@@ -328,6 +342,38 @@ class AiAnalytics extends utils.Adapter {
                 total: pending.length,
                 currentSourceId: entry.sourceId,
                 message: `Pruefe Auspraegungen ${index + 1}/${pending.length}...`,
+            });
+        }
+
+        return { backfilledCount: pending.length };
+    }
+
+    async backfillDataQuality(entries) {
+        const pending = entries
+            .filter((entry) => entry.active !== false && !entry.ignored && (!entry.writePattern || entry.writePattern === 'unknown'))
+            .slice(0, DATA_QUALITY_BACKFILL_BATCH_SIZE);
+
+        for (let index = 0; index < pending.length; index++) {
+            const entry = pending[index];
+            try {
+                const sourceObj = await this.getForeignObjectAsync(entry.sourceId);
+                const obj = { id: entry.sourceId, common: (sourceObj && sourceObj.common) || {} };
+                const result = await classifyDataQuality(this, obj, entry.historyInstance);
+                await setCatalogEntry(this, { ...entry, ...result });
+                if (this.log && this.log.silly) {
+                    this.log.silly(`Datenqualitaets-Backfill: ${entry.sourceId} -> ${result.writePattern}/${result.updateFrequency}/${result.dataCompleteness}`);
+                }
+            } catch (error) {
+                if (this.log) {
+                    this.log.error(`Datenqualitaets-Backfill fuer ${entry.sourceId} fehlgeschlagen: ${error.message}`);
+                }
+            }
+
+            await this.updateCatalogSyncState({
+                phase: 'backfill',
+                processed: index + 1,
+                total: pending.length,
+                currentSourceId: entry.sourceId,
             });
         }
 
