@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `feature/entitlement-architecture-decisions`
 - Ziel: Beta-Ende, JWS-Tokenformat und Ausstellungs-Webanwendung als verbindliche Entitlement-Architektur festlegen.
-- Letzter sicherer Commit: `54fb7b4 docs: mark beta.27 release complete`.
-- Aktueller Stand: Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung sind dokumentiert; Grace-/Chat-Regeln präzisiert.
-- Nächster Schritt: Dokumentation prüfen, committen und als Planungsstand veröffentlichen.
+- Letzter sicherer Commit: `3095f0a docs: finalize entitlement architecture decisions`.
+- Aktueller Stand: Beta-Ende `0.1.0`, Ed25519-JWS und separate Webanwendung sind dokumentiert; Release-Vorbereitung für `0.0.1-beta.28` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.28` veröffentlichen.
 
 ## TODO
 

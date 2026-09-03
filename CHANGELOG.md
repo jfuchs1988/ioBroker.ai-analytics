@@ -9,6 +9,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.28] - 2026-09-03
+
+### Dokumentation
+- Entitlement-Architektur finalisiert: Beta-Ende bei `0.1.0`, Ed25519-signiertes JWS, separate Ausstellungs-Webanwendung, 35-Tage-Token, 30 Tage Sponsoring, 30 Tage Grace, keine Instanzbindung und eine Chat-Anfrage pro Tag nach Ablauf.
+
 ## [0.0.1-beta.27] - 2026-09-03
 
 ### Dokumentation

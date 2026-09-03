@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.27",
+    "version": "0.0.1-beta.28",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.28": {
+        "en": "Finalized entitlement architecture: beta ends at 0.1.0, Ed25519-signed JWS tokens are issued by a separate web application, with 35-day tokens, 30-day sponsorship, 30-day grace, no instance binding, and one chat request per day after expiry.",
+        "de": "Entitlement-Architektur finalisiert: Beta-Ende bei 0.1.0, Ed25519-signierte JWS-Tokens aus einer separaten Webanwendung, 35-Tage-Tokens, 30 Tage Sponsoring, 30 Tage Grace, keine Instanzbindung und eine Chat-Anfrage pro Tag nach Ablauf."
+      },
       "0.0.1-beta.27": {
         "en": "Specified sponsoring entitlement rules: 35-day tokens, 30-day sponsorship, 30-day grace period, no instance binding, offline verification, and one chat request per day after expiry.",
         "de": "Sponsoring-Entitlement-Regeln spezifiziert: 35-Tage-Tokens, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Pruefung und eine Chat-Anfrage pro Tag nach Ablauf."
