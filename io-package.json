@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.30",
+    "version": "0.0.1-beta.31",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,9 +34,14 @@
       "name": { "en": "AI Analytics", "de": "AI Analytics" }
     },
     "dependencies": [{ "js-controller": ">=5.0.0" }],
+    "globalDependencies": [{ "admin": ">=7.0.0" }],
     "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "news": {
+      "0.0.1-beta.31": {
+        "en": "Fixed publication consistency: synchronized the lockfile, added the required Admin global dependency, tightened entitlement claims, and reduced development files in the npm package.",
+        "de": "Veröffentlichungskonsistenz behoben: Lockfile synchronisiert, erforderliche Admin-Global-Dependency ergänzt, Entitlement-Claims gehärtet und Entwicklungsdateien aus dem npm-Paket entfernt."
+      },
       "0.0.1-beta.30": {
         "en": "Prepared repository publication with complete bilingual README documentation and a dedicated adapter icon.",
         "de": "Repository-Veröffentlichung mit vollständiger zweisprachiger README-Dokumentation und eigenem Adapter-Icon vorbereitet."

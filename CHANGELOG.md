@@ -1,13 +1,12 @@
 # Changelog
 
-## Unreleased
-
-- Lizenzmodell auf MIT-Kern mit separat dokumentierten sponsor-required
-  KI-Komponenten nach evcc-Vorbild umgestellt; technische Entitlement-Prüfung
-  folgt in einem eigenen Task.
-
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
+
+## [0.0.1-beta.31] - 2026-09-03
+
+### Behoben
+- Veröffentlichungs- und Paketkonsistenz verbessert: Lockfile synchronisiert, Admin-Global-Dependency ergänzt, JWS-Claims um Audience/Tokenversion erweitert und Entwicklungsdateien aus dem npm-Tarball ausgeschlossen.
 
 ## [0.0.1-beta.30] - 2026-09-03
 

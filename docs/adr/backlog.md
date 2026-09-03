@@ -26,7 +26,7 @@ Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt.
 
 ## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (evcc-Vorbild)
 
-Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist teilweise festgelegt: Webanwendung als Aussteller, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Tokenformat, konkrete Webanwendung, Trial-/Contributor-Entitlements und das Beta-Ende (Datum oder `0.1.0`).
+Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
 
 ## 5. CI-/Linting-/Dependency-Scanning-Stack (konkrete Tool-Wahl)
 
