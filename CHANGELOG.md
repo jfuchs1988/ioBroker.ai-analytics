@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.22] - 2026-09-03
+
+### Dokumentation
+- Globale, nach Nutzwert priorisierte Produkt-Roadmap mit Markt-/Bedarfsanalyse, Nutzerwünschen, offenen Produktlücken, Nicht-Zielen und empfohlenem nächsten Entwicklungsschritt ergänzt.
+
 ## [0.0.1-beta.21] - 2026-09-03
 
 ### Geändert

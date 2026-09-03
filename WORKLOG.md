@@ -7,8 +7,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Branch: `feature/docs-product-roadmap`
 - Ziel: Markt-/Bedarfsanalyse als globale, nach Nutzwert priorisierte Produkt-Roadmap und TODO-Liste dokumentieren.
 - Letzter sicherer Commit: `b411295 docs: mark beta.21 release complete`.
-- Aktueller Stand: Roadmap mit Positionierung, Nutzerbedarf, priorisierten Produktlücken, Nicht-Zielen und nächstem empfohlenem Task ergänzt.
-- Nächster Schritt: Roadmap prüfen, committen und in `master` integrieren.
+- Aktueller Stand: Roadmap mit Positionierung, Nutzerbedarf, priorisierten Produktlücken, Nicht-Zielen und nächstem empfohlenem Task ergänzt. Release-Vorbereitung für `0.0.1-beta.22` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.22` veröffentlichen.
 
 ## TODO
 
