@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/sponsoring-token-spec`
+- Branch: `master`
 - Ziel: Festgelegte Sponsoring-Token-Regeln in der bestehenden Entitlement-Spec und im Plan dokumentieren.
-- Letzter sicherer Commit: `0d6a317 docs: specify sponsoring entitlement rules`.
-- Aktueller Stand: Token-Regeln in Spec, Plan, ADR und Backlog dokumentiert; Release-Vorbereitung für `0.0.1-beta.27` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.27` veröffentlichen.
+- Letzter sicherer Commit: `9498606 merge: specify sponsoring entitlement rules`.
+- Aktueller Stand: Release `v0.0.1-beta.27` veröffentlicht; Token-Regeln in Spec, Plan, ADR und Backlog dokumentiert; Feature-Branch gelöscht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -42,6 +42,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Main-/Admin-Orchestrator-Tests ergänzt; 276 Unit-Tests, ESLint und Admin-Build erfolgreich.
 - Release `0.0.1-beta.20` erstellt, nach `master` gemergt, als `v0.0.1-beta.20` getaggt, gepusht und auf GitHub veröffentlicht.
 - GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
+- Hybrid-Lizenzgrundlage als MIT-Kern mit separat dokumentierten sponsor-pflichtigen KI-Komponenten veröffentlicht.
+- Sponsoring-Entitlement-Regeln dokumentiert: 35-Tage-Token, 30 Tage Sponsoring, 30 Tage Grace, keine Instanzbindung, Offline-Prüfung und eine Chat-Anfrage pro Tag.
+- Release `0.0.1-beta.27` erstellt, nach `master` gemergt, als `v0.0.1-beta.27` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
