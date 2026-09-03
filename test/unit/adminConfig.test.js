@@ -15,6 +15,11 @@ describe('admin configuration links and model discovery', () => {
         }
     });
 
+    it('provides the required size for the onboarding section header', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        expect(config.items.settingsTab.items.onboardingHeader.size).to.equal(3);
+    });
+
     it('links OpenRouter, OpenCode Zen, and GitHub Sponsors from the configuration', () => {
         const configText = fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8');
 

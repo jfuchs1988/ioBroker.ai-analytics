@@ -148,6 +148,7 @@
         "onboardingHeader": {
           "type": "header",
           "text": "Onboarding-Modell (optional, sonst wie oben)",
+          "size": 3,
           "newLine": true
         },
         "onboardingProviderType": {

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.23",
+    "version": "0.0.1-beta.24",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.24": {
+        "en": "Fixed invalid admin JSON configuration and kept the progress indicator polling while the manual proactive check runs in the background.",
+        "de": "Ungueltige Admin-JSON-Konfiguration behoben und die Fortschrittsanzeige bleibt waehrend der manuellen proaktiven Pruefung aktiv."
+      },
       "0.0.1-beta.23": {
         "en": "Added hybrid statistical anomaly pre-analysis for gauge time series, filtering unremarkable objects before the proactive LLM check.",
         "de": "Hybride statistische Anomalievoranalyse fuer Gauge-Zeitreihen ergaenzt, die unauffaellige Objekte vor der proaktiven LLM-Pruefung herausfiltert."

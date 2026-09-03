@@ -138,6 +138,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
     }
 
     async runCommand(command, runningText, successText) {
+        const backgroundCommand = command === 'runProactiveCheckNow';
         this.setState({ status: runningText });
         this.startProgressPolling();
         try {
@@ -147,7 +148,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         } catch (error) {
             this.setState({ status: `Fehler: ${error.message || error}` });
         } finally {
-            if (this.progressTimer) {
+            if (this.progressTimer && !backgroundCommand) {
                 clearInterval(this.progressTimer);
                 this.progressTimer = null;
             }
@@ -156,12 +157,18 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
 
     startProgressPolling() {
         if (this.progressTimer) clearInterval(this.progressTimer);
+        let observedRunning = false;
         const readProgress = async () => {
             try {
                 const state = await this.props.oContext.socket.getState(`ai-analytics.${this.props.oContext.instance}.catalogSync`);
                 if (!state || !state.val) return;
                 const progress = typeof state.val === 'string' ? JSON.parse(state.val) : state.val;
                 this.setState({ progress });
+                if (progress.running === true) observedRunning = true;
+                if (observedRunning && progress.running === false && this.progressTimer) {
+                    clearInterval(this.progressTimer);
+                    this.progressTimer = null;
+                }
             } catch (_error) {
                 // The command result remains usable when an older Admin does not expose getState here.
             }
