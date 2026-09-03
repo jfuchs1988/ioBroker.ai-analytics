@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.29",
+    "version": "0.0.1-beta.30",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -11,6 +11,9 @@
     "authors": ["Johannes Fuchs <johannes.fuchs@jfuchs.de>"],
     "keywords": ["ai", "analytics", "influxdb", "history"],
     "license": "MIT",
+    "icon": "ai-analytics.svg",
+    "extIcon": "https://raw.githubusercontent.com/jfuchs1988/ioBroker.ai-analytics/master/admin/ai-analytics.svg",
+    "readme": "https://github.com/jfuchs1988/ioBroker.ai-analytics/blob/master/README.md",
     "licenseInformation": {
       "type": "commercial",
       "license": "MIT; KI-Komponenten sponsor-pflichtig (siehe LICENSES/SPONSOR-REQUIRED.md)",
@@ -34,6 +37,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
     "news": {
+      "0.0.1-beta.30": {
+        "en": "Prepared repository publication with complete bilingual README documentation and a dedicated adapter icon.",
+        "de": "Repository-Veröffentlichung mit vollständiger zweisprachiger README-Dokumentation und eigenem Adapter-Icon vorbereitet."
+      },
       "0.0.1-beta.29": {
         "en": "Added dormant offline Ed25519-JWS entitlement verification, protected token configuration, license status states, and the one-chat-per-day fallback for future 0.1.0 enforcement.",
         "de": "Dormante Offline-Ed25519-JWS-Entitlement-Pruefung, geschuetzte Token-Konfiguration, Lizenzstatus-States und der Ein-Chat-pro-Tag-Fallback fuer die spaetere 0.1.0-Durchsetzung ergaenzt."

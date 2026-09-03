@@ -1,63 +1,127 @@
 # ioBroker.ai-analytics
 
-Ein ioBroker-Adapter, der zwei Fähigkeiten kombiniert:
+`ioBroker.ai-analytics` combines historical Smart Home analytics with a
+proactive AI check. It discovers ioBroker objects that are already recorded by
+History, InfluxDB, or SQL, builds a semantic catalog, answers questions about
+the recorded data, and explains unusual observations.
 
-1. **Chat-Q&A** — Fragen in natürlicher Sprache zu historischen Verbrauchs-/Nutzungsdaten (z. B. "Wie hat sich mein Stromverbrauch verändert und warum?"), beantwortet anhand der in InfluxDB/History/SQL geloggten Objekte.
-2. **Proaktive Prüfungen** — ein periodischer Hintergrundlauf lässt eine KI eigenständig auf Auffälligkeiten prüfen (Gerätenutzung, Beleuchtung, Verbrauch, PV-Einspeisung) und meldet Ergebnisse im Chat.
+## Features
 
-Nur Objekte mit aktivem History-/InfluxDB-/SQL-Logging werden berücksichtigt. Ein einmaliger (danach inkrementeller) Onboarding-Lauf klassifiziert jedes gefundene Objekt semantisch und fragt bei Unklarheit im Chat nach, statt zu raten.
+- Natural-language questions about historical consumption and device usage
+- Period comparisons for gauges, switches, daily counters, cumulative totals,
+  and event counts
+- Automatic discovery of objects with enabled history logging
+- Semantic onboarding with a review conversation instead of guessing
+- Proactive checks with a statistical anomaly pre-analysis before the LLM
+- Data-quality fields for writability, write pattern, update frequency, and
+  completeness
+- Device catalog management in the ioBroker Admin UI
+- CSV export/import for catalog maintenance
+- Anthropic, OpenAI, OpenRouter, and local OpenAI-compatible providers
+- Optional separate provider for onboarding
+- Daily token budget and usage history
+- Offline-capable sponsorship entitlement foundation; enforcement starts at
+  `0.1.0` according to the documented entitlement contract
 
-## Dokumentation
+## Requirements
 
-Zentraler Einstiegspunkt: **[docs/README.md](docs/README.md)**.
+- ioBroker with JavaScript controller 5 or newer
+- Node.js 18 or newer
+- At least one active `history`, `influxdb`, or `sql` logging adapter
+- An API key for a supported cloud provider, or a reachable local
+  OpenAI-compatible endpoint such as Ollama, LM Studio, or LocalAI
 
-- [Architekturdokumentation (arc42)](docs/architecture/arc42-index.md) — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Entscheidungen und offene Risiken.
-- [Architekturentscheidungen (ADRs)](docs/adr/adr-index.md) und [Backlog offener Entscheidungen](docs/adr/backlog.md).
-- [Design-Spec](docs/specs/2026-08-21-ai-analytics-design.md) — das ursprüngliche, mit dem Nutzer abgestimmte Design.
-- [Implementierungsplan](docs/plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde, inkl. "Known Gaps"-Abschnitt für offene Punkte.
-- [CONTRIBUTING.md](CONTRIBUTING.md) — unser Entwicklungsprozess (Branching, wann Spec/Plan/ADR nötig sind, TDD-Erwartung).
+The adapter only analyzes objects that are already enabled for history logging.
+It does not enable logging or change foreign ioBroker objects.
 
-## Status
+## Installation
 
-v0.0.1-beta.10 released. Alle 13 ursprünglichen Implementierungs-Tasks sind abgeschlossen und reviewt. Installation, Start, Discovery, Katalog und die reparierten Admin-Transportwege wurden auf einer echten ioBroker-Instanz geprüft. Siehe [Risiken und technische Schulden](docs/architecture/11-risiken-und-schulden.md) für verbleibende Lücken.
+When the adapter is available in the ioBroker repository, install it from the
+Admin adapter list and create an instance. During development, installation can
+also use a GitHub release archive or a local package:
 
-## Voraussetzungen
+```bash
+npm install
+npm run pack:release
+```
 
-- Node.js >= 18
-- Eine laufende ioBroker-Instanz mit mindestens einer aktiven `influxdb`-, `history`- oder `sql`-Adapterinstanz
-- Ein API-Key für mindestens einen unterstützten LLM-Provider (Anthropic, OpenAI, OpenRouter) — oder ein lokal erreichbarer OpenAI-kompatibler Server (z. B. LM Studio)
+The resulting archive can be installed with the ioBroker URL/file installer.
 
-## Entwicklung
+## Configuration
+
+Configure the adapter in the ioBroker Admin UI:
+
+- Chat/check provider, model, API key, and optional base URL
+- Optional independent onboarding provider
+- Proactive-check interval and silent/no-result behavior
+- Daily token budget and manually maintained token prices
+- Optional value-kind and data-quality backfills
+- Sponsorship entitlement token for the future stable release policy
+
+The token field is protected and encrypted by ioBroker. It is not included in
+the settings CSV export.
+
+## Providers and Privacy
+
+OpenRouter is a convenient entry point for currently free tool-capable models,
+but free availability, rate limits, and provider data policies can change.
+OpenCode Zen is linked as an alternative but is not automatically classified
+as permanently free. Local OpenAI-compatible endpoints avoid sending Smart
+Home data to a cloud provider.
+
+The adapter does not expose raw database query languages to the model. It uses
+curated tools and catalog metadata instead. Review the privacy and retention
+terms of any cloud provider before sending personal Smart Home data.
+
+## Supported History Sources
+
+The adapter uses the generic ioBroker History API and supports active logging
+from History, InfluxDB, and SQL adapters. The relevant device/data-source
+documentation is available at:
+
+- [ioBroker History adapter](https://github.com/ioBroker/ioBroker.history)
+- [ioBroker InfluxDB adapter](https://github.com/ioBroker/ioBroker.influxdb)
+- [ioBroker SQL adapter](https://github.com/ioBroker/ioBroker.sql)
+
+## Sponsoring and License
+
+The repository contains an MIT-licensed core and separately documented
+`sponsor-required` AI components. All `-beta` versions remain free. The
+technical entitlement policy starts with `0.1.0`: Ed25519-signed JWS tokens are
+issued by a separate sponsorship web application, have 35 days of technical
+validity, represent 30 days of sponsorship, and include a 30-day grace period.
+After the grace period, one chat request per local day remains available and
+proactive AI checks are disabled. Tokens are not instance-bound.
+
+Support the project through [GitHub Sponsors](https://github.com/sponsors/jfuchs1988).
+See [LICENSE](LICENSE), [sponsor-required terms](LICENSES/SPONSOR-REQUIRED.md),
+and the [entitlement architecture](docs/specs/2026-09-03-hybrid-license-and-entitlements.md).
+
+## Development
 
 ```bash
 npm install
 npm test
+npm run lint
+npm run build:admin
 ```
 
-`npm test` führt sowohl die Unit-Tests (`test/unit/**/*.test.js`) als auch den Adapter-Smoke-Test (`test/adapter.test.js`, über `@iobroker/testing`) aus.
+`npm test` runs the unit suite and the adapter test. The adapter test currently
+also documents a deprecated `@iobroker/testing` smoke-test behavior; the
+repository additionally contains proxyquire-based orchestrator and flow tests.
 
-## Konfiguration
+## Documentation
 
-Über die ioBroker-Admin-Oberfläche einstellbar: LLM-Provider und API-Key, Modell, Basis-URL (für OpenRouter/lokale Server), Intervall der proaktiven Prüfung, Verhalten bei ergebnislosem Prüflauf (still vs. Bestätigung). Die Modellfelder laden Vorschläge direkt beim Provider; eine Modell-ID kann weiterhin manuell eingetragen werden.
+- [Documentation index](docs/README.md)
+- [Product roadmap](docs/roadmap.md)
+- [Architecture](docs/architecture/arc42-index.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing guide](CONTRIBUTING.md)
 
-### Kostenlose API-Modelle
+## Status
 
-[OpenRouter](https://openrouter.ai/settings/keys) ist der empfohlene Einstieg. Bei ausgewähltem Provider `OpenRouter` lädt die Modell-Auswahl automatisch nur aktuell kostenlos ausgewiesene Modelle, die Tool-Calling unterstützen. Die Erkennung basiert auf dem Live-Modellkatalog von OpenRouter; Verfügbarkeit und Rate-Limits können sich jederzeit ändern. Ohne eigene Basis-URL verwendet der Adapter automatisch `https://openrouter.ai/api/v1`.
+Current development version: `0.0.1-beta.29`. The adapter is in beta and a
+manual acceptance test on a real ioBroker installation remains part of the
+release process.
 
-[OpenCode Zen](https://opencode.ai/auth) ist als Alternative in der Admin-Konfiguration verlinkt. Dort angebotene Gratis-Modelle sind laut Anbieter teilweise zeitlich begrenzt und im Modell-Endpunkt nicht zuverlässig als kostenlos gekennzeichnet. Außerdem gelten je Gratis-Modell unterschiedliche Regeln zur Speicherung oder Trainingsnutzung. Deshalb nimmt der Adapter Zen nicht in die automatische Gratis-Erkennung auf. Bei Nutzung mit einer benutzerdefinierten OpenAI-kompatiblen Basis-URL dürfen nur die von Zen für `/chat/completions` ausgewiesenen Modelle gewählt werden.
-
-Kostenlos bedeutet nicht unbegrenzt: Konten, Tageslimits und Datenschutzbedingungen werden vom jeweiligen Anbieter festgelegt. Private Smart-Home-Daten sollten nur an einen Anbieter gesendet werden, dessen Bedingungen der Betreiber geprüft und akzeptiert hat.
-
-### Eigenes Modell fürs Onboarding (optional)
-
-Die einmalige Klassifizierung neu gefundener Objekte kann einen komplett eigenen Provider nutzen — z. B. ein günstiges oder lokales Modell fürs Onboarding und ein starkes für Chat/Prüfung. Dafür gibt es vier zusätzliche, optionale Felder in derselben Form wie oben: `onboardingProviderType`, `onboardingApiKey`, `onboardingModel`, `onboardingBaseUrl`. Bleibt `onboardingProviderType` leer, wird die Chat-Konfiguration mitbenutzt; ist er gesetzt, gilt die Onboarding-Konfiguration vollständig eigenständig (kein feldweiser Rückfall auf die Chat-Werte). Hintergrund: [ADR-0021](docs/adr/0021-getrennte-provider-pro-zweck.md).
-
-Beim Adapterstart wird jeder der beiden Provider einmalig auf Erreichbarkeit geprüft. Das Ergebnis steht in den States `ai-analytics.<instanz>.info.chatProviderReachable` und `ai-analytics.<instanz>.info.onboardingProviderReachable`. Eine fehlgeschlagene Prüfung blockiert jeweils nur die betroffene Funktion (Klassifizierung bzw. Chat/proaktive Prüfung), nicht den gesamten Adapter.
-
-### Token-Kosten-Tab
-
-Der Budget-Bereich im Admin-Tab zeigt neben dem heutigen Verbrauch auch eine Verlaufs-Historie (Balkendiagramm, wählbar 30 Tage/gesamt), berechnete Kosten getrennt nach Chat/Prüfung und Onboarding sowie eine heuristische Tages-/Stunden-Limit-Empfehlung. Die Preise pro 1 Mio. Input-/Output-Tokens werden manuell in der Admin-Config gepflegt (vier zusätzliche Felder, Default 0 — z. B. für lokale, kostenlose Modelle). Hintergrund: [ADR-0022](docs/adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md).
-
-## Projekt unterstützen
-
-Das Projekt kann über [GitHub Sponsors](https://github.com/sponsors/jfuchs1988) unterstützt werden. Der Link ist auch dauerhaft im AI-Analytics-Tab und in der Adapter-Konfiguration sichtbar. GitHub zeigt zusätzlich einen Sponsor-Button im Repository, sobald das Sponsors-Profil für `jfuchs1988` freigeschaltet ist.
+German documentation: [README.de.md](README.de.md).
