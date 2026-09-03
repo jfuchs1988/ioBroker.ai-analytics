@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/anomaly-progress-feedback`
+- Branch: `master`
 - Ziel: Fortschrittsstillstand während der statistischen Anomalievoranalyse beheben.
-- Letzter sicherer Commit: `1d65438 docs: mark beta.24 release complete`.
-- Aktueller Stand: Progress-Callback pro geprüftem Katalogobjekt ergänzt; 291 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.25` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.25` veröffentlichen.
+- Letzter sicherer Commit: Merge von `fix/anomaly-progress-feedback` nach `master`.
+- Aktueller Stand: Progress-Callback pro geprüftem Katalogobjekt integriert; Release-Vorbereitung für `0.0.1-beta.25` abgeschlossen.
+- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.25` erstellen und Branch löschen.
 
 ## TODO
 
