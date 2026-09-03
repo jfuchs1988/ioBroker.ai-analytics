@@ -1,6 +1,6 @@
 {
   "name": "iobroker.ai-analytics",
-  "version": "0.0.1-beta.20",
+  "version": "0.0.1-beta.21",
   "description": "KI-gestuetzte Analyse und proaktive Pruefungen fuer historisierte ioBroker-Objekte",
   "main": "main.js",
   "engines": {

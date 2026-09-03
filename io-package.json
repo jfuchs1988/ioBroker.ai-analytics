@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.20",
+    "version": "0.0.1-beta.21",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.21": {
+        "en": "Added an isolated fake-adapter flow test covering discovery, real onboarding, syncCatalog, and catalog state persistence.",
+        "de": "Isolierten Fake-Adapter-Durchflusstest fuer Discovery, echtes Onboarding, syncCatalog und Katalog-State-Persistenz ergaenzt."
+      },
       "0.0.1-beta.20": {
         "en": "Added proxyquire/Sinon coverage for main adapter orchestration, admin dispatch, state-bridge wiring, unload handling, and data-quality backfills.",
         "de": "Proxyquire-/Sinon-Tests fuer zentrale main.js-Orchestratorpfade, Admin-Dispatcher, State-Bridge, Unload und Datenqualitaets-Backfills ergaenzt."

@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.21] - 2026-09-03
+
+### Geändert
+- Ein isolierter Fake-Adapter-Durchflusstest führt Discovery, echtes Onboarding und Katalog-State-Persistenz über `syncCatalog()` zusammen.
+- Die Testdokumentation unterscheidet jetzt klar zwischen dem neuen isolierten Durchflusstest und einem noch offenen echten ioBroker-End-to-End-Test.
+
 ## [0.0.1-beta.20] - 2026-09-03
 
 ### Geändert

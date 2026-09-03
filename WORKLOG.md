@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Proxyquire-basierte Testabdeckung für `main.js`-Lifecycle/Dispatcher und Admin-Kommandos ergänzen.
-- Letzter sicherer Commit: `a51727f docs: record beta.20 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.20` veröffentlicht; Feature-Branch gelöscht; GitHub Actions CI erfolgreich.
-- Nächster Schritt: keiner.
+- Branch: `feature/test-sync-catalog-flow`
+- Ziel: Durchgängigen Proxyquire-Test für `runOnboarding` → `syncCatalog` → persistierten Katalog ergänzen.
+- Letzter sicherer Commit: `0235eae docs: mark beta.20 release complete`.
+- Aktueller Stand: Durchgängiger Test für Discovery, echtes Onboarding, Katalog-State-Persistenz und Sync-Ergebnis ergänzt; 277 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.21` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.21` veröffentlichen.
 
 ## TODO
 
