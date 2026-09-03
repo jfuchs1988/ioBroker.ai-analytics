@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/publication-readiness`
+- Branch: `master`
 - Ziel: Veröffentlichungsanforderungen ohne npm-Publishing vorbereiten.
-- Letzter sicherer Commit: `594b54a docs: mark beta.29 release complete`.
-- Aktueller Stand: Zweisprachige README, Icon und GitHub-Topics ergänzt; 297 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.30` läuft.
-- Nächster Schritt: Veröffentlichungsstand committen, Branch nach `master` integrieren und `v0.0.1-beta.30` veröffentlichen.
+- Letzter sicherer Commit: `c033034 merge: prepare adapter repository publication`.
+- Aktueller Stand: Release `v0.0.1-beta.30` veröffentlicht; zweisprachige README, Icon und GitHub-Topics ergänzt; npm-Publishing bewusst offen.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -49,6 +49,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.28` erstellt, nach `master` gemergt, als `v0.0.1-beta.28` getaggt, gepusht und auf GitHub veröffentlicht.
 - Offline prüfbare Ed25519-JWS-Entitlement-Grundlage mit Beta-Guard, Lizenzstatus-States und täglichem Chat-Fallback integriert.
 - Release `0.0.1-beta.29` erstellt, nach `master` gemergt, als `v0.0.1-beta.29` getaggt, gepusht und auf GitHub veröffentlicht.
+- Veröffentlichungsanforderungen ohne npm-Publishing vorbereitet: README EN/DE, Icon, Metadaten und GitHub-Topics.
+- Release `0.0.1-beta.30` erstellt, nach `master` gemergt, als `v0.0.1-beta.30` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
