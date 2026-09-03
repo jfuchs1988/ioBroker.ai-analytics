@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Offline-Entitlement-Prüfung und geschützte Token-Konfiguration als Vorbereitung für `0.1.0` implementieren.
-- Letzter sicherer Commit: Merge von `feature/sponsoring-token-enforcement` nach `master`.
-- Aktueller Stand: `lib/license.js`, Beta-Guard, Lizenzstatus-States, geschütztes Tokenfeld und täglicher Chat-Fallback integriert; Release-Vorbereitung für `0.0.1-beta.29` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.29` erstellen und Branch löschen.
+- Letzter sicherer Commit: `e700163 docs: record beta.29 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.29` veröffentlicht; offline prüfbare Entitlement-Grundlage integriert; Feature-Branch gelöscht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -47,6 +47,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.27` erstellt, nach `master` gemergt, als `v0.0.1-beta.27` getaggt, gepusht und auf GitHub veröffentlicht.
 - Beta-Ende `0.1.0`, Ed25519-JWS, separate Token-Webanwendung und die finalen Grace-/Chat-Regeln festgelegt.
 - Release `0.0.1-beta.28` erstellt, nach `master` gemergt, als `v0.0.1-beta.28` getaggt, gepusht und auf GitHub veröffentlicht.
+- Offline prüfbare Ed25519-JWS-Entitlement-Grundlage mit Beta-Guard, Lizenzstatus-States und täglichem Chat-Fallback integriert.
+- Release `0.0.1-beta.29` erstellt, nach `master` gemergt, als `v0.0.1-beta.29` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
