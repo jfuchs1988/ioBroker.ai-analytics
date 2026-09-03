@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Markt-/Bedarfsanalyse als globale, nach Nutzwert priorisierte Produkt-Roadmap und TODO-Liste dokumentieren.
-- Letzter sicherer Commit: Merge von `feature/docs-product-roadmap` nach `master`.
-- Aktueller Stand: Globale priorisierte Produkt-Roadmap integriert; Release-Vorbereitung für `0.0.1-beta.22` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.22` erstellen und Branch löschen.
+- Letzter sicherer Commit: `6692484 docs: record beta.22 release handoff`.
+- Aktueller Stand: Globale priorisierte Produkt-Roadmap integriert; Release `v0.0.1-beta.22` veröffentlicht; Feature-Branch gelöscht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -22,6 +22,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - History-Health-Status mit Meldung nach drei Fehlern, Retries nach 12/24/48 Stunden und Reset nach Erfolg implementiert; 241 Unit-Tests erfolgreich.
 - Release `0.0.1-beta.18` erstellt, nach `master` gemergt, als `v0.0.1-beta.18` getaggt, gepusht und auf GitHub veröffentlicht.
 - GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
+- Globale Produkt-Roadmap mit priorisierten Findings und empfohlenem nächsten Entwicklungsschritt dokumentiert.
+- Release `0.0.1-beta.22` erstellt, nach `master` gemergt, als `v0.0.1-beta.22` getaggt, gepusht und auf GitHub veröffentlicht.
 - Durchflusstest für Discovery → Onboarding → Katalog-State-Persistenz ergänzt.
 - Release `0.0.1-beta.21` erstellt, nach `master` gemergt, als `v0.0.1-beta.21` getaggt, gepusht und auf GitHub veröffentlicht.
 - GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
