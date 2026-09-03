@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Ungültige Admin-JSON-Konfiguration und die bei 0% hängenbleibende Prüf-Fortschrittsanzeige korrigieren.
-- Letzter sicherer Commit: `11ea4a1 docs: record beta.24 release handoff`.
-- Aktueller Stand: Release `v0.0.1-beta.24` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
-- Nächster Schritt: keiner.
+- Branch: `fix/anomaly-progress-feedback`
+- Ziel: Fortschrittsstillstand während der statistischen Anomalievoranalyse beheben.
+- Letzter sicherer Commit: `1d65438 docs: mark beta.24 release complete`.
+- Aktueller Stand: Progress-Callback pro geprüftem Katalogobjekt ergänzt; 291 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.25` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.25` veröffentlichen.
 
 ## TODO
 

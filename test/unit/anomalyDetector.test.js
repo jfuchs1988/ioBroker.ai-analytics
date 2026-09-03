@@ -126,4 +126,16 @@ describe('findAnomalyCandidates', () => {
         expect(getHistory.calledTwice).to.equal(true);
         expect(warn.calledOnce).to.equal(true);
     });
+
+    it('reports progress before and after each eligible history sample', async () => {
+        const getHistory = sinon.stub().resolves([{ val: 100 }, { val: 100 }, { val: 100 }]);
+        const onProgress = sinon.stub().resolves();
+        const { findAnomalyCandidates } = loadDetectorWithHistory(getHistory);
+
+        await findAnomalyCandidates({}, [{ sourceId: 'sensor.0.power', historyInstance: 'history.0', valueKind: 'gauge' }], 100000, onProgress);
+
+        expect(onProgress.callCount).to.equal(2);
+        expect(onProgress.firstCall.args[0]).to.include({ processed: 0, total: 1, currentSourceId: 'sensor.0.power' });
+        expect(onProgress.secondCall.args[0]).to.include({ processed: 1, total: 1, currentSourceId: 'sensor.0.power' });
+    });
 });

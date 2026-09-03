@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.25] - 2026-09-03
+
+### Behoben
+- Die statistische Anomalievoranalyse schreibt jetzt pro geprüftem Gauge-Objekt Fortschritt und aktuelle Objekt-ID in den `catalogSync`-State; dadurch bleibt die manuelle Prüfungsanzeige auch während langer History-Läufe sichtbar in Bewegung.
+
 ## [0.0.1-beta.24] - 2026-09-03
 
 ### Behoben

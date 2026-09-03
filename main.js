@@ -17,7 +17,7 @@ const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
 const { classifyDataQuality } = require('./lib/dataQualityClassifier');
-const { findAnomalyCandidates } = require('./lib/anomalyDetector');
+const { findAnomalyCandidates, isEligibleCatalogEntry } = require('./lib/anomalyDetector');
 const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
@@ -418,7 +418,23 @@ class AiAnalytics extends utils.Adapter {
         let anomalyCandidates = [];
         try {
             const catalogEntries = await getAllCatalogEntries(this);
-            anomalyCandidates = await findAnomalyCandidates(this, catalogEntries);
+            const eligibleCount = catalogEntries.filter(isEligibleCatalogEntry).length;
+            await this.updateCatalogSyncState({
+                phase: 'check',
+                processed: 0,
+                total: eligibleCount,
+                currentSourceId: null,
+                message: `Statistische Voranalyse läuft ... 0/${eligibleCount}`,
+            });
+            anomalyCandidates = await findAnomalyCandidates(this, catalogEntries, Date.now(), progress =>
+                this.updateCatalogSyncState({
+                    phase: 'check',
+                    processed: progress.processed,
+                    total: progress.total,
+                    currentSourceId: progress.currentSourceId,
+                    message: progress.message,
+                })
+            );
         } catch (error) {
             this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
         }

@@ -304,10 +304,11 @@ describe('AiAnalytics proactive anomaly gate', () => {
         const appendChatMessage = sinon.stub().resolves();
         const recordUsage = sinon.stub().resolves();
         const findAnomalyCandidates = sinon.stub().resolves(candidates || []);
+        const isEligibleCatalogEntry = sinon.stub().returns(true);
         const isBudgetExceeded = sinon.stub().resolves(false);
         const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
             '@iobroker/adapter-core': { Adapter: class {} },
-            './lib/anomalyDetector': { findAnomalyCandidates },
+            './lib/anomalyDetector': { findAnomalyCandidates, isEligibleCatalogEntry },
             './lib/catalog': { getAllCatalogEntries: sinon.stub().resolves([]), setCatalogEntry: sinon.stub(), markInactive: sinon.stub() },
             './lib/usage': { isBudgetExceeded, recordUsage },
             './lib/chatLog': { appendChatMessage, ensureChatHistoryState: sinon.stub(), getRecentChatHistory: sinon.stub() },
