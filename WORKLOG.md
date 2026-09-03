@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Fortschrittsstillstand während der statistischen Anomalievoranalyse beheben.
-- Letzter sicherer Commit: Merge von `fix/anomaly-progress-feedback` nach `master`.
-- Aktueller Stand: Progress-Callback pro geprüftem Katalogobjekt integriert; Release-Vorbereitung für `0.0.1-beta.25` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.25` erstellen und Branch löschen.
+- Letzter sicherer Commit: `a0cb2ac docs: record beta.25 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.25` veröffentlicht; Feature-Branch gelöscht; lokale Verifikation erfolgreich.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -27,6 +27,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.23` erstellt, nach `master` gemergt, als `v0.0.1-beta.23` getaggt, gepusht und auf GitHub veröffentlicht.
 - Admin-JSON- und Prüf-Fortschrittsanzeige-Fix integriert.
 - Release `0.0.1-beta.24` erstellt, nach `master` gemergt, als `v0.0.1-beta.24` getaggt, gepusht und auf GitHub veröffentlicht.
+- Fortschritts-Callback für die statistische Anomalievoranalyse ergänzt.
+- Release `0.0.1-beta.25` erstellt, nach `master` gemergt, als `v0.0.1-beta.25` getaggt, gepusht und auf GitHub veröffentlicht.
 - Release `0.0.1-beta.22` erstellt, nach `master` gemergt, als `v0.0.1-beta.22` getaggt, gepusht und auf GitHub veröffentlicht.
 - Durchflusstest für Discovery → Onboarding → Katalog-State-Persistenz ergänzt.
 - Release `0.0.1-beta.21` erstellt, nach `master` gemergt, als `v0.0.1-beta.21` getaggt, gepusht und auf GitHub veröffentlicht.
