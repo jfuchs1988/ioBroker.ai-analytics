@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Lizenzmodell auf MIT-Kern mit separat dokumentierten sponsor-required
+  KI-Komponenten nach evcc-Vorbild umgestellt; technische Entitlement-Prüfung
+  folgt in einem eigenen Task.
+
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
