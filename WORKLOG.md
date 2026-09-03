@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/hybride-anomalieerkennung`
+- Branch: `master`
 - Ziel: Statistische Kandidatenstufe vor der proaktiven LLM-Prüfung implementieren.
-- Letzter sicherer Commit: `11ed349 docs: mark beta.22 release complete`.
-- Aktueller Stand: Phase 1 der hybriden Anomalieerkennung implementiert; 289 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.23` läuft.
-- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.23` veröffentlichen.
+- Letzter sicherer Commit: Merge von `feature/hybride-anomalieerkennung` nach `master`.
+- Aktueller Stand: Phase 1 der hybriden Anomalieerkennung integriert; Release-Vorbereitung für `0.0.1-beta.23` abgeschlossen.
+- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.23` erstellen und Branch löschen.
 
 ## TODO
 
