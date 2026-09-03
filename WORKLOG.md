@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Durchgängigen Proxyquire-Test für `runOnboarding` → `syncCatalog` → persistierten Katalog ergänzen.
-- Letzter sicherer Commit: Merge von `feature/test-sync-catalog-flow` nach `master`.
-- Aktueller Stand: Durchgängiger Test für Discovery, echtes Onboarding, Katalog-State-Persistenz und Sync-Ergebnis integriert; Release-Vorbereitung für `0.0.1-beta.21` abgeschlossen.
-- Nächster Schritt: `master` pushen, Release `v0.0.1-beta.21` erstellen und Branch löschen.
+- Letzter sicherer Commit: `d94b6d8 docs: record beta.21 release handoff`.
+- Aktueller Stand: Release `v0.0.1-beta.21` veröffentlicht; Feature-Branch gelöscht; lokale und GitHub-Verifikation erfolgreich.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -23,6 +23,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.18` erstellt, nach `master` gemergt, als `v0.0.1-beta.18` getaggt, gepusht und auf GitHub veröffentlicht.
 - GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
 - Durchflusstest für Discovery → Onboarding → Katalog-State-Persistenz ergänzt.
+- Release `0.0.1-beta.21` erstellt, nach `master` gemergt, als `v0.0.1-beta.21` getaggt, gepusht und auf GitHub veröffentlicht.
+- GitHub Actions CI für `master` erfolgreich: Linting, Tests, Admin-Build und Dependency-Audit.
 - Prozessregeln auf Branch, Zwischen-Commits, Push, Merge nach `master` und GitHub-Release ausgerichtet.
 - `master` als tatsächlichen Integrationsbranch dokumentiert; ältere `develop`-Regeln bleiben historische ADRs.
 - `npm test` erfolgreich: 229 Unit-Tests und 1 Adaptertest.
