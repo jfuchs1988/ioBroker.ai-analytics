@@ -349,6 +349,38 @@ describe('buildTools', () => {
         expect(getHistory.calledOnceWith({}, 'influxdb.0', 'meter.0.daily', 0, 10, 'minmax')).to.equal(true);
     });
 
+    it('includes data-quality fields in getPeriodTotal results, with unknown fallback', async () => {
+        const getHistory = sinon.stub().resolves([{ ts: 1, val: 5 }, { ts: 2, val: 12 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{
+                sourceId: 'meter.0.daily',
+                historyInstance: 'influxdb.0',
+                valueKind: 'daily_reset_counter',
+                writePattern: 'continuous',
+                updateFrequency: 'minutes',
+                dataCompleteness: 'complete',
+            }]),
+            getHistory,
+        });
+        const result = await buildTools({}).execute('getPeriodTotal', { sourceId: 'meter.0.daily', periods: [{ start: 0, end: 10 }] });
+        expect(result).to.deep.include({ writePattern: 'continuous', updateFrequency: 'minutes', dataCompleteness: 'complete' });
+    });
+
+    it('falls back to unknown data-quality fields in comparePeriods when the entry has none', async () => {
+        const getHistory = sinon.stub();
+        getHistory.onFirstCall().resolves([{ ts: 1, val: 40 }]);
+        getHistory.onSecondCall().resolves([{ ts: 1, val: 50 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'meter.0.daily', historyInstance: 'history.0', valueKind: 'daily_reset_counter' }]),
+            getHistory,
+        });
+        const result = await buildTools({}).execute('comparePeriods', {
+            sourceId: 'meter.0.daily',
+            periods: [{ start: 0, end: 10 }, { start: 10, end: 20 }],
+        });
+        expect(result).to.deep.include({ writePattern: 'unknown', updateFrequency: 'unknown', dataCompleteness: 'unknown' });
+    });
+
     it('calculates on-duration and switch count for boolean states', async () => {
         const getHistory = sinon.stub().resolves([{ ts: 100, val: true }, { ts: 400, val: false }, { ts: 700, val: true }]);
         const { buildTools } = loadToolsWithStubs({

@@ -429,6 +429,7 @@ class AiAnalytics extends utils.Adapter {
                     'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
                     'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
+                    'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
                     'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
                 userMessage: 'Fuehre die periodische Pruefung durch.',
                 onProgress: progress => this.updateCatalogSyncState({ phase: 'check', processed: progress.processed, total: progress.total, message: `Prüfung läuft ... ${Math.round((progress.processed / progress.total) * 100)}%` }),
@@ -486,6 +487,7 @@ class AiAnalytics extends utils.Adapter {
                 'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                 'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
                  'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
+                 'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
                  'Falls der Nutzer nach seinem Standort oder der aktuellen Uhrzeit/Zeitzone fragt, nutze die oben genannten Angaben. ' +
                  'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
                  'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry. ' +
