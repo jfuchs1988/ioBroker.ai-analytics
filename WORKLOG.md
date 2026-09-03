@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `master`
 - Ziel: Repository-Checker-Befunde und Veröffentlichungs-/Tokenvertragskonsistenz beheben.
-- Letzter sicherer Commit: `5663979 fix: resolve adapter checker findings`.
-- Aktueller Stand: Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt; 297 Unit-Tests, ESLint, Admin-Build und Pack-Prüfung grün. Release-Vorbereitung für `0.0.1-beta.32` läuft.
-- Nächster Schritt: Release `v0.0.1-beta.32` taggen und veröffentlichen.
+- Letzter sicherer Commit: `4e7f2cd docs: record beta.32 checker fixes`.
+- Aktueller Stand: Release `v0.0.1-beta.32` veröffentlicht; Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -53,6 +53,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.30` erstellt, nach `master` gemergt, als `v0.0.1-beta.30` getaggt, gepusht und auf GitHub veröffentlicht.
 - Systemreview-Fixes für Veröffentlichung und Entitlement-Vertrag integriert.
 - Release `0.0.1-beta.31` erstellt, nach `master` gemergt, als `v0.0.1-beta.31` getaggt, gepusht und auf GitHub veröffentlicht.
+- Repository-Checker-Fixes für Metadaten, Lizenz, News, Dependencies und Paketinhalt integriert.
+- Release `0.0.1-beta.32` erstellt, nach `master` gemergt, als `v0.0.1-beta.32` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
