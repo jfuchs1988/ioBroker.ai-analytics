@@ -6,9 +6,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 - Branch: `feature/test-main-admin-coverage`
 - Ziel: Proxyquire-basierte Testabdeckung für `main.js`-Lifecycle/Dispatcher und Admin-Kommandos ergänzen.
-- Letzter sicherer Commit: `74651b7 docs: mark beta.19 release complete`.
-- Aktueller Stand: Proxyquire-/Sinon-Tests für Dispatch, Callback-/Fehlerpfade, Bridge-Verdrahtung, Unload und Datenqualitäts-Backfills ergänzt; 276 Unit-Tests, ESLint und Admin-Build grün.
-- Nächster Schritt: Worklog aktualisieren, Commit erstellen und Branch für Review/Integration veröffentlichen.
+- Letzter sicherer Commit: `7543d37 test: cover main adapter orchestration paths`.
+- Aktueller Stand: Proxyquire-/Sinon-Tests für Dispatch, Callback-/Fehlerpfade, Bridge-Verdrahtung, Unload und Datenqualitäts-Backfills ergänzt; 276 Unit-Tests, ESLint und Admin-Build grün. Release-Vorbereitung für `0.0.1-beta.20` läuft.
+- Nächster Schritt: Release-Vorbereitung committen, Branch nach `master` integrieren und `v0.0.1-beta.20` veröffentlichen.
 
 ## TODO
 

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.19",
+    "version": "0.0.1-beta.20",
     "title": "AI Analytics",
     "titleLang": { "en": "AI Analytics", "de": "AI Analytics" },
     "desc": {
@@ -34,6 +34,10 @@
     "encryptedNative": ["apiKey", "onboardingApiKey"],
     "protectedNative": ["apiKey", "onboardingApiKey"],
     "news": {
+      "0.0.1-beta.20": {
+        "en": "Added proxyquire/Sinon coverage for main adapter orchestration, admin dispatch, state-bridge wiring, unload handling, and data-quality backfills.",
+        "de": "Proxyquire-/Sinon-Tests fuer zentrale main.js-Orchestratorpfade, Admin-Dispatcher, State-Bridge, Unload und Datenqualitaets-Backfills ergaenzt."
+      },
       "0.0.1-beta.18": {
         "en": "Added chat-based user-confirmed device catalog updates, safe onboarding defaults, persistent History health retries after repeated failures, and CI checks for tests, linting, builds, and dependencies.",
         "de": "Chat-basierte, nutzerbestätigte Gerätepflege, sichere Onboarding-Defaults, persistente History-Retries nach wiederholten Fehlern sowie CI-Prüfungen für Tests, Linting, Builds und Abhängigkeiten ergänzt."
