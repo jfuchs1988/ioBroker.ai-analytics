@@ -223,6 +223,91 @@ describe('runOnboarding', () => {
         expect(result.needsReview[0].needsReview).to.equal(true);
     });
 
+    it('defaults PV and heat-pump objects to Keller without requesting review', async () => {
+        const discovered = [
+            { id: 'sun2000.0.meter.activePower', historyInstance: 'history.0', common: { name: 'Active power', unit: 'W' } },
+            { id: 'viessmannapi.0.1.0.features.heating.sensors.temperature.value', historyInstance: 'history.0', common: { name: 'Temperature', unit: '°C' } },
+        ];
+        const provider = {
+            chat: sinon.stub().callsFake(({ messages }) => {
+                const sourceId = [...messages[0].content.matchAll(/"sourceId": "([^"]+)"/g)].pop()[1];
+                return Promise.resolve({
+                    content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'consumption', room: '', confidence: 'low' }]),
+                });
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding({}, provider, discovered);
+
+        expect(result.needsReview).to.deep.equal([]);
+        expect(setCatalogEntry.callCount).to.equal(2);
+        for (const call of setCatalogEntry.getCalls()) {
+            expect(call.args[1]).to.include({ room: 'Keller', needsReview: false, confidence: 'low', classificationSource: 'default' });
+        }
+    });
+
+    it('uses neutral defaults for unknown Shelly and Homematic actuators', async () => {
+        const discovered = [
+            { id: 'shelly.0.shellyplus2pm#abc#1.Relay1.Power', historyInstance: 'history.0', common: { name: 'Power', unit: 'W' } },
+            { id: 'hm-rpc.0.000A1D89A5C234.1.LEVEL', historyInstance: 'history.0', common: { name: 'LEVEL' } },
+        ];
+        const provider = {
+            chat: sinon.stub().callsFake(({ messages }) => {
+                const sourceId = [...messages[0].content.matchAll(/"sourceId": "([^"]+)"/g)].pop()[1];
+                return Promise.resolve({
+                    content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'environment', room: '', confidence: 'low' }]),
+                });
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding({}, provider, discovered);
+        const stored = setCatalogEntry.getCalls().map((call) => call.args[1]);
+
+        expect(result.needsReview).to.deep.equal([]);
+        expect(stored[0]).to.include({ description: 'Shelly Relay 1 aktuelle Leistung', category: 'device_usage', needsReview: false, classificationSource: 'default' });
+        expect(stored[1]).to.include({ description: 'Homematic-Aktor 000A1D89A5C234 Stellwert', category: 'device_usage', needsReview: false, classificationSource: 'default' });
+    });
+
+    it('uses a UniFi client hostname from the object tree for presence detection', async () => {
+        const sourceId = 'unifi.0.default.clients.6c:ac:c2:b8:18:f3.is_online';
+        const discovered = [{ id: sourceId, historyInstance: 'history.0', common: { name: 'is_online' } }];
+        const adapter = {
+            getForeignObjectsAsync: sinon.stub().resolves({}),
+            getForeignObjectAsync: sinon.stub().resolves({ common: { name: 'Johannes Handy' }, native: { hostname: 'pixel-johannes' } }),
+        };
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'environment', room: '', confidence: 'low' }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(result.needsReview).to.deep.equal([]);
+        expect(adapter.getForeignObjectAsync.calledWith('unifi.0.default.clients.6c:ac:c2:b8:18:f3')).to.equal(true);
+        expect(setCatalogEntry.firstCall.args[1]).to.include({
+            description: 'Anwesenheit pixel-johannes',
+            category: 'device_usage',
+            needsReview: false,
+            classificationSource: 'default',
+        });
+    });
+
     it('continues after batch processing fails', async () => {
         const discovered = [
             { id: 'javascript.0.bad', historyInstance: 'history.0', common: { name: 'BadObject' } },

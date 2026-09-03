@@ -16,6 +16,7 @@ const adminCommands = require('./lib/adminCommands');
 const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
+const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
 const CATALOG_SYNC_STATE = 'catalogSync';
@@ -92,6 +93,7 @@ class AiAnalytics extends utils.Adapter {
     async onReady() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
+        await ensureHealthState(this);
         await ensureReachabilityStates(this);
         await this.ensureCatalogSyncState();
         await adminBridge.ensureBridgeState(this);
@@ -332,6 +334,19 @@ class AiAnalytics extends utils.Adapter {
         return { backfilledCount: pending.length };
     }
 
+    async appendHistoryFailureReports() {
+        const reports = await consumeFailureReports(this);
+        for (const report of reports) {
+            await appendChatMessage(
+                this,
+                'assistant',
+                `Die History-Instanz ${report.historyInstance} ist nach drei Fehlern voruebergehend pausiert. ` +
+                    'Weitere Versuche erfolgen nach 12, 24 und 48 Stunden. ' +
+                    `Letzter Fehler: ${report.error || 'unbekannter Fehler'}`
+            );
+        }
+    }
+
     /**
      * @returns {Promise<{skipped: boolean, reason?: string}>} `skipped: true` wenn der Lauf gar nicht stattfand
      */
@@ -383,10 +398,12 @@ class AiAnalytics extends utils.Adapter {
         this.log.silly(`Proaktive Pruefung: Lauf beendet, Ergebnis: ${isNothingFound ? 'keine Auffaelligkeiten' : 'Auffaelligkeit gefunden'}`);
 
         if (isNothingFound && silentIfNothingFound) {
+            await this.appendHistoryFailureReports();
             await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
             return { skipped: false };
         }
 
+        await this.appendHistoryFailureReports();
         await appendChatMessage(this, 'assistant', finalText);
         await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
         return { skipped: false };
@@ -422,15 +439,19 @@ class AiAnalytics extends utils.Adapter {
                 'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                 'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                 'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
-                'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
-                'Falls der Nutzer nach seinem Standort oder der aktuellen Uhrzeit/Zeitzone fragt, nutze die oben genannten Angaben. ' +
-                'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
-                'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry.',
+                 'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
+                 'Falls der Nutzer nach seinem Standort oder der aktuellen Uhrzeit/Zeitzone fragt, nutze die oben genannten Angaben. ' +
+                 'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
+                 'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry. ' +
+                 'Wenn der Nutzer mehrere Geräte erklärt oder eine bestehende Zuordnung korrigiert, nutze updateCatalogEntries. ' +
+                 'Rufe dieses Schreibwerkzeug nur nach einer ausdruecklichen Nutzerangabe auf, fasse die gespeicherten Zuordnungen danach kurz zusammen ' +
+                 'und verwende für die Antwort weiterhin die gepflegte description statt der rohen sourceId.',
             userMessage: question,
             priorMessages,
         });
 
         await recordUsage(this, usage, 'chat');
+        await this.appendHistoryFailureReports();
         this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
 
         return appendChatMessage(this, 'assistant', finalText);
@@ -514,7 +535,9 @@ class AiAnalytics extends utils.Adapter {
 }
 
 if (require.main !== module) {
-    module.exports = (options) => new AiAnalytics(options);
+    const createAdapter = options => new AiAnalytics(options);
+    createAdapter.AiAnalytics = AiAnalytics;
+    module.exports = createAdapter;
 } else {
     new AiAnalytics();
 }

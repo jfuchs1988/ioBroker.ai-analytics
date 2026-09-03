@@ -10,15 +10,15 @@ _Aktualisiert 2026-08-22: der manuelle Re-Discovery-Trigger aus Punkt 1 und der 
 
 _Aktualisiert 2026-08-22: Punkt 12 durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) auf die verbleibende Frage der automatischen Kandidaten-Auswahl verengt._
 
-_Aktualisiert 2026-08-23: Punkt 13 durch [ADR-0022](0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md) und den Token-Kosten-Tab aufgelöst — entfällt._
+_Aktualisiert 2026-09-03: Der Nutzer bestätigt, dass die History-Adapter-Auswahl zunächst nicht erweitert werden muss; die aktuelle Unterstützung von `influxdb`, `history` und `sql` bleibt ausreichend. Mehrinstanz-Unterstützung soll global bleiben. Katalog-Backup/Restore, WhatsApp/Alexa und automatische Modellauswahl werden nicht benötigt._
 
-## 1. Auswahl der History-Adapterinstanz(en)
+## 1. Auswahl der History-Adapterinstanz(en) — zurückgestellt
 
-Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Zu klären: soll die Admin-Konfiguration eine Instanz-Auswahl anbieten (Mehrfachauswahl-Feld)?
+Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Eine Erweiterung auf weitere History-Adapter oder eine Instanz-Auswahl ist zunächst nicht erforderlich.
 
-## 2. Deduplizierung wiederholter Ausfallmeldungen
+## 2. Deduplizierung und abgestufte Wiederholung von Ausfallmeldungen
 
-Spec verlangt "einmalig melden, nicht bei jedem Lauf erneut" bei komplettem Ausfall einer History-Instanz. Zu klären: welcher Zustand wird persistiert, um "bereits gemeldet" zu erkennen, und wann gilt eine Meldung als "erledigt" (nächster erfolgreicher Lauf? manuelles Zurücksetzen?).
+Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt. Nach drei aufeinanderfolgenden Fehlern wird einmalig im Chat gemeldet und die Instanz wird aus den Prüfungen genommen. Wiederholungen erfolgen nach 12, 24 und 48 Stunden. Nach dem letzten erfolglosen Retry wird die Instanz nicht weiter automatisch belastet. Eine erfolgreiche Abfrage setzt den Status zurück.
 
 ## 3. Teststrategie für main.js und die Admin-UI
 
@@ -32,11 +32,11 @@ Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) entschieden: 
 
 Bereits als Folge-Plan angekündigt (GitHub Actions, ESLint+Prettier, `@iobroker/adapter-dev`-Checker, CHANGELOG-Pflege, Dependabot/Renovate), aber noch keine konkreten Konfigurationsentscheidungen (z. B. welche ESLint-Regelbasis, welcher Node-Versionsmatrix in CI).
 
-## 6. Versionierungs-/Release-Policy nach der Beta-Phase
+## 6. Versionierungs-/Release-Policy nach der Beta-Phase — TODO
 
 Wann wird aus `0.0.x-beta` eine `0.1.0`? Nach welchen Kriterien (alle bekannten Lücken behoben? erfolgreicher Langzeit-Betrieb?). Noch nicht festgelegt.
 
-## 7. Katalog-Skalierung bei großen Installationen
+## 7. Katalog-Skalierung bei großen Installationen — TODO
 
 Von der Spec als spätere Optimierung markiert. Zu klären: Vorfilterung nach Kategorie/Raum, Embedding-basierte Relevanzsuche, oder einfache Paginierung — sobald eine reale Installation mit vielen hundert Objekten das nötig macht.
 
@@ -44,19 +44,19 @@ Von der Spec als spätere Optimierung markiert. Zu klären: Vorfilterung nach Ka
 
 [ADR-0017](0017-scoped-catalog-write-capability.md) hat die erste, eng begrenzte Schreibfähigkeit des **LLM-Tools** (`updateCatalogEntry`, nur für `needsReview`-Einträge) eingeführt. [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) hat den **Admin-Message-Bus**-Pfad (Mensch über Admin-UI, voller Katalog-Schreibzugriff) als separate, bereits geklärte Vertrauensgrenze definiert. Offen bleibt das generelle Modell für künftige, weitergehende **LLM**-Schreibzugriffe (z. B. Geräte schalten): reicht eine enge, feld-/status-beschränkte Freigabe wie bei ADR-0017 weiterhin, oder braucht es ab einem bestimmten Wirkungsgrad eine explizite Nutzerbestätigung pro Schreibaktion?
 
-## 9. Mehrinstanz-Unterstützung
+## 9. Mehrinstanz-Unterstützung — Entscheidung: global
 
-Können mehrere Instanzen dieses Adapters gleichzeitig laufen (z. B. für unterschiedliche Objektgruppen oder Räume)? Bisher nicht bedacht, `catalog.*`/`chat.*` sind pro Instanz getrennt, aber Discovery ist global über alle historisierten Objekte.
+Mehrere Instanzen dürfen global über alle historisierten Objekte arbeiten. Eine Einschränkung nach Räumen oder Objektgruppen ist nicht vorgesehen. Die technische Mehrinstanz-Isolation der ioBroker-Namespaces bleibt bestehen.
 
-## 10. Katalog-Backup/-Restore
+## 10. Katalog-Backup/-Restore — entfällt
 
-Geht der State-Speicher verloren (z. B. Objekte-DB-Reset), muss das komplette Onboarding neu laufen — bei großen Installationen potenziell teuer. Zu klären: Export/Import-Mechanismus für den Katalog?
+Wird aktuell nicht benötigt. Der Geräte-Tab bietet bereits CSV-Export/-Import für die praktische Bearbeitung bestehender Einträge.
 
-## 11. WhatsApp-/Alexa-Anbindung — technische Richtung
+## 11. WhatsApp-/Alexa-Anbindung — später
 
-Laut [ADR-0010](0010-ausgabekanal-v1-nur-chat-tab.md) als spätere Erweiterung vorgesehen, aber keine technische Richtung entschieden (eigene Bridge? bestehender Telegram-/WhatsApp-Adapter als Zwischenschicht? Alexa Smart Home Skill?).
+Bleibt eine spätere Erweiterung und wird derzeit nicht geplant.
 
-## 12. Automatische Kandidaten-Auswahl unter mehreren LLM-Modellen (Kosten/Qualität)
+## 12. Automatische Kandidaten-Auswahl unter mehreren LLM-Modellen — entfällt
 
-Durch [ADR-0021](0021-getrennte-provider-pro-zweck.md) teilweise gelöst: Onboarding und Chat/Prüfung können jetzt unabhängige, fest konfigurierte Provider nutzen, inkl. Start-Selbstprüfung der Erreichbarkeit. Weiterhin offen: automatisches Auswählen unter mehreren vom Nutzer eingetragenen Kandidatenmodellen anhand von Kosten/Qualität — bewusst nicht umgesetzt (siehe [Design-Spec](../specs/2026-08-22-multi-model-onboarding-design.md), Nicht-Ziele). Falls später gewünscht: Format der Bewertung (Testklassifikationen mit bekanntem Ergebnis? Kosten-pro-Objekt-Schätzung aus Provider-Preislisten?), Persistenz der automatischen Wahl, Override-UI.
+Es wird ein Provider/Modell pro Zweck konfiguriert. Eine automatische Kosten-/Qualitätsauswahl wird nicht benötigt.
 

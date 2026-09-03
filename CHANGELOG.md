@@ -3,6 +3,17 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.18] - 2026-09-03
+
+### Hinzugefügt
+- Chat-Agent: ausdrückliche Nutzererklärungen können mehrere Gerätezuordnungen dauerhaft in der Gerätetabelle aktualisieren.
+- Onboarding: sichere Standardzuordnungen für PV/Wärmepumpe, Shelly, Homematic und UniFi-Anwesenheitserkennung.
+- History-Health: Ausfälle werden nach drei Fehlern einmalig gemeldet und nach 12, 24 und 48 Stunden erneut versucht.
+- CI mit Tests, ESLint, Admin-Build und Dependency-Audit.
+
+### Behoben
+- History-Instanzen mit wiederholtem Ausfall werden während der Wartezeit aus weiteren Prüfungen herausgehalten.
+
 ## [0.0.1-beta.17] - 2026-09-03
 
 ### Geändert
