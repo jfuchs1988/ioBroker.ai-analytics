@@ -5,11 +5,23 @@ const {
     median,
     medianAbsoluteDeviation,
     detectSeriesAnomaly,
+    detectDailyAggregateAnomaly,
     isEligibleCatalogEntry,
 } = require('../../lib/anomalyDetector');
 
 function loadDetectorWithHistory(getHistory) {
-    return proxyquire('../../lib/anomalyDetector', { './dataAccess': { getHistory } });
+    // '@global': true, damit auch der ueber ./periodValue transitiv geladene
+    // './dataAccess' denselben Stub sieht (Phase-2-Pfade fuer Zaehler/Boolean).
+    return proxyquire('../../lib/anomalyDetector', { './dataAccess': { getHistory, '@global': true } });
+}
+
+function loadDetectorWithPeriodValue({ computePeriodValue, resolvePeriod }) {
+    return proxyquire('../../lib/anomalyDetector', {
+        './periodValue': {
+            computePeriodValue,
+            resolvePeriod: resolvePeriod || ((period, now) => ({ start: now + period.dayOffset * 86400000, end: now + (period.dayOffset + 1) * 86400000 })),
+        },
+    });
 }
 
 describe('anomalyDetector statistics', () => {
@@ -80,12 +92,71 @@ describe('anomalyDetector statistics', () => {
     });
 });
 
+describe('detectDailyAggregateAnomaly', () => {
+    it('does not flag a current value within the baseline spread', () => {
+        const result = detectDailyAggregateAnomaly({
+            currentValue: 10,
+            baselineValues: [9, 10, 11, 10, 9, 10, 11],
+            dataCompleteness: 'complete',
+        });
+
+        expect(result).to.equal(null);
+    });
+
+    it('flags a robust outlier against the daily baseline', () => {
+        const result = detectDailyAggregateAnomaly({
+            currentValue: 40,
+            baselineValues: [9, 10, 11, 10, 9, 10, 11],
+            dataCompleteness: 'complete',
+        });
+
+        expect(result).to.include({ reason: 'deviation', baselineMedian: 10, currentValue: 40 });
+        expect(result.robustZ).to.be.at.least(3.5);
+    });
+
+    it('flags a missing current value as missing_data, not a deviation', () => {
+        const result = detectDailyAggregateAnomaly({
+            currentValue: null,
+            baselineValues: [9, 10, 11, 10, 9, 10, 11],
+            dataCompleteness: 'complete',
+        });
+
+        expect(result).to.include({ reason: 'missing_data' });
+        expect(result.currentCount).to.equal(0);
+    });
+
+    it('flags stale data as missing_data even with a numeric current value', () => {
+        const result = detectDailyAggregateAnomaly({
+            currentValue: 10,
+            baselineValues: [9, 10, 11, 10, 9, 10, 11],
+            dataCompleteness: 'stale',
+        });
+
+        expect(result).to.include({ reason: 'missing_data' });
+    });
+
+    it('returns null when the baseline has too few days', () => {
+        const result = detectDailyAggregateAnomaly({
+            currentValue: 40,
+            baselineValues: [9, 10],
+            dataCompleteness: 'complete',
+        });
+
+        expect(result).to.equal(null);
+    });
+});
+
 describe('isEligibleCatalogEntry', () => {
-    it('only accepts active, non-ignored gauge entries', () => {
+    it('accepts active, non-ignored gauge and daily-aggregate entries', () => {
         expect(isEligibleCatalogEntry({ active: true, ignored: false, valueKind: 'gauge' })).to.equal(true);
         expect(isEligibleCatalogEntry({ active: false, valueKind: 'gauge' })).to.equal(false);
         expect(isEligibleCatalogEntry({ ignored: true, valueKind: 'gauge' })).to.equal(false);
-        expect(isEligibleCatalogEntry({ active: true, valueKind: 'daily_reset_counter' })).to.equal(false);
+        expect(isEligibleCatalogEntry({ active: true, valueKind: 'daily_reset_counter' })).to.equal(true);
+        expect(isEligibleCatalogEntry({ active: true, valueKind: 'cumulative_total' })).to.equal(true);
+        expect(isEligibleCatalogEntry({ active: true, valueKind: 'event_count' })).to.equal(true);
+        expect(isEligibleCatalogEntry({ active: true, valueKind: 'boolean_state' })).to.equal(true);
+        expect(isEligibleCatalogEntry({ active: true, valueKind: undefined })).to.equal(false);
+        expect(isEligibleCatalogEntry({ active: false, valueKind: 'boolean_state' })).to.equal(false);
     });
 });
 
@@ -107,12 +178,12 @@ describe('findAnomalyCandidates', () => {
         const result = await findAnomalyCandidates({}, [entry], now);
 
         expect(result).to.have.lengthOf(1);
-        expect(result[0]).to.include({ sourceId: 'sensor.0.power', description: 'Leistung', reason: 'deviation' });
+        expect(result[0]).to.include({ sourceId: 'sensor.0.power', description: 'Leistung', reason: 'deviation', valueKind: 'gauge' });
         expect(getHistory.calledTwice).to.equal(true);
         expect(getHistory.firstCall.args).to.deep.equal([{}, 'history.0', 'sensor.0.power', now - 24 * 3600 * 1000, now, 'average']);
     });
 
-    it('isolates history failures and excludes ineligible entries', async () => {
+    it('isolates history failures for both gauge and daily-aggregate entries', async () => {
         const getHistory = sinon.stub().rejects(new Error('History offline'));
         const warn = sinon.stub();
         const { findAnomalyCandidates } = loadDetectorWithHistory(getHistory);
@@ -123,9 +194,76 @@ describe('findAnomalyCandidates', () => {
         ], Date.now());
 
         expect(result).to.deep.equal([]);
-        expect(result.failedCount).to.equal(1);
-        expect(getHistory.calledTwice).to.equal(true);
-        expect(warn.calledOnce).to.equal(true);
+        expect(result.failedCount).to.equal(2);
+        expect(warn.calledTwice).to.equal(true);
+    });
+
+    it('flags a daily_reset_counter with an outlying day total', async () => {
+        const now = 30 * 24 * 3600 * 1000;
+        const computePeriodValue = sinon.stub();
+        for (let i = 0; i < 7; i++) computePeriodValue.onCall(i).resolves({ total: 10 });
+        computePeriodValue.onCall(7).resolves({ total: 40 });
+        const { findAnomalyCandidates } = loadDetectorWithPeriodValue({ computePeriodValue });
+        const entry = {
+            sourceId: 'counter.0.total',
+            historyInstance: 'history.0',
+            description: 'Wasserzaehler',
+            valueKind: 'daily_reset_counter',
+            dataCompleteness: 'complete',
+        };
+
+        const result = await findAnomalyCandidates({}, [entry], now);
+
+        expect(result).to.have.lengthOf(1);
+        expect(result[0]).to.include({
+            sourceId: 'counter.0.total',
+            valueKind: 'daily_reset_counter',
+            reason: 'deviation',
+            currentTotal: 40,
+            baselineMedianTotal: 10,
+        });
+        expect(computePeriodValue.callCount).to.equal(8);
+    });
+
+    it('flags a boolean_state with an outlying on-duration', async () => {
+        const now = 30 * 24 * 3600 * 1000;
+        const computePeriodValue = sinon.stub();
+        for (let i = 0; i < 7; i++) computePeriodValue.onCall(i).resolves({ onDurationMs: 3600000, switchCount: 4 });
+        computePeriodValue.onCall(7).resolves({ onDurationMs: 20 * 3600000, switchCount: 2 });
+        const { findAnomalyCandidates } = loadDetectorWithPeriodValue({ computePeriodValue });
+        const entry = {
+            sourceId: 'switch.0.pump',
+            historyInstance: 'history.0',
+            description: 'Pumpe',
+            valueKind: 'boolean_state',
+            dataCompleteness: 'complete',
+        };
+
+        const result = await findAnomalyCandidates({}, [entry], now);
+
+        expect(result).to.have.lengthOf(1);
+        expect(result[0]).to.include({
+            sourceId: 'switch.0.pump',
+            valueKind: 'boolean_state',
+            reason: 'deviation',
+            currentOnDurationMs: 20 * 3600000,
+        });
+    });
+
+    it('does not flag a steady daily_reset_counter', async () => {
+        const now = 30 * 24 * 3600 * 1000;
+        const computePeriodValue = sinon.stub().resolves({ total: 10 });
+        const { findAnomalyCandidates } = loadDetectorWithPeriodValue({ computePeriodValue });
+        const entry = {
+            sourceId: 'counter.0.total',
+            historyInstance: 'history.0',
+            valueKind: 'daily_reset_counter',
+            dataCompleteness: 'complete',
+        };
+
+        const result = await findAnomalyCandidates({}, [entry], now);
+
+        expect(result).to.deep.equal([]);
     });
 
     it('reports progress before and after each eligible history sample', async () => {

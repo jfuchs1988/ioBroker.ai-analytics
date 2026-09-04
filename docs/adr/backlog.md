@@ -12,6 +12,8 @@ _Aktualisiert 2026-08-22: Punkt 12 durch [ADR-0021](0021-getrennte-provider-pro-
 
 _Aktualisiert 2026-09-03: Der Nutzer bestätigt, dass die History-Adapter-Auswahl zunächst nicht erweitert werden muss; die aktuelle Unterstützung von `influxdb`, `history` und `sql` bleibt ausreichend. Mehrinstanz-Unterstützung soll global bleiben. Katalog-Backup/Restore, WhatsApp/Alexa und automatische Modellauswahl werden nicht benötigt._
 
+_Aktualisiert 2026-09-04: Punkt 3 (Teststrategie) und Punkt 5 (CI-Aktivierung) sind gelöst — Nummern bleiben als stabile Anker für bestehende Querverweise (z. B. [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) auf Punkt 8) erhalten, keine Neunummerierung._
+
 ## 1. Auswahl der History-Adapterinstanz(en) — zurückgestellt
 
 Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen berücksichtigt. Eine Erweiterung auf weitere History-Adapter oder eine Instanz-Auswahl ist zunächst nicht erforderlich.
@@ -20,20 +22,25 @@ Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen ber
 
 Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt. Nach drei aufeinanderfolgenden Fehlern wird einmalig im Chat gemeldet und die Instanz wird aus den Prüfungen genommen. Wiederholungen erfolgen nach 12, 24 und 48 Stunden. Nach dem letzten erfolglosen Retry wird die Instanz nicht weiter automatisch belastet. Eine erfolgreiche Abfrage setzt den Status zurück.
 
-## 3. Teststrategie für main.js und die Admin-UI
+## 3. Teststrategie für main.js und die Admin-UI — gelöst
 
-`test/adapter.test.js` ist durch eine veraltete `@iobroker/testing`-Verhaltensänderung faktisch wirkungslos (bestätigt weiterhin der Fall auch nach dem Dependency-Bump auf v5.3.0). Zu klären: `tests.integration` (echter js-controller, schwerer, näher an der Realität) oder ein proxyquire-basierter Fake-Adapter-Test (leichter, aber weniger realistisch)?
+Umgesetzt: `test/e2e/adapter.e2e.test.js` mit `tests.integration` aus
+`@iobroker/testing` (echter js-controller, echte Adapterinstanz,
+`npm run test:e2e`, manuell verifiziert). Admin-UI: Vitest +
+`@testing-library/react` + jsdom (`npm run test:admin`, Teil von `npm test`).
+Details: `docs/specs/2026-09-04-teststrategie-main-und-admin-ui.md`.
 
 ## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (Referenzprojekt)
 
 Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
 
-## 5. CI-Aktivierung — zurückgestellt
+## 5. CI-Aktivierung — gelöst (bewusst gegen CI entschieden)
 
-ESLint, Mocha, Admin-Build und npm-Audit sind als lokale Prüfschritte vorhanden.
-GitHub-Actions-Workflows wurden auf Nutzerwunsch entfernt. Offen ist nur, ob und
-wann automatische CI wieder aktiviert werden soll; bis dahin erfolgen Prüfung
-und Release manuell.
+ESLint, Mocha, Admin-Build und npm-Audit sind als lokale Prüfschritte
+vorhanden. Die zuvor nur deaktivierten GitHub-Actions-Workflow-Dateien
+(`CI`, `Release`) sind auf Nutzerwunsch am 2026-09-04 vollständig aus dem
+Repository entfernt worden statt sie reaktiviert vorzuhalten; Prüfung und
+Release bleiben dauerhaft manuell.
 
 ## 6. Versionierungs-/Release-Policy nach der Beta-Phase — TODO
 
