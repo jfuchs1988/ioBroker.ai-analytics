@@ -112,11 +112,15 @@ Das stärkt den wichtigsten Qualitätsanspruch: keine vagen KI-Vermutungen.
 
 ### 7. Korrelationen und abgeleitete Kennzahlen
 
-**Nutzen: hoch · Risiko: hoch · Status: offen**
+**Nutzen: hoch · Risiko: hoch · Status: offen, in drei Sub-Projekte zerlegt**
 
 - PV, Netzbezug, Batterie und Verbraucher gemeinsam analysieren
 - Raumtemperatur, Heizung und Fensterzustände korrelieren
 - abgeleitete Kennzahlen wie Eigenverbrauch, Laufzeit oder Wirkungsgrad
+
+Zerlegung und empfohlene Reihenfolge (abgeleitete Kennzahlen →
+HVAC-Korrelation → Energie-Korrelation) siehe
+[Übersicht](specs/2026-09-04-korrelation-und-abgeleitete-kennzahlen-uebersicht.md).
 
 ### 8. Semantische Datenqualität vervollständigen
 
