@@ -6,11 +6,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/teststrategie-main-und-admin-ui` (beide Tasks unten laufen
-  wegen einer OneDrive-Dateisperre beim Branch-Wechsel auf einem Branch statt
-  zwei getrennten; werden als zwei getrennte Commits gehalten).
-- Status: Beide Tasks abgeschlossen und verifiziert, noch nicht committed
-  (wartet auf ausdrücklichen Commit-/Merge-Auftrag).
+- Branch: `master`.
+- Status: Beide Tasks committed (`2038af6`, `8d15f38`), nach `master`
+  gemergt (`fbb8fa5`) und nach `origin/master` gepusht. Feature-Branch
+  gelöscht.
 
 ## TODO
 
@@ -39,22 +38,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
     einmaliger js-controller-Installation), nicht Teil von `npm test`.
   - Verifiziert: `npm test` (372 Unit-Tests + 8 Admin-Tests), `npm run lint`,
     `npm run build:admin`, `npm run test:e2e` — alle grün.
+- Nach `master` gemergt und nach `origin/master` gepusht.
 
-- Bestehende Struktur mit einem Referenzprojekt verglichen und veraltete bzw.
-  doppelte Statusangaben identifiziert.
-- Lokale `AGENTS.md` auf Session-Start, Pflichtregeln und aufgabenbezogenes
-  Laden reduziert; versionierte Fachkontexte unter `docs/agents/` ergänzt.
-- README, Entwicklungsprozess, Architekturstatus und `LICENSES/` konsolidiert.
-- Dokumentationstest für relative Links, volatile README-Versionen und die
-  Übereinstimmung von Sponsor-Inventar und Dateiköpfen ergänzt.
-- Verifiziert: 378 Unit-Tests und 1 Adaptertest erfolgreich, ESLint und
-  Admin-Build erfolgreich, Releasepaket per `npm pack --dry-run` geprüft.
-- Lizenzaudit durchgeführt: kein Hinweis auf kopierten Anwendungscode des
-  Referenzprojekts;
-  Third-Party-Notices für gebündelte Admin-Abhängigkeiten und weitere
-  Lizenzfamilien ergänzt. `@iobroker`- und `cropperjs`-Hinweise bleiben im
-  Bundle erhalten.
-- Release `0.0.1-beta.47` committed, nach `master` gemergt, getaggt und als
-  GitHub-Release veröffentlicht.
-- Release `0.0.1-beta.48` committed, nach `master` gemergt, getaggt und als
-  GitHub-Release veröffentlicht.
+Ältere abgeschlossene Historie (Dokumentationskonsolidierung, Lizenzaudit,
+Releases beta.47/beta.48) steht in `CHANGELOG.md` und Git.
