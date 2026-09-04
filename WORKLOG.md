@@ -8,6 +8,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Ziel: Nutzer-Feedback zu "Aktuelles Budget (heute)" in den Settings: Tokenzahlen ohne Tausendertrennzeichen kaum lesbar, keine Trennung Chat/Onboarding, keine berechneten Kosten, Reset-Ergebnis (0-Verbrauch) nicht klar erkennbar.
 - Fix: `formatTodaySummary(todayEntry, dailyTokenBudget, prices)` in `lib/usage.js` umgebaut — nutzt `Intl.NumberFormat('de-DE')` für Tausenderpunkte, zeigt Chat- und Onboarding-Tokens getrennt inkl. aus den konfigurierten Preisen live berechneter Kosten (gleiche Rechenweise wie `admin/tab.js: computeCost`). `recordHistoryEntry` gibt jetzt den Tageseintrag zurück, damit `recordUsageUnlocked`/`resetUsageUnlocked` ihn zusammen mit `pricesFromConfig(adapter.config)` an `formatTodaySummary` übergeben können. `admin/jsonConfig.json`: `budgetSummary`-Feld auf volle Breite gesetzt (Text ist jetzt länger) und `sponsorLink` bekommt `newLine: true`, damit es nicht mehr neben das jetzt breitere Feld gequetscht wird.
 - Verifiziert: 370 Unit-Tests, 1 Adaptertest, ESLint erfolgreich. Kein Admin-Build nötig (nur `lib/usage.js` und `admin/jsonConfig.json` geändert, kein `src-admin`).
+- PR #11 gegen `master` erstellt und gemergt; Release `0.0.1-beta.45` manuell auf GitHub veröffentlicht (kein Tarball-Asset). DONE.
 
 - Branch: `fix/settings-csv-import-loses-changes`
 - Ziel: Beim Settings-CSV-Import gehen fast alle importierten Werte verloren; Speichern-Button und Formularfelder reagieren nicht.
@@ -43,6 +44,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## DONE
 
+- Tagesbudget-Anzeige mit Tausendertrennzeichen, Chat/Onboarding-Aufteilung und live berechneten Kosten aus konfigurierten Preisen versehen; PR #11 gemergt, Release `0.0.1-beta.45` veröffentlicht.
 - Settings-CSV-Import-Bug behoben (`this.onChangeAsync` statt `this.onChange` in `SettingsCsvComponent.handleFileSelected`), Regressionstest ergänzt; PR #10 gemergt, Release `0.0.1-beta.44` veröffentlicht.
 - Admin-Einstellungen, CSV-Import, gebündelte Katalogbearbeitung und Markdown-Chatdarstellung verbessert; PR #1 gemergt.
 - Historisierte Datenpunkte als eigener Tab in den Adapter-Einstellungen wiederhergestellt; PR #2 gemergt.
