@@ -20,7 +20,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - PR #7 gegen `master` erstellt und gemergt; Release `0.0.1-beta.42` veröffentlicht.
 - Aktueller Stand: Antworten speichern nur Input-/Output-Tokens; Kosten werden live aus den aktuellen Chatpreisen berechnet. Chat und Onboarding bleiben getrennt. Token-Reset-Button und Admin-Befehl ergänzen.
 - Verifiziert: 367 Unit-Tests, 1 Adaptertest, ESLint und Admin-Build erfolgreich.
-- Nächster Schritt: Commit, PR und Release durchführen.
+- PR #9 gegen `master` erstellt und gemergt. Release `0.0.1-beta.43` wird direkt veröffentlicht.
 - PR #6 gegen `master` erstellt und gemergt. Release `0.0.1-beta.41` wird direkt veröffentlicht.
 - Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
 - Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.

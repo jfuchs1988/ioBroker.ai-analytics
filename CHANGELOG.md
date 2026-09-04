@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.43] - 2026-09-04
+
+### Hinzugefügt
+- Tokenzähler und Usage-Historie können in den Einstellungen zurückgesetzt werden.
+- Chat- und Onboarding-Kosten werden live aus Tokenzahlen und aktuell eingetragenen Preisen berechnet; Kostenwerte werden nicht gespeichert.
+
 ## [0.0.1-beta.42] - 2026-09-04
 
 ### Behoben
