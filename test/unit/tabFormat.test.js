@@ -12,6 +12,7 @@ const {
     formatRecommendationLine,
     parseBridgeResponse,
     extractChatHistory,
+    markdownToHtml,
 } = require('../../admin/tab.js');
 
 describe('formatMessageLine', () => {
@@ -19,6 +20,17 @@ describe('formatMessageLine', () => {
         expect(formatMessageLine({ role: 'assistant', text: 'Keine Auffaelligkeiten.' })).to.equal(
             '[assistant] Keine Auffaelligkeiten.'
         );
+    });
+});
+
+describe('markdownToHtml', () => {
+    it('renders headings, emphasis, lists, and tables without allowing raw HTML', () => {
+        const html = markdownToHtml('## Titel\n\n- **Wichtig**\n\n| Wert | Ergebnis |\n|---|---:|\n| Temperatur | 21 °C |\n\n<script>alert(1)</script>');
+        expect(html).to.include('<h2>Titel</h2>');
+        expect(html).to.include('<strong>Wichtig</strong>');
+        expect(html).to.include('<table>');
+        expect(html).to.include('&lt;script&gt;alert(1)&lt;/script&gt;');
+        expect(html).not.to.include('<script>');
     });
 });
 
