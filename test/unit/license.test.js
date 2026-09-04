@@ -103,4 +103,33 @@ describe('license evaluation', () => {
         expect(result.fullAccess).to.equal(false);
         expect(canUseChat(result, null, '2026-09-03')).to.equal(true);
     });
+
+    it('rejects malformed claim timelines despite a valid signature', () => {
+        const { publicKey, privateKey } = makeKeys();
+        const now = 1_700_000_000;
+        const token = makeSignedToken({
+            privateKey,
+            payload: {
+                iss: 'ai-analytics-license', aud: 'ioBroker.ai-analytics', tokenVersion: 1,
+                licenseId: 'license-123', iat: now, nbf: now, exp: now + 100, sponsorUntil: now + 200,
+            },
+        });
+
+        const result = evaluateLicense({
+            version: '0.1.0', token, now,
+            publicKeys: { '2026-09': publicKey.export({ type: 'spki', format: 'pem' }) },
+        });
+
+        expect(result).to.deep.include({ status: 'invalid', fullAccess: false });
+    });
+
+    it('does not resolve signing keys through the object prototype', () => {
+        const result = evaluateLicense({
+            version: '0.1.0',
+            token: `${base64Url(JSON.stringify({ alg: 'EdDSA', kid: 'toString', typ: 'JWT' }))}.${base64Url('{}')}.AA`,
+            publicKeys: {},
+        });
+
+        expect(result.reason).to.equal('Unbekannter Signaturschluessel');
+    });
 });

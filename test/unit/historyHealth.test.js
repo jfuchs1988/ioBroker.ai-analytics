@@ -27,11 +27,15 @@ describe('historyHealth', () => {
         expect(adapter.setObjectNotExistsAsync.calledOnceWith(STATE_ID)).to.equal(true);
     });
 
-    it('reports after three failures and schedules 12/24/48 hour retries', async () => {
+    it('starts backoff after three failures and retries forever with a capped delay', async () => {
         const adapter = makeAdapter();
         const clock = sinon.useFakeTimers(new Date('2026-09-03T12:00:00Z').getTime());
         try {
             expect((await recordHistoryFailure(adapter, 'history.0', new Error('offline'))).shouldReport).to.equal(false);
+            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
+            await recordHistoryFailure(adapter, 'history.0', new Error('offline'));
+            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
+            expect((await recordHistoryFailure(adapter, 'history.0', new Error('offline'))).shouldReport).to.equal(true);
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
             clock.tick(12 * 3600 * 1000);
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
@@ -39,15 +43,29 @@ describe('historyHealth', () => {
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
             clock.tick(24 * 3600 * 1000);
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
-            expect((await recordHistoryFailure(adapter, 'history.0', new Error('offline'))).shouldReport).to.equal(true);
-            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
+            await recordHistoryFailure(adapter, 'history.0', new Error('offline'));
             clock.tick(48 * 3600 * 1000);
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
             await recordHistoryFailure(adapter, 'history.0', new Error('offline'));
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
+            clock.tick(48 * 3600 * 1000);
+            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
         } finally {
             clock.restore();
         }
+    });
+
+    it('serializes concurrent failures so no increments are lost', async () => {
+        const adapter = makeAdapter();
+
+        await Promise.all([
+            recordHistoryFailure(adapter, 'history.0', new Error('one')),
+            recordHistoryFailure(adapter, 'history.0', new Error('two')),
+            recordHistoryFailure(adapter, 'history.0', new Error('three')),
+        ]);
+
+        expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
+        expect(await consumeFailureReports(adapter)).to.deep.equal([{ historyInstance: 'history.0', error: 'three' }]);
     });
 
     it('delivers a failure report once and clears the state after recovery', async () => {

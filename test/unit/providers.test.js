@@ -179,6 +179,7 @@ describe('openai-compatible provider', () => {
         sinon.stub(global, 'fetch').callsFake(fetchStub);
 
         const provider = createOpenAiCompatibleProvider({
+            type: 'local',
             apiKey: 'key',
             model: 'local-model',
             baseUrl: 'http://localhost:1234/v1',
@@ -284,6 +285,39 @@ describe('openai-compatible provider', () => {
 
         expect(result.usage).to.deep.equal({ inputTokens: 0, outputTokens: 0 });
     });
+
+    it('aborts a chat request at the configured timeout', async () => {
+        let observedSignal;
+        sinon.stub(global, 'fetch').callsFake((_url, options) => {
+            observedSignal = options.signal;
+            return new Promise((_resolve, reject) => {
+                options.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+            });
+        });
+        const provider = createOpenAiCompatibleProvider({ apiKey: 'key', model: 'x', requestTimeoutMs: 10 });
+
+        let error;
+        try {
+            await provider.chat({ system: 's', messages: [], tools: [] });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.code).to.equal('PROVIDER_TIMEOUT');
+        expect(error.retryable).to.equal(true);
+        expect(observedSignal.aborted).to.equal(true);
+    });
+
+    it('rejects malformed tool calls and token usage', () => {
+        const { fromOpenAiResponse } = require('../../lib/providers/openaiCompatible');
+        expect(() => fromOpenAiResponse({
+            choices: [{ message: { content: null, tool_calls: [{ id: 'x', function: { name: 'tool', arguments: '[]' } }] } }],
+        })).to.throw('must be an object');
+        expect(() => fromOpenAiResponse({
+            choices: [{ message: { content: 'ok' } }],
+            usage: { prompt_tokens: -1, completion_tokens: 0 },
+        })).to.throw('token usage');
+    });
 });
 
 describe('createProvider', () => {
@@ -347,5 +381,78 @@ describe('createProvider', () => {
 
         expect(thrown.message).to.equal('network down');
         expect(global.fetch.callCount).to.equal(3);
+    });
+
+    it('does not retry permanent HTTP failures or malformed successful responses', async () => {
+        const fetchStub = sinon.stub(global, 'fetch');
+        fetchStub.resolves({ ok: false, status: 401, text: async () => 'secret response body' });
+        const unauthorized = createProvider({ type: 'openai', apiKey: 'k', model: 'x' });
+
+        let error;
+        try {
+            await unauthorized.chat({ system: 's', messages: [], tools: [] });
+        } catch (caught) {
+            error = caught;
+        }
+        expect(error.message).to.equal('OpenAI-compatible API error 401');
+        expect(error.message).not.to.include('secret response body');
+        expect(fetchStub.calledOnce).to.equal(true);
+
+        fetchStub.resetHistory();
+        fetchStub.resolves({ ok: true, json: async () => ({}) });
+        const malformed = createProvider({ type: 'anthropic', apiKey: 'k' });
+        try {
+            await malformed.chat({ system: 's', messages: [], tools: [] });
+        } catch (caught) {
+            error = caught;
+        }
+        expect(error.message).to.include('content array');
+        expect(fetchStub.calledOnce).to.equal(true);
+    });
+
+    it('honors Retry-After for transient HTTP failures', async () => {
+        const clock = sinon.useFakeTimers();
+        try {
+            const fetchStub = sinon.stub(global, 'fetch');
+            fetchStub.onFirstCall().resolves({
+                ok: false,
+                status: 429,
+                headers: { get: (name) => name === 'retry-after' ? '2' : null },
+                text: async () => 'slow down',
+            });
+            fetchStub.onSecondCall().resolves({
+                ok: true,
+                json: async () => ({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }),
+            });
+            const provider = createProvider({ type: 'openai', apiKey: 'k', model: 'x' });
+            const resultPromise = provider.chat({ system: 's', messages: [], tools: [] });
+
+            await clock.tickAsync(1999);
+            expect(fetchStub.calledOnce).to.equal(true);
+            await clock.tickAsync(1);
+            const result = await resultPromise;
+            expect(result.content).to.equal('ok');
+            expect(fetchStub.calledTwice).to.equal(true);
+        } finally {
+            clock.restore();
+        }
+    });
+
+    it('rejects provider responses above the configured hard size limit without retrying', async () => {
+        const fetchStub = sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            json: async () => ({ content: [{ type: 'text', text: 'x'.repeat(1024 * 1024) }], stop_reason: 'end_turn' }),
+        });
+        const provider = createProvider({ type: 'anthropic', apiKey: 'k' });
+
+        let error;
+        try {
+            await provider.chat({ system: 's', messages: [], tools: [] });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.message).to.include('exceeds');
+        expect(fetchStub.calledOnce).to.equal(true);
     });
 });

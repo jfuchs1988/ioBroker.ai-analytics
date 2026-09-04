@@ -1,6 +1,12 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureBridgeState, parseRequest, handleBridgeStateChange, BRIDGE_STATE } = require('../../lib/adminBridge');
+const {
+    ensureBridgeState,
+    parseRequest,
+    handleBridgeStateChange,
+    BRIDGE_STATE,
+    MAX_REQUEST_BYTES,
+} = require('../../lib/adminBridge');
 
 function makeAdapter(overrides = {}) {
     return {
@@ -82,6 +88,19 @@ describe('adminBridge', () => {
             expect(adapter.log.warn.calledOnce).to.equal(true);
             expect(adapter.log.warn.firstCall.args[0]).to.include('deleteEverything');
         });
+
+        it('rejects oversized requests and IDs', () => {
+            const adapter = makeAdapter();
+            const oversized = JSON.stringify({
+                id: 'tab-1',
+                command: 'chatQuestion',
+                message: { text: 'x'.repeat(MAX_REQUEST_BYTES) },
+            });
+            expect(parseRequest(adapter, `ai-analytics.0.${BRIDGE_STATE}`, { val: oversized, ack: false })).to.equal(null);
+
+            const longId = JSON.stringify({ id: 'x'.repeat(129), command: 'listCatalogEntries', message: {} });
+            expect(parseRequest(adapter, `ai-analytics.0.${BRIDGE_STATE}`, { val: longId, ack: false })).to.equal(null);
+        });
     });
 
     describe('handleBridgeStateChange', () => {
@@ -149,6 +168,40 @@ describe('adminBridge', () => {
             expect(handled).to.equal(false);
             expect(dispatch.notCalled).to.equal(true);
             expect(adapter.setStateAsync.notCalled).to.equal(true);
+        });
+
+        it('deduplicates concurrent and completed replays of the same request', async () => {
+            const adapter = makeAdapter();
+            let finish;
+            const dispatch = sinon.stub().returns(new Promise(resolve => { finish = resolve; }));
+            const state = {
+                val: JSON.stringify({ id: 'tab-replay', command: 'runDiscoveryNow', message: {} }),
+                ack: false,
+            };
+
+            const first = handleBridgeStateChange(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state, dispatch);
+            const concurrentReplay = handleBridgeStateChange(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state, dispatch);
+            finish({ foundCount: 1 });
+            await Promise.all([first, concurrentReplay]);
+            await handleBridgeStateChange(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state, dispatch);
+
+            expect(dispatch.calledOnce).to.equal(true);
+            expect(adapter.setStateAsync.callCount).to.equal(3);
+        });
+
+        it('rejects reuse of a request ID with a different payload', async () => {
+            const adapter = makeAdapter();
+            const dispatch = sinon.stub().resolves({ entries: [] });
+            const first = { val: JSON.stringify({ id: 'same-id', command: 'listCatalogEntries', message: {} }), ack: false };
+            const changed = { val: JSON.stringify({ id: 'same-id', command: 'removeCatalogEntry', message: { sourceId: 'x' } }), ack: false };
+
+            await handleBridgeStateChange(adapter, `ai-analytics.0.${BRIDGE_STATE}`, first, dispatch);
+            await handleBridgeStateChange(adapter, `ai-analytics.0.${BRIDGE_STATE}`, changed, dispatch);
+
+            expect(dispatch.calledOnce).to.equal(true);
+            const response = JSON.parse(adapter.setStateAsync.secondCall.args[1].val);
+            expect(response.ok).to.equal(false);
+            expect(response.error).to.include('wiederverwendet');
         });
     });
 });

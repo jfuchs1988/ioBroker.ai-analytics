@@ -1,7 +1,7 @@
 // test/unit/usage.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureUsageState, recordUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, formatTodaySummary } = require('../../lib/usage');
+const { ensureUsageState, recordUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, MAX_HISTORY_DAYS, formatTodaySummary } = require('../../lib/usage');
 
 function makeAdapter(config) {
     return {
@@ -64,6 +64,30 @@ describe('usage', () => {
         expect(result.tokensToday).to.equal(0);
     });
 
+    it('getTodayUsage resets malformed and nonnumeric stored usage', async () => {
+        const adapter = makeAdapter();
+        adapter.getStateAsync.onFirstCall().resolves({ val: '{broken' });
+        adapter.getStateAsync.onSecondCall().resolves({ val: JSON.stringify({ date: new Date().toISOString().slice(0, 10), tokensToday: 'many' }) });
+
+        expect((await getTodayUsage(adapter)).tokensToday).to.equal(0);
+        expect((await getTodayUsage(adapter)).tokensToday).to.equal(0);
+    });
+
+    it('rejects invalid provider token counts without writing corrupted usage', async () => {
+        const adapter = makeAdapter();
+        adapter.getStateAsync.resolves(null);
+
+        let error;
+        try {
+            await recordUsage(adapter, { inputTokens: 'many', outputTokens: -1 });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error).to.be.an('error');
+        expect(adapter.setStateAsync.notCalled).to.equal(true);
+    });
+
     it('isBudgetExceeded is false when dailyTokenBudget is 0 or unset', async () => {
         const adapter = makeAdapter({ dailyTokenBudget: 0 });
         expect(await isBudgetExceeded(adapter)).to.equal(false);
@@ -110,6 +134,22 @@ describe('usage', () => {
             const adapter = makeAdapter();
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({ val: JSON.stringify({ not: 'an array' }) });
             expect(await getUsageHistory(adapter)).to.deep.equal([]);
+        });
+
+        it('drops malformed history entries and repairs nonnumeric purpose totals', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter();
+            adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([null, 42, { date: today, chat: { inputTokens: 'many', outputTokens: -5 } }]),
+            });
+
+            await recordUsage(adapter, { inputTokens: 10, outputTokens: 2 });
+
+            const historyCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === HISTORY_STATE);
+            expect(JSON.parse(historyCall.args[1].val)).to.deep.equal([
+                { date: today, chat: { inputTokens: 10, outputTokens: 2 } },
+            ]);
         });
 
         it('returns the stored array unchanged', async () => {
@@ -190,6 +230,41 @@ describe('usage', () => {
                 chat: { inputTokens: 10, outputTokens: 5 },
                 onboarding: { inputTokens: 0, outputTokens: 0 },
             });
+        });
+
+        it('bounds usage history to the configured retention length', async () => {
+            const existingHistory = Array.from({ length: MAX_HISTORY_DAYS }, (_, index) => ({
+                date: `old-${index}`,
+                chat: { inputTokens: 1, outputTokens: 0 },
+                onboarding: { inputTokens: 0, outputTokens: 0 },
+            }));
+            const adapter = makeAdapter();
+            adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({ val: JSON.stringify(existingHistory) });
+
+            await recordUsage(adapter, { inputTokens: 1, outputTokens: 0 });
+
+            const historyCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === HISTORY_STATE);
+            const history = JSON.parse(historyCall.args[1].val);
+            expect(history).to.have.lengthOf(MAX_HISTORY_DAYS);
+            expect(history[0].date).to.equal('old-1');
+        });
+
+        it('serializes concurrent usage updates for one adapter', async () => {
+            const states = new Map();
+            const adapter = makeAdapter();
+            adapter.getStateAsync.callsFake(async id => states.has(id) ? { val: states.get(id) } : null);
+            adapter.setStateAsync.callsFake(async (id, state) => {
+                await Promise.resolve();
+                states.set(id, state.val);
+            });
+
+            await Promise.all([
+                recordUsage(adapter, { inputTokens: 10, outputTokens: 1 }),
+                recordUsage(adapter, { inputTokens: 20, outputTokens: 2 }),
+            ]);
+
+            expect(JSON.parse(states.get(USAGE_STATE)).tokensToday).to.equal(33);
         });
 
         it('recordUsage also writes TODAY_SUMMARY_STATE with formatted string', async () => {

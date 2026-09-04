@@ -123,6 +123,7 @@ describe('findAnomalyCandidates', () => {
         ], Date.now());
 
         expect(result).to.deep.equal([]);
+        expect(result.failedCount).to.equal(1);
         expect(getHistory.calledTwice).to.equal(true);
         expect(warn.calledOnce).to.equal(true);
     });

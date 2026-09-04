@@ -38,6 +38,32 @@ describe('AiAnalytics command dispatch', () => {
         expect(result).to.deep.equal({ question: 'Was lief gestern?' });
     });
 
+    it('rejects oversized and concurrent chat questions', async () => {
+        const adapter = Object.create(AiAnalytics.prototype);
+        adapter.log = { silly: sinon.stub() };
+        let finish;
+        adapter.processChatQuestion = sinon.stub().returns(new Promise(resolve => { finish = resolve; }));
+
+        let error;
+        try {
+            await adapter.dispatchAdapterCommand('chatQuestion', { text: 'x'.repeat(16001) });
+        } catch (caught) {
+            error = caught;
+        }
+        expect(error.message).to.include('zu lang');
+
+        const first = adapter.dispatchAdapterCommand('chatQuestion', { text: 'Erste Frage' });
+        try {
+            await adapter.dispatchAdapterCommand('chatQuestion', { text: 'Zweite Frage' });
+        } catch (caught) {
+            error = caught;
+        }
+        expect(error.message).to.include('bereits verarbeitet');
+        finish({ ok: true });
+        await first;
+        expect(adapter.chatRunPromise).to.equal(null);
+    });
+
     it('rejects a second chat question on the same day in limited license mode', async () => {
         const adapter = Object.create(AiAnalytics.prototype);
         adapter.licenseState = { status: 'limited', fullAccess: false };
@@ -135,6 +161,18 @@ describe('AiAnalytics command dispatch', () => {
 
         expect(adapter.dispatchAdapterCommand.notCalled).to.equal(true);
         expect(adapter.sendTo.notCalled).to.equal(true);
+    });
+
+    it('rejects allowed commands from non-admin message senders', async () => {
+        const adapter = Object.create(AiAnalytics.prototype);
+        adapter.log = { warn: sinon.stub() };
+        adapter.sendTo = sinon.spy();
+        adapter.dispatchAdapterCommand = sinon.stub();
+
+        await adapter.onMessage({ command: 'chatQuestion', message: { text: 'test' }, from: 'system.adapter.javascript.0', callback: { id: 1 } });
+
+        expect(adapter.dispatchAdapterCommand.notCalled).to.equal(true);
+        expect(adapter.sendTo.firstCall.args[2]).to.deep.equal({ error: 'Nicht autorisiert.' });
     });
 
     it('delegates state changes to the admin bridge and always invokes the unload callback', async () => {
@@ -341,6 +379,7 @@ describe('AiAnalytics proactive anomaly gate', () => {
         adapter.config = { silentIfNothingFound: false };
         adapter.chatProviderOk = true;
         adapter.tools = {};
+        adapter.readOnlyTools = { definitions: [{ name: 'listCatalog' }] };
         adapter.log = { silly: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
         adapter.updateCatalogSyncState = sinon.stub().resolves();
         adapter.appendHistoryFailureReports = sinon.stub().resolves();
@@ -370,7 +409,20 @@ describe('AiAnalytics proactive anomaly gate', () => {
 
         expect(result).to.deep.equal({ skipped: false });
         expect(runAgent.calledOnce).to.equal(true);
+        expect(runAgent.firstCall.args[0].tools).to.equal(adapter.readOnlyTools);
         expect(runAgent.firstCall.args[0].systemPrompt).to.include(JSON.stringify(candidates));
         expect(loaded.recordUsage.calledOnceWith(adapter, { inputTokens: 5 }, 'chat')).to.equal(true);
+    });
+
+    it('reports an incomplete check instead of no anomalies when history reads fail', async () => {
+        const candidates = [];
+        Object.defineProperty(candidates, 'failedCount', { value: 2 });
+        const loaded = loadMainWithProactiveStubs({ candidates });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.include({ skipped: false, incomplete: true, failedCount: 2 });
+        expect(loaded.appendChatMessage.firstCall.args[2]).to.include('unvollständig');
     });
 });
