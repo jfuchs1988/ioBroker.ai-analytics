@@ -211,6 +211,40 @@ describe('openai-compatible provider', () => {
         expect(await listOpenAiCompatibleModels({ type: 'opencode' })).to.deep.equal(OPENCODE_ZEN_MODELS.map(id => ({ id, name: id, isFree: true })));
     });
 
+    it('uses Chat Completions for the four OpenCode chat models', async () => {
+        const fetchStub = sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            body: null,
+            text: async () => JSON.stringify({ choices: [{ message: { content: 'Hallo' }, finish_reason: 'stop' }] }),
+        });
+        const provider = createOpenAiCompatibleProvider({ type: 'opencode', apiKey: 'key', model: 'mimo-v2.5-free' });
+        await provider.chat({ system: 's', messages: [], tools: [] });
+        expect(fetchStub.firstCall.args[0]).to.equal('https://opencode.ai/zen/v1/chat/completions');
+        expect(JSON.parse(fetchStub.firstCall.args[1].body).messages[0].role).to.equal('system');
+    });
+
+    it('uses Responses API for the two Muse models and maps text/tool calls', async () => {
+        const fetchStub = sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            body: null,
+            text: async () => JSON.stringify({
+                output: [
+                    { type: 'message', content: [{ type: 'output_text', text: 'Hallo' }] },
+                    { type: 'function_call', call_id: 'call_1', name: 'listCatalog', arguments: '{}' },
+                ],
+                usage: { input_tokens: 3, output_tokens: 2 },
+            }),
+        });
+        const provider = createOpenAiCompatibleProvider({ type: 'opencode', apiKey: 'key', model: 'muse-spark-1.3-contributor-free' });
+        const result = await provider.chat({ system: 's', messages: [], tools: [{ name: 'listCatalog', description: 'list', inputSchema: { type: 'object' } }] });
+        expect(fetchStub.firstCall.args[0]).to.equal('https://opencode.ai/zen/v1/responses');
+        const body = JSON.parse(fetchStub.firstCall.args[1].body);
+        expect(body.input[0].role).to.equal('system');
+        expect(body.tools[0].name).to.equal('listCatalog');
+        expect(result).to.deep.include({ content: 'Hallo', toolCalls: [{ id: 'call_1', name: 'listCatalog', input: {} }] });
+        expect(result.usage).to.deep.equal({ inputTokens: 3, outputTokens: 2 });
+    });
+
     it('normalizes custom base URLs and requires one for local providers', () => {
         expect(resolveOpenAiBaseUrl('openai', '')).to.equal('https://api.openai.com/v1');
         expect(resolveOpenAiBaseUrl('openrouter', '')).to.equal('https://openrouter.ai/api/v1');

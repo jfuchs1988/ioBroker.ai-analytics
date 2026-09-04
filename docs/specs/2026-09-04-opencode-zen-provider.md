@@ -12,6 +12,7 @@ OpenCode Zen soll als vorausgefüllter OpenAI-kompatibler Anbieter auswählbar s
 - Die automatische Endpoint-Vorgabe gilt für Chat und optionales Onboarding.
 - Bestehende benutzerdefinierte URLs und Modelle bleiben nutzbar.
 - API-Schlüssel werden nicht in Code, Tests, Logs oder Dokumentation aufgenommen.
+- Die vier MiMo/Ling/Nemotron-Modelle verwenden `/chat/completions`; beide Muse-Modelle verwenden `/responses` mit Responses-API-Wire-Format.
 
 ## Modelle
 
