@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.33] - 2026-09-03
+
+### Behoben
+- Finale Repository-Checker-Bereinigung: aktuelle `adapter-core`-Version, korrekte Secret-Feldplatzierung, vollständige Übersetzungen, `tier` und `ioBroker`-Keyword ergänzt.
+
 ## [0.0.1-beta.32] - 2026-09-03
 
 ### Behoben

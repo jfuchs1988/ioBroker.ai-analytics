@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Repository-Checker-Befunde und Veröffentlichungs-/Tokenvertragskonsistenz beheben.
-- Letzter sicherer Commit: `4e7f2cd docs: record beta.32 checker fixes`.
-- Aktueller Stand: Release `v0.0.1-beta.32` veröffentlicht; Checker-Fixes, News-Reduktion und Paketbereinigung umgesetzt.
-- Nächster Schritt: keiner.
+- Branch: `fix/publication-consistency`
+- Ziel: Finale Repository-Checker-Befunde beheben.
+- Letzter sicherer Commit: `5663979 fix: resolve adapter checker findings`.
+- Aktueller Stand: Nach Abbruch in OpenCode fortgesetzt; ungültiges JSON in `io-package.json` (überzähliges Komma nach dem `0.0.1-beta.27`-News-Eintrag) behoben. 297 Unit-Tests, Adapter-Smoke-Test, ESLint und Admin-Build erfolgreich.
+- Nächster Schritt: Commit, Push, Merge nach `master`, Release `v0.0.1-beta.33` taggen und veröffentlichen.
 
 ## TODO
 

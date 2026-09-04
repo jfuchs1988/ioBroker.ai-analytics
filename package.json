@@ -1,13 +1,20 @@
 {
   "name": "iobroker.ai-analytics",
-  "version": "0.0.1-beta.32",
+  "version": "0.0.1-beta.33",
   "description": "KI-gestuetzte Analyse und proaktive Pruefungen fuer historisierte ioBroker-Objekte",
   "main": "main.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jfuchs1988/ioBroker.ai-analytics.git"
   },
-  "keywords": ["iobroker", "analytics", "history", "influxdb", "artificial-intelligence"],
+  "keywords": [
+    "ioBroker",
+    "iobroker",
+    "analytics",
+    "history",
+    "influxdb",
+    "artificial-intelligence"
+  ],
   "engines": {
     "node": ">=18"
   },
@@ -15,7 +22,7 @@
   "funding": "https://github.com/sponsors/jfuchs1988",
   "license": "MIT",
   "dependencies": {
-    "@iobroker/adapter-core": "^3.1.6"
+    "@iobroker/adapter-core": "^3.4.3"
   },
   "devDependencies": {
     "@iobroker/gui-components": "^10.2.1",
