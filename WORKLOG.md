@@ -7,13 +7,14 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `feature/session-context-docs`
-- Status: Release `0.0.1-beta.47` vorbereitet, noch nicht committed oder veröffentlicht.
+- Status: Release `0.0.1-beta.47` veröffentlicht, Handoff abgeschlossen.
 - Spec: `docs/specs/2026-09-04-session-kontext-und-dokumentation.md`
 - Plan: `docs/plans/2026-09-04-session-kontext-und-dokumentation.md`
 
 ## TODO
 
-- Commit, Push, Merge, Tag und GitHub-Release abschließen.
+- Nächste Produktaufgabe: aktuellen Adapterstand auf einer echten ioBroker-
+  Installation live abnehmen.
 
 ## DONE
 
@@ -30,3 +31,5 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Third-Party-Notices für gebündelte Admin-Abhängigkeiten und weitere
   Lizenzfamilien ergänzt. `@iobroker`- und `cropperjs`-Hinweise bleiben im
   Bundle erhalten.
+- Release `0.0.1-beta.47` committed, nach `master` gemergt, getaggt und als
+  GitHub-Release veröffentlicht.
