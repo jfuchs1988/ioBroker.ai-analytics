@@ -1,5 +1,8 @@
 # ioBroker.ai-analytics
 
+[![Aktuelles Release](https://img.shields.io/github/v/release/jfuchs1988/ioBroker.ai-analytics?include_prereleases)](https://github.com/jfuchs1988/ioBroker.ai-analytics/releases)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/jfuchs1988)](https://github.com/sponsors/jfuchs1988)
+
 `ioBroker.ai-analytics` verbindet historische Smart-Home-Analytics mit einer
 proaktiven KI-Prüfung. Der Adapter findet ioBroker-Datenpunkte, die bereits
 über History, InfluxDB oder SQL aufgezeichnet werden, baut daraus einen
@@ -20,7 +23,7 @@ ungewöhnliche Beobachtungen.
 - CSV-Export/-Import für die Katalogpflege
 - Anthropic, OpenAI, OpenRouter und lokale OpenAI-kompatible Provider
 - Optional eigener Provider für das Onboarding
-- Tagesbudget und Verbrauchshistorie für Tokens
+- Tagesbudget in EUR mit Token- und Kostenhistorie
 - Offline-fähige Grundlage für die spätere Sponsoring-Entitlement-Prüfung
 
 ## Voraussetzungen
@@ -56,7 +59,7 @@ Im ioBroker-Admin konfigurierbar:
 - Chat-/Prüfungsprovider, Modell, API-Key und optionale Basis-URL
 - Optional eigener Onboarding-Provider
 - Prüfintervall und Verhalten bei keinem Fund
-- Tagesbudget und manuell gepflegte Tokenpreise
+- Tagesbudget in EUR und manuell gepflegte Tokenpreise
 - Optionale valueKind- und Datenqualitäts-Backfills
 - Sponsoring-Entitlement-Token für die spätere stabile Release-Policy
 
@@ -98,7 +101,7 @@ Instanz gebunden.
 
 Das Projekt kann über [GitHub Sponsors](https://github.com/sponsors/jfuchs1988)
 unterstützt werden. Siehe [LICENSE](LICENSE), die
-[sponsor-required Bedingungen](LICENSES/SPONSOR-REQUIRED.md) und die
+[Lizenzübersicht](LICENSES/README.md) und die
 [Entitlement-Architektur](docs/specs/2026-09-03-hybrid-license-and-entitlements.md).
 
 ## Entwicklung
@@ -123,8 +126,10 @@ das Repository Proxyquire-basierte Tests für Orchestrierung und Adapterfluss.
 
 ## Status
 
-Aktuelle Entwicklungsversion: `0.0.1-beta.35`. Der Adapter befindet sich in
-der Beta-Phase; eine manuelle Abnahme auf einer echten ioBroker-Installation
+Der Adapter befindet sich in der Beta-Phase. Die aktuelle Version steht in
+[`package.json`](package.json) und wird über
+[GitHub Releases](https://github.com/jfuchs1988/ioBroker.ai-analytics/releases)
+veröffentlicht. Eine manuelle Abnahme auf einer echten ioBroker-Installation
 gehört weiterhin zum Releaseprozess.
 
 English documentation: [README.md](README.md).

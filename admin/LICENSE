@@ -20,4 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-The admin UI is not a sponsor-required component.
+## Scope
+
+The Admin UI is not a sponsor-required component. The complete adapter package
+also contains separately licensed source files. See `LICENSES/README.md` and
+`LICENSES/exclusions.md` in the package root for the complete license overview.
+Third-party attribution for bundled Admin dependencies is in
+`LICENSES/THIRD-PARTY-NOTICES.md`.

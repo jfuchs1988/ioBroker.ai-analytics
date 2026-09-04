@@ -2,7 +2,7 @@
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Angenommen (rechtliche Grundlage, technische Durchsetzung offen)  
+**Status:** Angenommen (Prüfgrundlage umgesetzt, produktive Aktivierung offen)
 **Datum:** 2026-09-03
 
 ## Kontext
@@ -29,8 +29,9 @@ Integrationen sponsor-pflichtig sind.
   30 Tage Sponsoring, 30 Tage Grace-Period ab Sponsoring-Ablauf, keine
   Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag
   statt proaktiver KI-Läufe.
-- Die aktuelle Umstellung ändert nur die Lizenzabgrenzung; sie sperrt noch
-  keine Funktionen.
+- Die Offline-Prüfgrundlage ist in `lib/license.js` umgesetzt. Der Beta-Guard
+  gewährt bis `0.1.0` Vollzugriff; produktive Sperren bleiben bis zur
+  Ausstellungs-Webanwendung und Veröffentlichung der Signaturschlüssel inaktiv.
 
 ## Konsequenzen
 

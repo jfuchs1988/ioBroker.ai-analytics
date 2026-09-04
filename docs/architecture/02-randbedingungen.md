@@ -5,7 +5,9 @@
 ## 2.1 Technische Randbedingungen (verbindlich, aus dem Implementierungsplan)
 
 - Node.js >= 22 (nutzt das eingebaute globale `fetch`, keine HTTP-Client-Abhängigkeit; folgt der aktuellen ioBroker-Empfehlung).
-- Reines JavaScript (CommonJS `require`/`module.exports`), kein TypeScript, kein Build-Schritt/Bundler.
+- Adapter-Backend in JavaScript mit CommonJS (`require`/`module.exports`) ohne
+  Backend-Buildschritt. Die React-basierte Admin-Custom-Component wird separat
+  mit Vite gebaut.
 - Keine offiziellen Vendor-SDKs für LLM-Provider — Provider-Clients rufen die REST-APIs direkt über `fetch` auf.
 - Historische Daten werden ausschließlich über ioBrokers generische Message-API gelesen: `adapter.sendToAsync(historyInstance, 'getHistory', { id, options: { start, end, aggregate } })`. Keine direkte InfluxDB-/SQL-Treiber-Abhängigkeit.
 - Geloggte Objekte werden ausschließlich über `obj.common.custom["<influxdb|history|sql>.N"].enabled === true` erkannt.
@@ -16,7 +18,10 @@
 ## 2.2 Organisatorische Randbedingungen
 
 - Entwicklung erfolgt über einen Spec → Plan → TDD-Implementierung → Review-Workflow, dokumentiert in [CONTRIBUTING.md](../../CONTRIBUTING.md).
-- Git-Branching: Für jeden Task wird ein eigener Branch angelegt und nach grünem `npm test` lokal per `git merge --no-ff` nach `master` gemergt; die ältere develop-first-Formulierung in [ADR-0016](../adr/0016-git-branching-modell.md) ist historischer Kontext.
+- Git-Branching: Für jeden Task wird ein eigener Branch angelegt. Commit, Push,
+  Merge nach `master` und Veröffentlichung erfolgen nur auf ausdrücklichen
+  Auftrag; die ältere develop-first-Formulierung in
+  [ADR-0016](../adr/0016-git-branching-modell.md) ist historischer Kontext.
 - GitHub-Repository `jfuchs1988/ioBroker.ai-analytics` mit MIT-lizenziertem
   Kern und separat dokumentierten sponsor-pflichtigen KI-Komponenten, siehe
   [ADR-0027](../adr/0027-hybrid-lizenzmodell-nach-evcc.md). Eine Aufnahme in

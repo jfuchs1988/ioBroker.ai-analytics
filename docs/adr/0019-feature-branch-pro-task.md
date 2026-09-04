@@ -2,7 +2,7 @@
 
 [← ADR-Übersicht](adr-index.md)
 
-> **Hinweis:** Diese ADR beschreibt den früheren lokalen `develop`-Merge als historische Prozessentscheidung. Die aktuelle operative Arbeitsanweisung für neue Tasks steht in [AGENTS.md](../../AGENTS.md) und [CONTRIBUTING.md](../../CONTRIBUTING.md).
+> **Hinweis:** Diese ADR beschreibt den früheren lokalen `develop`-Merge als historische Prozessentscheidung. Die aktuelle versionierte Arbeitsanweisung steht in [CONTRIBUTING.md](../../CONTRIBUTING.md) und im [Entwicklungsworkflow](../agents/development-workflow.md).
 
 **Status:** Angenommen
 **Datum:** 2026-08-22

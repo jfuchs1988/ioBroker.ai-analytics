@@ -22,6 +22,6 @@ SOFTWARE.
 
 ## Scope
 
-This MIT license applies only to components not identified as sponsor-required
-in `LICENSES/SPONSOR-REQUIRED.md`. Sponsor-required components are excluded
-from this license and are subject to the separate terms in that file.
+This MIT license applies only to components not identified as excluded in
+`LICENSES/exclusions.md`. See `LICENSES/README.md` for the complete license
+overview.

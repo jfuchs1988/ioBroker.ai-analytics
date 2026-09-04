@@ -1,5 +1,8 @@
 # ioBroker.ai-analytics
 
+[![Latest release](https://img.shields.io/github/v/release/jfuchs1988/ioBroker.ai-analytics?include_prereleases)](https://github.com/jfuchs1988/ioBroker.ai-analytics/releases)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/jfuchs1988)](https://github.com/sponsors/jfuchs1988)
+
 `ioBroker.ai-analytics` combines historical Smart Home analytics with a
 proactive AI check. It discovers ioBroker objects that are already recorded by
 History, InfluxDB, or SQL, builds a semantic catalog, answers questions about
@@ -19,7 +22,7 @@ the recorded data, and explains unusual observations.
 - CSV export/import for catalog maintenance
 - Anthropic, OpenAI, OpenRouter, and local OpenAI-compatible providers
 - Optional separate provider for onboarding
-- Daily token budget and usage history
+- Daily cost budget in EUR with token and cost history
 - Offline-capable sponsorship entitlement foundation; enforcement starts at
   `0.1.0` according to the documented entitlement contract
 
@@ -54,7 +57,7 @@ Configure the adapter in the ioBroker Admin UI:
 - Chat/check provider, model, API key, and optional base URL
 - Optional independent onboarding provider
 - Proactive-check interval and silent/no-result behavior
-- Daily token budget and manually maintained token prices
+- Daily budget in EUR and manually maintained token prices
 - Optional value-kind and data-quality backfills
 - Sponsorship entitlement token for the future stable release policy
 
@@ -94,8 +97,8 @@ After the grace period, one chat request per local day remains available and
 proactive AI checks are disabled. Tokens are not instance-bound.
 
 Support the project through [GitHub Sponsors](https://github.com/sponsors/jfuchs1988).
-See [LICENSE](LICENSE), [sponsor-required terms](LICENSES/SPONSOR-REQUIRED.md),
-and the [entitlement architecture](docs/specs/2026-09-03-hybrid-license-and-entitlements.md).
+See [LICENSE](LICENSE), the [license overview](LICENSES/README.md), and the
+[entitlement architecture](docs/specs/2026-09-03-hybrid-license-and-entitlements.md).
 
 ## Development
 
@@ -120,8 +123,10 @@ repository additionally contains proxyquire-based orchestrator and flow tests.
 
 ## Status
 
-Current development version: `0.0.1-beta.35`. The adapter is in beta and a
-manual acceptance test on a real ioBroker installation remains part of the
+The adapter is in beta. The current version is maintained in
+[`package.json`](package.json) and published through
+[GitHub Releases](https://github.com/jfuchs1988/ioBroker.ai-analytics/releases).
+A manual acceptance test on a real ioBroker installation remains part of the
 release process.
 
 German documentation: [README.de.md](README.de.md).

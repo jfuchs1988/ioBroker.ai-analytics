@@ -31,9 +31,18 @@ Jeder Provider-Client übersetzt dieses normalisierte Format in sein eigenes Wir
 
 ## 8.4 Testkonzept
 
-- Unit-Tests (mocha/chai/sinon) für jedes `lib/*`-Modul mit gemockter Adapter-API — kein echter DB- oder LLM-Zugriff nötig. Zusätzlich prüfen Proxyquire-/Sinon-Tests zentrale `main.js`-Orchestratorpfade; ein Durchflusstest führt Discovery, echtes Onboarding und Katalog-State-Persistenz mit Fake-Adapter zusammen. Die hybride Anomalievoranalyse ist inklusive LLM-Gate getestet. Stand: 289 Unit-Tests + 1 Adapter-Smoke-Test, alle grün (Stand 2026-09-03).
-- Admin-UI (JSON Config, Chat-Tab) hat keine automatisierten Tests — dafür ein manueller Abnahmetest an einer echten ioBroker-Instanz (läuft aktuell, siehe [Risiken](11-risiken-und-schulden.md)).
-- **Verbleibende Lücke:** `test/adapter.test.js` nutzt `@iobroker/testing`s `tests.unit`, das in der installierten v4-Version ein deprecated No-Op ist (druckt nur eine Warnung, lädt `main.js` nie, ruft nie `onReady`/`onUnload` auf). Ein echter ioBroker-End-to-End-Test mit js-controller sowie automatisierte DOM-Tests der Admin-UI existieren weiterhin nicht; der neue Fake-Adapter-Durchflusstest deckt den zentralen Anwendungspfad isoliert ab.
+- Unit-Tests (Mocha/Chai/Sinon) prüfen `lib/*`-Module mit gemockter
+  Adapter-API. Proxyquire-/Sinon-Tests decken zentrale `main.js`-
+  Orchestratorpfade ab; ein Durchflusstest verbindet Discovery, Onboarding und
+  Katalog-State-Persistenz mit einem Fake-Adapter. Die aktuelle Testanzahl wird
+  ausschließlich aus der Testausgabe bezogen.
+- Admin-Helfer besitzen fokussierte Unit-Tests, aber keine vollständige
+  automatisierte DOM-Abdeckung. Deshalb bleibt eine manuelle Abnahme an einer
+  echten ioBroker-Instanz erforderlich, siehe [Risiken](11-risiken-und-schulden.md).
+- **Verbleibende Lücke:** `test/adapter.test.js` nutzt ein deprecated Verhalten
+  von `@iobroker/testing` und ist kein echter js-controller-End-to-End-Test. Ein
+  echter Integrationstest und vollständige DOM-Tests existieren weiterhin
+  nicht.
 
 ---
 [← zurück zur Architektur-Übersicht](arc42-index.md) · [7. Verteilungssicht](07-verteilungssicht.md) · weiter zu [9. Architekturentscheidungen](09-architekturentscheidungen.md)

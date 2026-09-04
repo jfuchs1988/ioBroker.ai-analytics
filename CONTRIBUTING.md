@@ -6,9 +6,14 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 
 - Der aktuelle Integrationsbranch heißt in diesem Repository `master` und ist damit der operative „Main“-Branch. Ältere Hinweise auf `develop` oder `main` sind historischer Kontext.
 - Für jedes Feature wird ein eigener `feature/<kurzbeschreibung>`-Branch, für jeden Bugfix ein eigener `fix/<kurzbeschreibung>`-Branch vom aktuellen `master` angelegt.
-- Die Lösung wird auf dem Task-Branch umgesetzt und in sinnvollen Zwischenständen committed.
-- Nach grünem `npm test` wird der Task-Branch gepusht, lokal per `git merge --no-ff` nach `master` gemergt und anschließend gelöscht.
-- Jeder abgeschlossene Task erhält auf `master` eine aktualisierte Version, einen Changelog-Eintrag, einen Release-Tag und einen GitHub-Release. Der vorhandene Release-Workflow baut und veröffentlicht den Tarball automatisch.
+- Die Lösung wird auf dem Task-Branch umgesetzt. Wenn Commits beauftragt sind,
+  werden sie in sinnvolle, thematisch geschlossene Zwischenstände geteilt.
+- Nach erfolgreicher Verifikation wird nur auf ausdrücklichen Auftrag committed,
+  gepusht, nach `master` gemergt oder veröffentlicht.
+- Releases werden derzeit manuell erstellt, weil keine GitHub-Actions-Workflows
+  im Repository aktiv sind. Ein Release-Task aktualisiert Version,
+  `CHANGELOG.md` und `io-package.json`, baut das Paket lokal und erstellt danach
+  Tag und GitHub-Release.
 
 ## Wann Spec / Plan / ADR nötig sind
 
@@ -23,19 +28,19 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 1. **Brainstorming** — Anforderungen klären, Ansätze vergleichen, mit dem Nutzer abstimmen.
 2. **Spec** — abgestimmtes Design schriftlich festhalten (`docs/specs/YYYY-MM-DD-<thema>.md`).
 3. **Plan** — in einzelne, TDD-taugliche Tasks zerlegen (`docs/plans/YYYY-MM-DD-<thema>.md`).
-4. **TDD-Implementierung** — pro Task: Test zuerst (rot), dann Implementierung (grün), dann Commit.
+4. **TDD-Implementierung** — pro Task: Test zuerst (rot), dann Implementierung
+   (grün); bei beauftragten Commits anschließend einen geschlossenen
+   Zwischenstand erstellen.
 5. **Review** — pro Task ein Review gegen Spec-Konformität und Code-Qualität; bei größeren Änderungen zusätzlich ein abschließendes Whole-Branch-Review.
-
-## Modellwahl bei KI-gestützter Entwicklung
-
-- Implementierung (Code schreiben, Tests ausführen): günstiges/schnelles Modell (aktuell: Haiku), wenn der Plan bereits detailliert genug ist.
-- Review, Denken, Architekturentscheidungen: das jeweils teuerste verfügbare Modell der Sitzung.
-- Details/Begründung: [ADR-0011](docs/adr/0011-subagent-driven-development.md).
 
 ## Tests
 
-- `npm test` muss vor jedem Commit grün sein (aktuell: 222 Unit-Tests + 1 Adapter-Smoke-Test — Hinweis zur eingeschränkten Aussagekraft des Smoke-Tests in [Testkonzept](docs/architecture/08-querschnittliche-konzepte.md#84-testkonzept)).
+- `npm test` muss vor jedem Commit grün sein. Die aktuelle Testanzahl kommt aus
+  der Testausgabe; die eingeschränkte Aussagekraft des Adaptertests steht im
+  [Testkonzept](docs/architecture/08-querschnittliche-konzepte.md#84-testkonzept).
 - Neue `lib/*`-Module bekommen eigene Unit-Tests mit gemockter Adapter-API.
+- `npm run lint` gehört zur Abschlussprüfung. Änderungen unter `src-admin/`
+  erfordern zusätzlich `npm run build:admin`.
 
 ## Dokumentation aktuell halten
 
@@ -58,12 +63,16 @@ Bei jeder Änderung, die eines der folgenden betrifft, wird die entsprechende Do
 1. `WORKLOG.md` auf `WIP` setzen und Branch/Status/Dokumentation prüfen.
 2. `feature/*` oder `fix/*` erstellen und Lösung implementieren.
 3. Worklog und betroffene Fach-/Architekturdokumentation live aktualisieren.
-4. Zwischenstände und am Ende den vollständigen Stand committen.
+4. Zwischenstände und den vollständigen Stand vor einer angeforderten
+   Veröffentlichung committen.
 5. `npm test`, Build und bei UI-Änderungen die Live-Abnahme durchführen.
-6. Branch pushen, nach `master` mergen und Branch löschen.
-7. Version/Changelog aktualisieren, Tag pushen und GitHub-Release-Workflow prüfen.
+6. Auf ausdrücklichen Auftrag Branch pushen, nach `master` mergen und Branch
+   löschen.
+7. Bei einem Release-Auftrag Version/Changelog aktualisieren, Paket prüfen, Tag
+   pushen und GitHub-Release manuell erstellen.
 8. `WORKLOG.md` auf `DONE` setzen und Status sauber hinterlassen.
 
 ## Commits
 
-Commit-Nachrichten erklären das *Warum*, nicht nur das *Was*. KI-unterstützte Commits sind mit `Co-Authored-By:` gekennzeichnet.
+Commit-Nachrichten erklären das *Warum*, nicht nur das *Was*. Keine Secrets,
+lokalen Zugangsdaten oder generierten Testartefakte committen.
