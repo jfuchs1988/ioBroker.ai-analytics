@@ -13,5 +13,6 @@ CONTRIBUTING.md
 docs/
 test/
 src-admin/
-.eslintrc.cjs
+eslint.config.js
 .mocharc.json
+.claude/
