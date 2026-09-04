@@ -4,11 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/publication-consistency`
-- Ziel: Finale Repository-Checker-Befunde beheben.
-- Letzter sicherer Commit: `5663979 fix: resolve adapter checker findings`.
-- Aktueller Stand: Nach Abbruch in OpenCode fortgesetzt; ungültiges JSON in `io-package.json` (überzähliges Komma nach dem `0.0.1-beta.27`-News-Eintrag) behoben. 297 Unit-Tests, Adapter-Smoke-Test, ESLint und Admin-Build erfolgreich.
-- Nächster Schritt: Commit, Push, Merge nach `master`, Release `v0.0.1-beta.33` taggen und veröffentlichen.
+- Branch: `master`
+- Ziel: Repository-Checker-Befunde und Veröffentlichungskonsistenz beheben.
+- Letzter sicherer Commit: `91f91af merge: finalize repository checker cleanup for beta.33`.
+- Aktueller Stand: Release `v0.0.1-beta.33` veröffentlicht.
+- Nächster Schritt: keiner.
 
 ## TODO
 
@@ -55,6 +55,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.31` erstellt, nach `master` gemergt, als `v0.0.1-beta.31` getaggt, gepusht und auf GitHub veröffentlicht.
 - Repository-Checker-Fixes für Metadaten, Lizenz, News, Dependencies und Paketinhalt integriert.
 - Release `0.0.1-beta.32` erstellt, nach `master` gemergt, als `v0.0.1-beta.32` getaggt, gepusht und auf GitHub veröffentlicht.
+- Nach Abbruch in OpenCode fortgesetzt: ungültiges JSON in `io-package.json` (überzähliges Komma im news-Objekt) behoben, das den vorherigen Task blockiert hatte. Release `0.0.1-beta.33` erstellt, nach `master` gemergt, als `v0.0.1-beta.33` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
