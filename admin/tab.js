@@ -15,6 +15,10 @@ function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
 
+function formatEuroAmount(value, decimals) {
+    return `${new Intl.NumberFormat('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value)} €`;
+}
+
 function formatUsageLine(entry, prices = {}) {
     const usage = entry && entry.usage;
     if (!usage || !Number.isFinite(usage.inputTokens) || !Number.isFinite(usage.outputTokens)) return '';
@@ -23,7 +27,7 @@ function formatUsageLine(entry, prices = {}) {
     const inputPrice = Number(prices.chatIn) || 0;
     const outputPrice = Number(prices.chatOut) || 0;
     const calculatedCost = (usage.inputTokens * inputPrice + usage.outputTokens * outputPrice) / 1000000;
-    const cost = inputPrice > 0 || outputPrice > 0 ? ` · Kosten: ${calculatedCost.toFixed(6)}` : '';
+    const cost = inputPrice > 0 || outputPrice > 0 ? ` · Kosten: ${formatEuroAmount(calculatedCost, 6)}` : '';
     return `Verbrauch: ${format.format(total)} Tokens (Input ${format.format(usage.inputTokens)}, Output ${format.format(usage.outputTokens)})${cost}`;
 }
 
@@ -128,14 +132,13 @@ function filterEntries(entries, query) {
     });
 }
 
-function formatBudgetLine(usage, dailyTokenBudget, today = new Date().toISOString().slice(0, 10)) {
-    const isStale = !!(usage && usage.date && usage.date !== today);
-    const tokensToday = isStale ? 0 : (usage && usage.tokensToday) || 0;
-    const budget = Number(dailyTokenBudget) || 0;
+function formatBudgetLine(todayEntry, dailyBudgetEur, prices) {
+    const cost = computeCost(todayEntry ? [todayEntry] : [], prices);
+    const budget = Number(dailyBudgetEur) || 0;
     if (budget <= 0) {
-        return `Heute genutzt: ${tokensToday} Tokens (kein Limit)`;
+        return `Heute genutzt: ${formatEuroAmount(cost.totalCost, 4)} (kein Limit)`;
     }
-    return `Heute genutzt: ${tokensToday} / ${budget} Tokens`;
+    return `Heute genutzt: ${formatEuroAmount(cost.totalCost, 4)} von ${formatEuroAmount(budget, 4)}`;
 }
 
 function computeRangeHistory(history, days) {
@@ -175,7 +178,7 @@ function recommendLimits(rangeEntries) {
 }
 
 function formatCostLine(cost) {
-    const format = (n) => n.toFixed(4);
+    const format = (n) => formatEuroAmount(n, 4);
     return `Kosten im Zeitraum: ${format(cost.totalCost)} (Normales Modell: ${format(cost.chatCost)}, Onboarding-Modell: ${format(cost.onboardingCost)})`;
 }
 
@@ -483,38 +486,30 @@ function toggleBudgetDetails() {
 
 function loadBudget() {
     const display = document.getElementById('budget-summary-bar');
-    socket.emit('getState', `${namespace}.usage.today`, (usageErr, usageState) => {
-        let usage = { tokensToday: 0 };
-        if (!usageErr && usageState && usageState.val) {
+    socket.emit('getState', `${namespace}.usage.history`, (historyErr, historyState) => {
+        let history = [];
+        if (!historyErr && historyState && historyState.val) {
             try {
-                usage = JSON.parse(usageState.val);
+                const parsed = JSON.parse(historyState.val);
+                history = Array.isArray(parsed) ? parsed : [];
             } catch (parseError) {
-                usage = { tokensToday: 0 };
+                history = [];
             }
         }
-        socket.emit('getState', `${namespace}.usage.history`, (historyErr, historyState) => {
-            let history = [];
-            if (!historyErr && historyState && historyState.val) {
-                try {
-                    const parsed = JSON.parse(historyState.val);
-                    history = Array.isArray(parsed) ? parsed : [];
-                } catch (parseError) {
-                    history = [];
-                }
-            }
-            budgetHistory = history;
-            socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
-                const native = !objErr && instanceObj && instanceObj.native ? instanceObj.native : {};
-                display.textContent = formatBudgetLine(usage, native.dailyTokenBudget);
-                budgetPrices = {
-                    chatIn: Number(native.chatPricePerMillionInputTokens) || 0,
-                    chatOut: Number(native.chatPricePerMillionOutputTokens) || 0,
-                    onboardingIn: Number(native.onboardingPricePerMillionInputTokens) || 0,
-                    onboardingOut: Number(native.onboardingPricePerMillionOutputTokens) || 0,
-                };
-                renderHistory(chatHistory, budgetPrices);
-                renderBudgetExtras();
-            });
+        budgetHistory = history;
+        const today = new Date().toISOString().slice(0, 10);
+        const todayEntry = history.find((entry) => entry.date === today) || null;
+        socket.emit('getObject', `system.adapter.${namespace}`, (objErr, instanceObj) => {
+            const native = !objErr && instanceObj && instanceObj.native ? instanceObj.native : {};
+            budgetPrices = {
+                chatIn: Number(native.chatPricePerMillionInputTokens) || 0,
+                chatOut: Number(native.chatPricePerMillionOutputTokens) || 0,
+                onboardingIn: Number(native.onboardingPricePerMillionInputTokens) || 0,
+                onboardingOut: Number(native.onboardingPricePerMillionOutputTokens) || 0,
+            };
+            display.textContent = formatBudgetLine(todayEntry, native.dailyBudgetEur, budgetPrices);
+            renderHistory(chatHistory, budgetPrices);
+            renderBudgetExtras();
         });
     });
 }

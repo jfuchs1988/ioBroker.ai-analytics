@@ -86,14 +86,14 @@ describe('SettingsCsvComponent settings import', () => {
     it('applies every imported settings column, not just the last one', async () => {
         const adapter = makeAdapter({
             checkIntervalHours: 24,
-            dailyTokenBudget: 0,
+            dailyBudgetEur: 0,
             maxAgentIterations: 8,
             maxToolCalls: 32,
         });
         const component = makeComponent(adapter);
         const file = {
             text: async () =>
-                'checkIntervalHours,dailyTokenBudget,maxAgentIterations,maxToolCalls\n48,999,7,31\n',
+                'checkIntervalHours,dailyBudgetEur,maxAgentIterations,maxToolCalls\n48,999,7,31\n',
         };
 
         await component.handleFileSelected({ target: { files: [file] } });
@@ -103,7 +103,7 @@ describe('SettingsCsvComponent settings import', () => {
 
         expect(adapter.data).to.deep.equal({
             checkIntervalHours: 48,
-            dailyTokenBudget: 999,
+            dailyBudgetEur: 999,
             maxAgentIterations: 7,
             maxToolCalls: 31,
         });
