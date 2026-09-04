@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.36] - 2026-09-04
+
+### Behoben
+- Einstellungsseite, Settings-CSV-Import und gebündelte Katalogbearbeitung verbessert.
+- Markdown-Antworten der KI werden im Chat formatiert dargestellt.
+
 ## [0.0.1-beta.35] - 2026-09-04
 
 ### Geändert
