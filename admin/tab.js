@@ -9,6 +9,7 @@ const BRIDGE_TIMEOUT_FAST_MS = 60000;
 const BRIDGE_TIMEOUT_SLOW_MS = 300000;
 const SLOW_COMMANDS = ['chatQuestion', 'runDiscoveryNow', 'runProactiveCheckNow'];
 const BUDGET_REFRESH_INTERVAL_MS = 20000;
+const THINKING_POLL_INTERVAL_MS = 400;
 
 function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
@@ -206,6 +207,49 @@ function setLoading(isLoading) {
         button.disabled = isLoading;
         button.textContent = isLoading ? '...' : 'Senden';
     }
+}
+
+function setThinking(isThinking) {
+    const status = document.getElementById('chat-thinking');
+    if (!status) return;
+    status.hidden = !isThinking;
+    if (isThinking) {
+        const text = document.getElementById('chat-thinking-text');
+        const progress = document.getElementById('chat-thinking-progress');
+        if (text) text.textContent = 'Denkt nach';
+        if (progress) progress.value = 0;
+    }
+}
+
+let thinkingPollTimer = null;
+
+function loadThinkingProgress() {
+    socket.emit('getState', `${namespace}.catalogSync`, (err, state) => {
+        if (err || !state || !state.val) return;
+        try {
+            const progress = typeof state.val === 'string' ? JSON.parse(state.val) : state.val;
+            if (progress.phase !== 'chat' || !progress.running) return;
+            const text = document.getElementById('chat-thinking-text');
+            const bar = document.getElementById('chat-thinking-progress');
+            const percent = progress.total ? Math.min(100, Math.round((progress.processed / progress.total) * 100)) : 0;
+            if (text) text.textContent = progress.message || `Denkt nach ... ${percent}%`;
+            if (bar) bar.value = percent;
+        } catch (_error) {
+            // Ignore a transient state update while the adapter is writing progress.
+        }
+    });
+}
+
+function startThinkingProgress() {
+    setThinking(true);
+    loadThinkingProgress();
+    thinkingPollTimer = setInterval(loadThinkingProgress, THINKING_POLL_INTERVAL_MS);
+}
+
+function stopThinkingProgress() {
+    if (thinkingPollTimer) clearInterval(thinkingPollTimer);
+    thinkingPollTimer = null;
+    setThinking(false);
 }
 
 let allDeviceEntries = [];
@@ -488,6 +532,7 @@ async function sendQuestion() {
     if (!text) return;
     input.value = '';
     setLoading(true);
+    startThinkingProgress();
 
     try {
         const response = await callAdapter('chatQuestion', { text });
@@ -501,6 +546,7 @@ async function sendQuestion() {
     } catch (error) {
         appendChatError(error.message);
     } finally {
+        stopThinkingProgress();
         setLoading(false);
     }
 }
