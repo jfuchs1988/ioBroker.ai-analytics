@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.39] - 2026-09-04
+
+### Sicherheit und Zuverlässigkeit
+- Tiefes Code-Review mit Hardening für Provider, Agent-Werkzeuge, Admin-Ausgabe, CSV-Verarbeitung, Zustände, History-Zugriffe und parallele Operationen abgeschlossen.
+- Produktionsabhängigkeiten ohne `npm audit`-Befund; verbleibende Audit-Hinweise betreffen ausschließlich Entwicklungs-Testwerkzeuge.
+
 ## [0.0.1-beta.38] - 2026-09-04
 
 ### Hinzugefügt
