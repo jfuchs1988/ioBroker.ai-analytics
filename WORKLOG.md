@@ -5,14 +5,16 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 ## WIP
 
 - Branch: `fix/historized-data-points-tab`
-- Ziel: Historisierte Datenpunkte wieder als eigenen Tab innerhalb der Adapter-Einstellungen anzeigen.
+- Ziel: Historisierte Datenpunkte wieder als eigenen Tab innerhalb der Adapter-Einstellungen anzeigen und laufende Chat-Anfragen mit Fortschritt anzeigen.
 - Letzter sicherer Commit: `6d33bae merge: exclude .claude/ session state and eslint.config.js from npm package`.
 - Aktueller Stand: In Arbeit. CSV-Import korrigiert, geschützte API-Schlüssel werden nicht mehr als unbrauchbare verschlüsselte Werte exportiert/importiert. Geräte-Komponente nutzt Auswahl plus Sammelspeicherung; Kategorie, Raum, Verhalten, Update-Frequenz, Vollständigkeit und Ignorieren sind editierbar. Automatische Keller-Zuordnung für PV, Wärmepumpen, Heizungs- und Weichwasseranlagen erweitert. Markdown-Renderer und Tests ergänzt.
 - Verifiziert: `npm test` mit 300 Unit-Tests und 1 Adaptertest, ESLint und `npm run build:admin` erfolgreich. Admin-Bundle neu gebaut.
 - PR #1 gegen `master` erstellt und gemergt; Release `0.0.1-beta.36` veröffentlicht. GitHub-Actions-CI bleibt deaktiviert.
 - Aktueller Stand: Katalogverwaltung aus der Einstellungsseite herausgelöst und als eigener Tab `Historisierte Datenpunkte` ergänzt.
-- Verifiziert: 300 Unit-Tests, 1 Adaptertest, Lint und Admin-Build erfolgreich.
-- PR #2 gegen `master` erstellt und gemergt. Release `0.0.1-beta.37` wird direkt veröffentlicht.
+- Verifiziert: 301 Unit-Tests, 1 Adaptertest, Lint und Admin-Build erfolgreich.
+- PR #2 gegen `master` erstellt und gemergt; Release `0.0.1-beta.37` veröffentlicht.
+- Aktueller Stand: Chat zeigt den Agent-Fortschritt aus `catalogSync` mit Prozentwert und Meldungen wie „Daten werden zusammengestellt“.
+- Nächster Schritt: Commit, PR und Release durchführen.
 - Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
 - Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
 - Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.

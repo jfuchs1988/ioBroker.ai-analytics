@@ -546,6 +546,15 @@ class AiAnalytics extends utils.Adapter {
         const priorEntries = await getRecentChatHistory(this, 10);
         const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
 
+        await this.updateCatalogSyncState({
+            running: true,
+            phase: 'chat',
+            processed: 0,
+            total: 8,
+            message: 'Daten werden zusammengestellt ... 0%',
+            error: null,
+        });
+
         const timeAndLocation = await buildTimeAndLocationContext(this);
         const { finalText, usage } = await runAgent({
             provider: this.chatProvider,
@@ -564,13 +573,34 @@ class AiAnalytics extends utils.Adapter {
                  'Wenn der Nutzer mehrere Geräte erklärt oder eine bestehende Zuordnung korrigiert, nutze updateCatalogEntries. ' +
                  'Rufe dieses Schreibwerkzeug nur nach einer ausdruecklichen Nutzerangabe auf, fasse die gespeicherten Zuordnungen danach kurz zusammen ' +
                  'und verwende für die Antwort weiterhin die gepflegte description statt der rohen sourceId.',
-            userMessage: question,
-            priorMessages,
-        });
+             userMessage: question,
+             priorMessages,
+             onProgress: progress => {
+                 const processed = Math.min(progress.processed || 0, 8);
+                 const total = Math.max(progress.total || 8, 1);
+                 const percent = Math.min(100, Math.round((processed / total) * 100));
+                 return this.updateCatalogSyncState({
+                     running: true,
+                     phase: 'chat',
+                     processed,
+                     total,
+                     message: `${processed < total ? 'Daten werden zusammengestellt' : 'Antwort wird erstellt'} ... ${percent}%`,
+                 });
+             },
+         });
 
         await recordUsage(this, usage, 'chat');
         await this.appendHistoryFailureReports();
         this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+
+        await this.updateCatalogSyncState({
+            running: false,
+            phase: 'done',
+            processed: 8,
+            total: 8,
+            message: 'Antwort fertig.',
+            finishedAt: new Date().toISOString(),
+        });
 
         const result = await appendChatMessage(this, 'assistant', finalText);
         if (!license.fullAccess) {

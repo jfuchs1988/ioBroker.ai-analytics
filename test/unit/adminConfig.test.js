@@ -48,6 +48,13 @@ describe('admin configuration links and model discovery', () => {
         expect(sponsorPosition).to.be.lessThan(navEnd);
     });
 
+    it('shows a thinking status while the chat request is running', () => {
+        const html = fs.readFileSync(path.join(ROOT, 'admin', 'tab.html'), 'utf8');
+        expect(html).to.include('id="chat-thinking"');
+        expect(html).to.include('Denkt nach');
+        expect(html).to.include('id="chat-thinking-progress"');
+    });
+
     it('declares GitHub Sponsors funding metadata', () => {
         const funding = fs.readFileSync(path.join(ROOT, '.github', 'FUNDING.yml'), 'utf8');
         const packageJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
