@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.47] - 2026-09-04
+
+### Geändert
+
+- Session-Kontext und Projektdokumentation nach Progressive Disclosure
+  strukturiert: schlanke lokale `AGENTS.md`, aufgabenbezogene Fachkontexte und
+  reduzierter `WORKLOG.md`.
+- README-, Prozess-, Architektur- und Entitlement-Dokumentation auf den
+  tatsächlichen Projektstand konsolidiert.
+- Lizenzübersicht um Ausnahmen, Assets, Abhängigkeiten und
+  `THIRD-PARTY-NOTICES.md` ergänzt.
+- Dokumentationstests prüfen relative Links, Überschriftenanker,
+  Versionskonsistenz und Sponsor-Dateiköpfe.
+
 ## [0.0.1-beta.46] - 2026-09-04
 
 ### Geändert

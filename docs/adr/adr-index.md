@@ -32,5 +32,6 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0024](0024-zweistufige-valuekind-klassifizierung.md) | Zweistufige `valueKind`-Klassifizierung (Metadaten + Datenprobe), kein LLM-Aufruf | Angenommen | 2026-08-24 |
 | [0025](0025-nutzerbestaetigte-katalogpflege-im-chat.md) | Nutzerbestätigte Katalogpflege im Chat | Angenommen | 2026-09-03 |
 | [0026](0026-schreibmuster-bewusste-datenvollstaendigkeit.md) | Schreibmuster-bewusste Datenvollständigkeits-Erkennung (`writable`/`writePattern`/`updateFrequency`/`dataCompleteness`) | Angenommen | 2026-09-03 |
-| [0027](0027-hybrid-lizenzmodell-nach-evcc.md) | Hybrides Lizenzmodell nach evcc | Angenommen (technische Durchsetzung offen) | 2026-09-03 |
+| [0027](0027-hybrid-lizenzmodell-nach-evcc.md) | Hybrides Lizenzmodell nach evcc | Angenommen (produktive Aktivierung offen) | 2026-09-03 |
 | [0028](0028-tagesbudget-in-eur-statt-token.md) | Tagesbudget in EUR statt Rohtoken, mit Preis-Validierung und Anzeige-Refresh beim Start | Angenommen | 2026-09-04 |
+| [0029](0029-progressive-disclosure-fuer-session-kontext.md) | Progressive Disclosure für Session-Kontext | Angenommen | 2026-09-04 |

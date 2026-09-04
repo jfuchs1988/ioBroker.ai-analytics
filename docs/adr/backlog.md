@@ -28,9 +28,12 @@ Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt.
 
 Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
 
-## 5. CI-/Linting-/Dependency-Scanning-Stack (konkrete Tool-Wahl)
+## 5. CI-Aktivierung — zurückgestellt
 
-Bereits als Folge-Plan angekündigt (GitHub Actions, ESLint+Prettier, `@iobroker/adapter-dev`-Checker, CHANGELOG-Pflege, Dependabot/Renovate), aber noch keine konkreten Konfigurationsentscheidungen (z. B. welche ESLint-Regelbasis, welcher Node-Versionsmatrix in CI).
+ESLint, Mocha, Admin-Build und npm-Audit sind als lokale Prüfschritte vorhanden.
+GitHub-Actions-Workflows wurden auf Nutzerwunsch entfernt. Offen ist nur, ob und
+wann automatische CI wieder aktiviert werden soll; bis dahin erfolgen Prüfung
+und Release manuell.
 
 ## 6. Versionierungs-/Release-Policy nach der Beta-Phase — TODO
 

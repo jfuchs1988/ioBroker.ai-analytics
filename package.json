@@ -1,6 +1,6 @@
 {
   "name": "iobroker.ai-analytics",
-  "version": "0.0.1-beta.46",
+  "version": "0.0.1-beta.47",
   "description": "KI-gestuetzte Analyse und proaktive Pruefungen fuer historisierte ioBroker-Objekte",
   "main": "main.js",
   "repository": {
@@ -19,7 +19,7 @@
   },
   "author": "Johannes Fuchs <johannes.fuchs@jfuchs.de>",
   "funding": "https://github.com/sponsors/jfuchs1988",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@iobroker/adapter-core": "^3.4.3"
   },

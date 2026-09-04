@@ -1,37 +1,41 @@
-# Dokumentation — ioBroker.ai-analytics
+# Dokumentation
 
-[← zurück zum Projekt-Root](../README.md)
+[← Projekt-README](../README.de.md)
 
-Diese Seite ist der zentrale Einstiegspunkt (Map of Content) in die gesamte Projektdokumentation.
+Dieser Index trennt Produkt-, Architektur-, Umsetzungs- und Agentenkontext.
 
-## Architektur
+## Einstieg nach Zweck
 
-- **[arc42-Architekturdokumentation](architecture/arc42-index.md)** — vollständiger Überblick über Ziele, Bausteine, Laufzeitverhalten, Randbedingungen, Risiken
-- **[Architekturentscheidungen (ADRs)](adr/adr-index.md)** — jede Entscheidung einzeln, mit Kontext und Konsequenzen
-- **[Backlog offener Architekturentscheidungen](adr/backlog.md)** — architekturrelevante Fragen, die noch diskutiert werden müssen
-- **[Produkt-Roadmap und globale TODO-Liste](roadmap.md)** — priorisierte Nutzerwünsche, Produktlücken und empfohlene nächste Schritte
+- [Produkt-Roadmap](roadmap.md): priorisierte Produktlücken und nächste Schritte
+- [Architekturübersicht](architecture/arc42-index.md): System, Laufzeit,
+  Qualitätsziele und Risiken
+- [Architekturentscheidungen](adr/adr-index.md): angenommene ADRs und
+  [offene Entscheidungen](adr/backlog.md)
+- [Agent-Fachkontext](agents/README.md): aufgabenbezogene technische
+  Kurzreferenzen für Entwicklungssitzungen
+- [Specs](specs/): verbindliches gewünschtes Verhalten
+- [Pläne](plans/): Umsetzungsschritte und historische Implementierungspläne
 
-## Specs
+## Aktiver Produktstatus
 
-- [2026-08-21 — ai-analytics Design](specs/2026-08-21-ai-analytics-design.md) — das ursprüngliche, mit dem Nutzer abgestimmte Design
-- [2026-09-02 — Provider-Modellerkennung und Sponsoring](specs/2026-09-02-provider-model-discovery-and-sponsoring.md) — kostenlose API-Einstiege, dynamische Modellvorschläge und sichtbare Sponsoring-Links
-- [2026-09-02 — Geräteübersicht in den Adapter-Einstellungen](specs/2026-09-02-geraete-in-einstellungen.md) — dynamische Katalogverwaltung in der JSON-Konfiguration
-- [2026-09-03 — Hybride Anomalieerkennung](specs/2026-09-03-hybride-anomalieerkennung.md) — statistische Kandidatenstufe vor der proaktiven LLM-Prüfung
-- [2026-09-03 — Hybrides Lizenzmodell und Entitlements](specs/2026-09-03-hybrid-license-and-entitlements.md) — MIT-Kern und sponsor-required KI-Komponenten
+- Der aktuelle Übergabestand steht ausschließlich in [WORKLOG.md](../WORKLOG.md).
+- Veröffentlichte Änderungen stehen im [CHANGELOG.md](../CHANGELOG.md).
+- Die aktuelle Version steht in [package.json](../package.json).
+- Dauerhafte Einschränkungen stehen in
+  [Risiken und technische Schulden](architecture/11-risiken-und-schulden.md).
 
-## Pläne
+## Zentrale aktuelle Verträge
 
-- [2026-08-21 — ai-analytics Implementierung](plans/2026-08-21-ai-analytics-implementation.md) — die 13 TDD-Tasks, aus denen der Adapter gebaut wurde (Status: abgeschlossen)
-- [2026-09-02 — Provider-Modellerkennung und Sponsoring](plans/2026-09-02-provider-model-discovery-and-sponsoring.md) — **abgeschlossen**, Modelllisten und GitHub Sponsors
-- [2026-09-02 — Geräteübersicht in den Adapter-Einstellungen](plans/2026-09-02-geraete-in-einstellungen.md) — **umgesetzt**, Custom-Config-Komponente und Verlagerung aus dem Custom-Tab
-- [2026-09-03 — Hybride Anomalieerkennung](plans/2026-09-03-hybride-anomalieerkennung-implementation.md) — **Phase 1 umgesetzt**, robuste Voranalyse numerischer Gauge-Zeitreihen
-- [2026-09-03 — Hybrides Lizenzmodell und Entitlements](plans/2026-09-03-hybrid-license-and-entitlements.md) — **Schritte 1 und 2 umgesetzt**, technische Entitlement-Prüfung offen
+- [Grunddesign](specs/2026-08-21-ai-analytics-design.md)
+- [Datenpunkt-Klassifizierung](specs/2026-08-24-datenpunkt-klassifizierung.md)
+- [Hybride Anomalieerkennung](specs/2026-09-03-hybride-anomalieerkennung.md)
+- [Hybrides Lizenzmodell und Entitlements](specs/2026-09-03-hybrid-license-and-entitlements.md)
+- [Deep Security Hardening](specs/2026-09-04-deep-security-hardening.md)
+- [Session-Kontext und Dokumentationsstruktur](specs/2026-09-04-session-kontext-und-dokumentation.md)
 
 ## Prozess
 
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — Branching-Modell, wann Spec/Plan/ADR nötig sind, TDD-/Review-Erwartung
-- [WORKLOG.md](../WORKLOG.md) — aktueller WIP/TODO/DONE-Arbeitsstand für Übergaben und Wiederaufnahme
-
-## Änderungen
-
-- [CHANGELOG.md](../CHANGELOG.md) — Versionshistorie
+- [CONTRIBUTING.md](../CONTRIBUTING.md): Branching, Tests und Veröffentlichung
+- [WORKLOG.md](../WORKLOG.md): ausschließlich aktive Übergabe
+- [Lizenzübersicht](../LICENSES/README.md): MIT-Kern, Ausnahmen, Abhängigkeiten
+  und Assets
