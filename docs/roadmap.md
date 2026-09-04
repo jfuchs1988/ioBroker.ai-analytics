@@ -112,11 +112,11 @@ Das stärkt den wichtigsten Qualitätsanspruch: keine vagen KI-Vermutungen.
 
 ### 7. Korrelationen und abgeleitete Kennzahlen
 
-**Nutzen: hoch · Risiko: hoch · Status: offen, in drei Sub-Projekte zerlegt**
+**Nutzen: hoch · Risiko: hoch · Status: Sub-Projekte A+C umgesetzt, B offen**
 
-- PV, Netzbezug, Batterie und Verbraucher gemeinsam analysieren
-- Raumtemperatur, Heizung und Fensterzustände korrelieren
-- abgeleitete Kennzahlen wie Eigenverbrauch, Laufzeit oder Wirkungsgrad
+- PV, Netzbezug, Batterie und Verbraucher gemeinsam analysieren (Sub-Projekt B, offen)
+- Raumtemperatur, Heizung und Fensterzustände korrelieren (Sub-Projekt C: Fenster/Heizung-Überlappung umgesetzt, Temperatur-Stagnation offen)
+- abgeleitete Kennzahlen wie Eigenverbrauch, Laufzeit oder Wirkungsgrad (Sub-Projekt A: Laufzeit + Eigenverbrauch umgesetzt, Wirkungsgrad offen)
 
 Zerlegung und empfohlene Reihenfolge (abgeleitete Kennzahlen →
 HVAC-Korrelation → Energie-Korrelation) siehe

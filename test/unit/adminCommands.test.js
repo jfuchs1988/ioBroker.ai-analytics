@@ -193,6 +193,7 @@ describe('adminCommands', () => {
             ['room', 'x'.repeat(201)],
             ['description', 'x'.repeat(2001)],
             ['derivedMetricRole', 'not-a-role'],
+            ['hvacRole', 'not-a-role'],
         ]) {
             it(`rejects an invalid ${field}`, async () => {
                 const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
@@ -267,6 +268,33 @@ describe('adminCommands', () => {
             const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
 
             expect(result.entry).to.deep.include({ derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
+            expect(setCatalogEntry.calledOnce).to.equal(true);
+        });
+
+        it('rejects hvacRole when the existing entry is not boolean_state', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'device_usage', valueKind: 'gauge' }]),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', hvacRole: 'window' });
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error.message).to.include('hvacRole');
+        });
+
+        it('accepts and stores a valid hvacRole on a boolean_state entry', async () => {
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'device_usage', valueKind: 'boolean_state' }]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', hvacRole: 'heating' });
+
+            expect(result.entry).to.deep.include({ hvacRole: 'heating' });
             expect(setCatalogEntry.calledOnce).to.equal(true);
         });
     });
