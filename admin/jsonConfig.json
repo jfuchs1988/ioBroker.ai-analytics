@@ -248,11 +248,15 @@
           "lg": 2,
           "xl": 2
         },
-        "dailyTokenBudget": {
+        "dailyBudgetEur": {
           "type": "number",
-          "label": "Taegliches Token-Budget (0 = kein Limit)",
+          "label": "Taegliches Budget (EUR, 0 = kein Limit)",
+          "help": "Wird nur ausgewertet, wenn fuer Chat oder Onboarding ein Preis pro 1 Mio. Tokens eingetragen ist.",
           "default": 0,
           "min": 0,
+          "validator": "data.dailyBudgetEur <= 0 || Number(data.chatPricePerMillionInputTokens) > 0 || Number(data.chatPricePerMillionOutputTokens) > 0 || Number(data.onboardingPricePerMillionInputTokens) > 0 || Number(data.onboardingPricePerMillionOutputTokens) > 0",
+          "validatorErrorText": "Kein Preis pro Token eingetragen: Ohne Preis kann kein Budget in EUR ausgewertet werden.",
+          "validatorNoSaveOnError": true,
           "xs": 12,
           "sm": 6,
           "md": 3,

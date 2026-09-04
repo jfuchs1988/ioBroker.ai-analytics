@@ -46,8 +46,8 @@ describe('markdownToHtml', () => {
 });
 
 describe('formatUsageLine', () => {
-    it('formats tokens and configured cost', () => {
-        expect(formatUsageLine({ usage: { inputTokens: 1000, outputTokens: 250 } }, { chatIn: 3, chatOut: 15 })).to.include('1.250 Tokens').and.to.include('Kosten: 0.006750');
+    it('formats tokens and configured cost in EUR', () => {
+        expect(formatUsageLine({ usage: { inputTokens: 1000, outputTokens: 250 } }, { chatIn: 3, chatOut: 15 })).to.include('1.250 Tokens').and.to.include('Kosten: 0,006750 €');
     });
 });
 
@@ -100,32 +100,28 @@ describe('filterEntries', () => {
 });
 
 describe('formatBudgetLine', () => {
+    const prices = { chatIn: 3, chatOut: 15, onboardingIn: 1, onboardingOut: 5 };
+    const chatEntry = { chat: { inputTokens: 1000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } };
+
     it('reports "kein Limit" when the budget is 0 or unset', () => {
-        expect(formatBudgetLine({ tokensToday: 150 }, 0)).to.equal('Heute genutzt: 150 Tokens (kein Limit)');
-        expect(formatBudgetLine({ tokensToday: 150 }, undefined)).to.equal('Heute genutzt: 150 Tokens (kein Limit)');
+        expect(formatBudgetLine(chatEntry, 0, prices)).to.equal('Heute genutzt: 3,0000 € (kein Limit)');
+        expect(formatBudgetLine(chatEntry, undefined, prices)).to.equal('Heute genutzt: 3,0000 € (kein Limit)');
     });
 
-    it('reports usage against the configured budget', () => {
-        expect(formatBudgetLine({ tokensToday: 150 }, 1000)).to.equal('Heute genutzt: 150 / 1000 Tokens');
+    it('reports cost against the configured EUR budget', () => {
+        expect(formatBudgetLine(chatEntry, 10, prices)).to.equal('Heute genutzt: 3,0000 € von 10,0000 €');
     });
 
-    it('defaults to 0 tokens when usage is missing', () => {
-        expect(formatBudgetLine(null, 1000)).to.equal('Heute genutzt: 0 / 1000 Tokens');
+    it('defaults to zero cost when there is no history entry for today', () => {
+        expect(formatBudgetLine(null, 10, prices)).to.equal('Heute genutzt: 0,0000 € von 10,0000 €');
     });
 
-    it('displays tokensToday normally when usage.date matches the injected today', () => {
-        expect(formatBudgetLine({ date: '2026-08-22', tokensToday: 150 }, 1000, '2026-08-22')).to.equal(
-            'Heute genutzt: 150 / 1000 Tokens'
-        );
-    });
-
-    it('treats usage as stale (0 tokens) when usage.date does not match the injected today', () => {
-        expect(formatBudgetLine({ date: '2026-08-21', tokensToday: 150 }, 1000, '2026-08-22')).to.equal(
-            'Heute genutzt: 0 / 1000 Tokens'
-        );
-        expect(formatBudgetLine({ date: '2026-08-21', tokensToday: 150 }, 0, '2026-08-22')).to.equal(
-            'Heute genutzt: 0 Tokens (kein Limit)'
-        );
+    it('sums chat and onboarding cost for the total', () => {
+        const entry = {
+            chat: { inputTokens: 1000000, outputTokens: 0 },
+            onboarding: { inputTokens: 2000000, outputTokens: 0 },
+        };
+        expect(formatBudgetLine(entry, 10, prices)).to.equal('Heute genutzt: 5,0000 € von 10,0000 €');
     });
 });
 
@@ -190,9 +186,9 @@ describe('recommendLimits', () => {
 });
 
 describe('formatCostLine', () => {
-    it('formats total, chat, and onboarding cost to 4 decimal places', () => {
+    it('formats total, chat, and onboarding cost to 4 decimal places in EUR', () => {
         expect(formatCostLine({ chatCost: 1.5, onboardingCost: 0.25, totalCost: 1.75 })).to.equal(
-            'Kosten im Zeitraum: 1.7500 (Normales Modell: 1.5000, Onboarding-Modell: 0.2500)'
+            'Kosten im Zeitraum: 1,7500 € (Normales Modell: 1,5000 €, Onboarding-Modell: 0,2500 €)'
         );
     });
 });

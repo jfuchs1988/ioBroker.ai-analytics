@@ -129,7 +129,7 @@ describe('adminBridge', () => {
 
         it('writes an error response when the dispatch throws', async () => {
             const adapter = makeAdapter();
-            const dispatch = sinon.stub().rejects(new Error('Tagesbudget an Tokens ist erschoepft.'));
+            const dispatch = sinon.stub().rejects(new Error('Tagesbudget (EUR) ist erschoepft.'));
             const state = {
                 val: JSON.stringify({ id: 'tab-2', command: 'chatQuestion', message: { text: 'Wie hoch?' } }),
                 ack: false,
@@ -141,7 +141,7 @@ describe('adminBridge', () => {
             expect(JSON.parse(written.val)).to.deep.equal({
                 id: 'tab-2',
                 ok: false,
-                error: 'Tagesbudget an Tokens ist erschoepft.',
+                error: 'Tagesbudget (EUR) ist erschoepft.',
             });
         });
 

@@ -12,7 +12,7 @@ const { getLimits } = require('./lib/limits');
 const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
-const { ensureUsageState, recordUsage, isBudgetExceeded } = require('./lib/usage');
+const { ensureUsageState, recordUsage, isBudgetExceeded, refreshTodaySummary } = require('./lib/usage');
 const adminCommands = require('./lib/adminCommands');
 const adminBridge = require('./lib/adminBridge');
 const { buildTimeAndLocationContext } = require('./lib/promptContext');
@@ -156,6 +156,7 @@ class AiAnalytics extends utils.Adapter {
     async onReady() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
+        await refreshTodaySummary(this);
         await ensureHealthState(this);
         await ensureLicenseStates(this);
         this.licenseState = evaluateLicense({ version: PACKAGE_VERSION, token: this.config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS });
@@ -505,7 +506,7 @@ class AiAnalytics extends utils.Adapter {
         }
 
         if (await isBudgetExceeded(this)) {
-            this.log.warn('Proaktive Pruefung: Tagesbudget an Tokens ist erschoepft, Lauf wird uebersprungen.');
+            this.log.warn('Proaktive Pruefung: Tagesbudget (EUR) ist erschoepft, Lauf wird uebersprungen.');
             await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Budget erschöpft.' });
             return { skipped: true, reason: 'budgetExceeded' };
         }
@@ -632,8 +633,8 @@ class AiAnalytics extends utils.Adapter {
         }
 
         if (await isBudgetExceeded(this)) {
-            this.log.warn('Chat: Tagesbudget an Tokens ist erschoepft, Frage wird nicht beantwortet.');
-            throw new Error('Tagesbudget an Tokens ist erschoepft.');
+            this.log.warn('Chat: Tagesbudget (EUR) ist erschoepft, Frage wird nicht beantwortet.');
+            throw new Error('Tagesbudget (EUR) ist erschoepft.');
         }
 
         const priorEntries = await getRecentChatHistory(this, 10);

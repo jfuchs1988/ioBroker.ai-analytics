@@ -1,7 +1,20 @@
 // test/unit/usage.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureUsageState, recordUsage, resetUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, MAX_HISTORY_DAYS, formatTodaySummary } = require('../../lib/usage');
+const {
+    ensureUsageState,
+    recordUsage,
+    resetUsage,
+    getTodayUsage,
+    getUsageHistory,
+    isBudgetExceeded,
+    refreshTodaySummary,
+    USAGE_STATE,
+    HISTORY_STATE,
+    TODAY_SUMMARY_STATE,
+    MAX_HISTORY_DAYS,
+    formatTodaySummary,
+} = require('../../lib/usage');
 
 function makeAdapter(config) {
     return {
@@ -14,7 +27,7 @@ function makeAdapter(config) {
 
 describe('usage', () => {
     it('resets today and history counters', async () => {
-        const adapter = makeAdapter({ dailyTokenBudget: 100 });
+        const adapter = makeAdapter({ dailyBudgetEur: 100 });
         await resetUsage(adapter);
         expect(adapter.setStateAsync.callCount).to.equal(3);
         expect(JSON.parse(adapter.setStateAsync.firstCall.args[1].val).tokensToday).to.equal(0);
@@ -95,55 +108,89 @@ describe('usage', () => {
         expect(adapter.setStateAsync.notCalled).to.equal(true);
     });
 
-    it('isBudgetExceeded is false when dailyTokenBudget is 0 or unset', async () => {
-        const adapter = makeAdapter({ dailyTokenBudget: 0 });
-        expect(await isBudgetExceeded(adapter)).to.equal(false);
-    });
+    describe('isBudgetExceeded (EUR-based)', () => {
+        it('is false when dailyBudgetEur is 0 or unset, regardless of usage', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter({ dailyBudgetEur: 0, chatPricePerMillionInputTokens: 3 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([{ date: today, chat: { inputTokens: 1000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
+            });
+            expect(await isBudgetExceeded(adapter)).to.equal(false);
+        });
 
-    it('isBudgetExceeded compares tokensToday against the configured budget', async () => {
-        const today = new Date().toISOString().slice(0, 10);
-        const adapter = makeAdapter({ dailyTokenBudget: 1000 });
-        adapter.getStateAsync.resolves({ val: JSON.stringify({ date: today, tokensToday: 1500 }) });
+        it('is false when a budget is set but no price is configured, even with heavy usage', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter({ dailyBudgetEur: 1 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([{ date: today, chat: { inputTokens: 100000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
+            });
+            expect(await isBudgetExceeded(adapter)).to.equal(false);
+        });
 
-        expect(await isBudgetExceeded(adapter)).to.equal(true);
-    });
+        it('compares today\'s calculated cost (chat + onboarding) against the configured EUR budget', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter({
+                dailyBudgetEur: 4,
+                chatPricePerMillionInputTokens: 3,
+                onboardingPricePerMillionInputTokens: 1,
+            });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([
+                    {
+                        date: today,
+                        chat: { inputTokens: 1000000, outputTokens: 0 }, // 3 EUR
+                        onboarding: { inputTokens: 2000000, outputTokens: 0 }, // 2 EUR
+                    },
+                ]),
+            });
+            // total cost 5 EUR >= 4 EUR budget
+            expect(await isBudgetExceeded(adapter)).to.equal(true);
+        });
 
-    it('isBudgetExceeded is false when under budget', async () => {
-        const today = new Date().toISOString().slice(0, 10);
-        const adapter = makeAdapter({ dailyTokenBudget: 1000 });
-        adapter.getStateAsync.resolves({ val: JSON.stringify({ date: today, tokensToday: 200 }) });
+        it('is false when under budget', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter({ dailyBudgetEur: 10, chatPricePerMillionInputTokens: 3 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([{ date: today, chat: { inputTokens: 1000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
+            });
+            expect(await isBudgetExceeded(adapter)).to.equal(false);
+        });
 
-        expect(await isBudgetExceeded(adapter)).to.equal(false);
+        it('is false when there is no history entry for today', async () => {
+            const adapter = makeAdapter({ dailyBudgetEur: 1, chatPricePerMillionInputTokens: 3 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
+            expect(await isBudgetExceeded(adapter)).to.equal(false);
+        });
     });
 
     describe('formatTodaySummary', () => {
-        it('formats zero usage with thousand separators and no budget line', () => {
+        it('formats zero usage with thousand separators, EUR cost, and no budget line', () => {
             expect(formatTodaySummary(null, 0, {})).to.equal(
-                '0 Tokens heute (kein Limit) · Chat: 0 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+                '0,0000 € heute verbraucht (kein Limit) · Chat: 0 Tokens · Kosten: 0,0000 € · Onboarding: 0 Tokens · Kosten: 0,0000 €'
             );
         });
 
         it('treats a missing budget the same as no limit', () => {
             expect(formatTodaySummary(null, undefined, {})).to.equal(
-                '0 Tokens heute (kein Limit) · Chat: 0 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+                '0,0000 € heute verbraucht (kein Limit) · Chat: 0 Tokens · Kosten: 0,0000 € · Onboarding: 0 Tokens · Kosten: 0,0000 €'
             );
         });
 
-        it('formats large token counts with German thousand separators against the configured budget', () => {
+        it('formats large token counts with German thousand separators, independent of cost', () => {
             const entry = { chat: { inputTokens: 100000, outputTokens: 20000 }, onboarding: { inputTokens: 0, outputTokens: 0 } };
-            expect(formatTodaySummary(entry, 500000, {})).to.equal(
-                '120.000 / 500.000 Tokens heute · Chat: 120.000 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+            expect(formatTodaySummary(entry, 0, {})).to.equal(
+                '0,0000 € heute verbraucht (kein Limit) · Chat: 120.000 Tokens · Kosten: 0,0000 € · Onboarding: 0 Tokens · Kosten: 0,0000 €'
             );
         });
 
-        it('splits chat and onboarding usage and calculates cost per purpose from configured prices', () => {
+        it('splits chat and onboarding usage, calculates cost per purpose, and reports total cost against the configured EUR budget', () => {
             const entry = {
                 chat: { inputTokens: 100000, outputTokens: 20000 },
                 onboarding: { inputTokens: 5000, outputTokens: 1000 },
             };
             const prices = { chatIn: 0.4, chatOut: 1.8, onboardingIn: 0.1, onboardingOut: 0.3 };
-            expect(formatTodaySummary(entry, 500000, prices)).to.equal(
-                '126.000 / 500.000 Tokens heute · Chat: 120.000 Tokens · Kosten: 0.0760 · Onboarding: 6.000 Tokens · Kosten: 0.0008'
+            expect(formatTodaySummary(entry, 5, prices)).to.equal(
+                '0,0768 € von 5,0000 € heute verbraucht · Chat: 120.000 Tokens · Kosten: 0,0760 € · Onboarding: 6.000 Tokens · Kosten: 0,0008 €'
             );
         });
     });
@@ -182,6 +229,33 @@ describe('usage', () => {
             const adapter = makeAdapter();
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({ val: JSON.stringify(stored) });
             expect(await getUsageHistory(adapter)).to.deep.equal(stored);
+        });
+    });
+
+    describe('refreshTodaySummary', () => {
+        it('recomputes TODAY_SUMMARY_STATE from persisted history and current config without recording new usage', async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            const adapter = makeAdapter({ dailyBudgetEur: 5, chatPricePerMillionInputTokens: 0.4, chatPricePerMillionOutputTokens: 1.8 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
+                val: JSON.stringify([{ date: today, chat: { inputTokens: 100000, outputTokens: 20000 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
+            });
+
+            await refreshTodaySummary(adapter);
+
+            expect(adapter.setStateAsync.calledOnce).to.equal(true);
+            const [id, state] = adapter.setStateAsync.firstCall.args;
+            expect(id).to.equal(TODAY_SUMMARY_STATE);
+            expect(state.val).to.include('Chat: 120.000 Tokens · Kosten: 0,0760 €');
+        });
+
+        it('reports an all-zero summary when there is no history entry for today', async () => {
+            const adapter = makeAdapter({ dailyBudgetEur: 5 });
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
+
+            await refreshTodaySummary(adapter);
+
+            const [, state] = adapter.setStateAsync.firstCall.args;
+            expect(state.val).to.equal(formatTodaySummary(null, 5, {}));
         });
     });
 
@@ -294,7 +368,7 @@ describe('usage', () => {
 
         it('recordUsage also writes TODAY_SUMMARY_STATE with formatted string', async () => {
             const today = new Date().toISOString().slice(0, 10);
-            const adapter = makeAdapter({ dailyTokenBudget: 1000 });
+            const adapter = makeAdapter({ dailyBudgetEur: 5 });
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
 
@@ -305,7 +379,7 @@ describe('usage', () => {
             expect(summaryCall.args[1].val).to.equal(
                 formatTodaySummary(
                     { date: today, chat: { inputTokens: 100, outputTokens: 20 }, onboarding: { inputTokens: 0, outputTokens: 0 } },
-                    1000,
+                    5,
                     {}
                 )
             );
@@ -319,7 +393,7 @@ describe('usage', () => {
             await recordUsage(adapter, { inputTokens: 1000000, outputTokens: 0 });
 
             const summaryCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === TODAY_SUMMARY_STATE);
-            expect(summaryCall.args[1].val).to.include('Chat: 1.000.000 Tokens · Kosten: 0.4000');
+            expect(summaryCall.args[1].val).to.include('Chat: 1.000.000 Tokens · Kosten: 0,4000 €');
         });
     });
 });

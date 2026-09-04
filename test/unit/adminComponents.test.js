@@ -58,12 +58,12 @@ describe('admin CSV helpers', () => {
     });
 
     it('strictly validates settings numbers, booleans, and providers', () => {
-        expect(validateSettingImportValue('dailyTokenBudget', '42')).to.equal(42);
+        expect(validateSettingImportValue('dailyBudgetEur', '42')).to.equal(42);
         expect(validateSettingImportValue('silentIfNothingFound', 'false')).to.equal(false);
         expect(validateSettingImportValue('providerType', 'openrouter')).to.equal('openrouter');
         expect(validateSettingImportValue('providerType', 'opencode')).to.equal('opencode');
         expect(() => validateSettingImportValue('checkIntervalHours', '0')).to.throw('checkIntervalHours');
-        expect(() => validateSettingImportValue('dailyTokenBudget', 'NaN')).to.throw('dailyTokenBudget');
+        expect(() => validateSettingImportValue('dailyBudgetEur', 'NaN')).to.throw('dailyBudgetEur');
         expect(() => validateSettingImportValue('providerType', 'unknown')).to.throw('providerType');
     });
 });
