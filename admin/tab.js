@@ -15,12 +15,15 @@ function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
 
-function formatUsageLine(entry) {
+function formatUsageLine(entry, prices = {}) {
     const usage = entry && entry.usage;
     if (!usage || !Number.isFinite(usage.inputTokens) || !Number.isFinite(usage.outputTokens)) return '';
     const format = new Intl.NumberFormat('de-DE');
     const total = usage.inputTokens + usage.outputTokens;
-    const cost = Number.isFinite(entry.cost) ? ` · Kosten: ${Number(entry.cost).toFixed(6)}` : '';
+    const inputPrice = Number(prices.chatIn) || 0;
+    const outputPrice = Number(prices.chatOut) || 0;
+    const calculatedCost = (usage.inputTokens * inputPrice + usage.outputTokens * outputPrice) / 1000000;
+    const cost = inputPrice > 0 || outputPrice > 0 ? ` · Kosten: ${calculatedCost.toFixed(6)}` : '';
     return `Verbrauch: ${format.format(total)} Tokens (Input ${format.format(usage.inputTokens)}, Output ${format.format(usage.outputTokens)})${cost}`;
 }
 
@@ -173,7 +176,7 @@ function recommendLimits(rangeEntries) {
 
 function formatCostLine(cost) {
     const format = (n) => n.toFixed(4);
-    return `Kosten im Zeitraum: ${format(cost.totalCost)} (Chat: ${format(cost.chatCost)}, Onboarding: ${format(cost.onboardingCost)})`;
+    return `Kosten im Zeitraum: ${format(cost.totalCost)} (Normales Modell: ${format(cost.chatCost)}, Onboarding-Modell: ${format(cost.onboardingCost)})`;
 }
 
 function formatRecommendationLine(recommendation) {
@@ -183,7 +186,10 @@ function formatRecommendationLine(recommendation) {
     return `Empfehlung (basierend auf bisherigem Verbrauch, kein hartes Limit): ${recommendation.dailyTokens} Tokens/Tag, ${recommendation.hourlyTokens} Tokens/Stunde`;
 }
 
-function renderHistory(history) {
+let chatHistory = [];
+
+function renderHistory(history, prices = budgetPrices) {
+    chatHistory = history || [];
     const container = document.getElementById('chat-messages');
     container.innerHTML = '';
     (history || []).forEach((entry) => {
@@ -197,7 +203,7 @@ function renderHistory(history) {
         time.textContent = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
         line.appendChild(bubble);
         line.appendChild(time);
-        const usage = formatUsageLine(entry);
+        const usage = formatUsageLine(entry, prices);
         if (usage) {
             const usageLine = document.createElement('div');
             usageLine.className = 'chat-usage';
@@ -506,6 +512,7 @@ function loadBudget() {
                     onboardingIn: Number(native.onboardingPricePerMillionInputTokens) || 0,
                     onboardingOut: Number(native.onboardingPricePerMillionOutputTokens) || 0,
                 };
+                renderHistory(chatHistory, budgetPrices);
                 renderBudgetExtras();
             });
         });

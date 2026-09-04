@@ -1,7 +1,7 @@
 // test/unit/usage.test.js
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { ensureUsageState, recordUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, MAX_HISTORY_DAYS, formatTodaySummary } = require('../../lib/usage');
+const { ensureUsageState, recordUsage, resetUsage, getTodayUsage, getUsageHistory, isBudgetExceeded, USAGE_STATE, HISTORY_STATE, TODAY_SUMMARY_STATE, MAX_HISTORY_DAYS, formatTodaySummary } = require('../../lib/usage');
 
 function makeAdapter(config) {
     return {
@@ -13,6 +13,13 @@ function makeAdapter(config) {
 }
 
 describe('usage', () => {
+    it('resets today and history counters', async () => {
+        const adapter = makeAdapter({ dailyTokenBudget: 100 });
+        await resetUsage(adapter);
+        expect(adapter.setStateAsync.callCount).to.equal(3);
+        expect(JSON.parse(adapter.setStateAsync.firstCall.args[1].val).tokensToday).to.equal(0);
+        expect(JSON.parse(adapter.setStateAsync.secondCall.args[1].val)).to.deep.equal([]);
+    });
     it('USAGE_STATE points at usage.today', () => {
         expect(USAGE_STATE).to.equal('usage.today');
     });
