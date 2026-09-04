@@ -6,39 +6,34 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`.
-- Status: Beide Tasks committed (`2038af6`, `8d15f38`), nach `master`
-  gemergt (`fbb8fa5`) und nach `origin/master` gepusht. Feature-Branch
-  gelöscht.
+- Branch: `feature/anomalieerkennung-phase2`
+- Ziel: Hybride Anomalieerkennung Phase 2 (Zähler + `boolean_state`), siehe
+  Spec `docs/specs/2026-09-04-hybride-anomalieerkennung-phase2.md`, Plan
+  `docs/plans/2026-09-04-hybride-anomalieerkennung-phase2.md`.
+- Stand: Code + Tests + Doku fertig, `npm test`/`npm run lint` grün. Noch
+  offen: `npm run build:admin` (nicht betroffen, kann übersprungen werden),
+  finale Diff-Prüfung, Commit/Merge/Push.
 
 ## TODO
 
-- Nächste Produktaufgabe: aktuellen Adapterstand auf einer echten ioBroker-
-  Installation live abnehmen.
+- Nächste Produktaufgabe (nach dieser): aktuellen Adapterstand auf einer
+  echten ioBroker-Installation live abnehmen.
 - Vor jedem künftigen Release `npm run test:e2e` einmal manuell ausführen
   (js-controller-Installation kann mehrere Minuten dauern).
 
 ## DONE
 
-- CI: Ungenutzte, seit 2026-09-04 deaktivierte GitHub-Actions-Workflows
-  (`CI`, `Release`) entfernt statt reaktiviert vorgehalten; `CONTRIBUTING.md`
-  und `docs/agents/development-workflow.md` an den tatsächlichen Zustand
-  (keine Workflow-Dateien mehr, rein manuelle Verifikation) angepasst.
-- Teststrategie (Spec `docs/specs/2026-09-04-teststrategie-main-und-admin-ui.md`,
-  Umsetzung `docs/plans/2026-09-04-teststrategie-main-und-admin-ui.md`):
-  - Admin-UI: Vitest + `@testing-library/react` + jsdom eingeführt; alte
-    String-Slicing-Tests (`test/unit/adminComponents.test.js`) durch echten
-    ESM-Import ersetzt; neuer Komponententest für `ProviderSelectComponent`
-    (`test/admin/`). `npm run test:admin`, Teil von `npm test`.
-  - Echter E2E-Test: `test/adapter.test.js` (deprecated `tests.unit`) entfernt,
-    ersetzt durch `test/e2e/adapter.e2e.test.js` mit `tests.integration` aus
-    `@iobroker/testing` — echter js-controller, echte Adapterinstanz, prüft
-    über `harness.on('stateChange', ...)` die Provider-Health-States, kein
-    LLM-Aufruf. `npm run test:e2e`, manuell verifiziert (2 passing, ~57s nach
-    einmaliger js-controller-Installation), nicht Teil von `npm test`.
-  - Verifiziert: `npm test` (372 Unit-Tests + 8 Admin-Tests), `npm run lint`,
-    `npm run build:admin`, `npm run test:e2e` — alle grün.
-- Nach `master` gemergt und nach `origin/master` gepusht.
+- Hybride Anomalieerkennung Phase 2: `lib/periodValue.js` aus `lib/tools.js`
+  extrahiert (Wiederverwendung der typbewussten Periodenberechnung);
+  `lib/anomalyDetector.js` um `detectDailyAggregateAnomaly` sowie
+  Zähler-/Boolean-Kandidaten (Tagesvergleich: letzter vollständiger
+  Kalendertag gegen 7 Kalendertage davor) erweitert; `main.js`-Systemprompt
+  kind-neutral formuliert. `npm test` (380 Unit-Tests) und `npm run lint`
+  grün.
+- CI-Aufräumung und Teststrategie (main.js + Admin-UI, echter
+  ioBroker-E2E-Test) aus der vorigen Session sind auf `master` gemergt und
+  gepusht (`2038af6`, `8d15f38`, `fbb8fa5`, `531fcce`). Details:
+  `docs/adr/backlog.md` Punkte 3 und 5, `docs/specs/2026-09-04-*`.
 
 Ältere abgeschlossene Historie (Dokumentationskonsolidierung, Lizenzaudit,
 Releases beta.47/beta.48) steht in `CHANGELOG.md` und Git.

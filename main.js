@@ -581,7 +581,8 @@ class AiAnalytics extends utils.Adapter {
                 systemPrompt:
                     timeAndLocation +
                     'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
-                    'Verbrauch, PV-Einspeisung) der letzten 24 Stunden. Begruende Auffaelligkeiten mit konkreten Werten. ' +
+                    'Verbrauch, PV-Einspeisung). Momentanwerte (gauge) beziehen sich auf die letzten 24 Stunden, ' +
+                    'Zaehler und Schalter (boolean_state) auf den letzten vollstaendigen Kalendertag. Begruende Auffaelligkeiten mit konkreten Werten. ' +
                     'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                     'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +

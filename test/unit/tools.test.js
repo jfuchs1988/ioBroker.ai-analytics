@@ -4,12 +4,16 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 
 function loadToolsWithStubs({ getAllCatalogEntries, getHistory, compareTimeframes, setCatalogEntry, getLocalDayBoundaries, getLocalTimeZone }) {
+    // '@global': true, damit die Stubs auch die von lib/periodValue.js intern
+    // requirten './dataAccess'/'./promptContext' abdecken (transitive Requires
+    // werden von proxyquire sonst nicht ueberschrieben).
     return proxyquire('../../lib/tools', {
         './catalog': { getAllCatalogEntries, setCatalogEntry, CATEGORIES: ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'] },
-        './dataAccess': { getHistory, compareTimeframes },
+        './dataAccess': { getHistory, compareTimeframes, '@global': true },
         './promptContext': {
             getLocalDayBoundaries: getLocalDayBoundaries || sinon.stub(),
             getLocalTimeZone: getLocalTimeZone || sinon.stub().returns('UTC'),
+            '@global': true,
         },
     });
 }

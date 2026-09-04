@@ -44,7 +44,7 @@ den versprochenen Nutzen tatsächlich liefern.
 
 ### 1. Hybride Anomalieerkennung
 
-**Nutzen: sehr hoch · Risiko: mittel · Status: Phase 1 umgesetzt**
+**Nutzen: sehr hoch · Risiko: mittel · Status: Phase 1+2 umgesetzt**
 
 - statistische Voranalyse für Baselines, Trends, Streuung, Ausreißer,
   Staleness und Datenlücken
@@ -54,9 +54,14 @@ den versprochenen Nutzen tatsächlich liefern.
 Das ist der größte funktionale Schritt über den heutigen freien Prüf-Prompt
 hinaus und reduziert Kosten sowie Fehlinterpretationen.
 
-Phase 1 ist seit `v0.0.1-beta.23` umgesetzt. Sie umfasst numerische
-Gauge-Zeitreihen, robuste Abweichungen, Datenlücken-Kandidaten und das
-LLM-Gate. Zähler, Boolean-Zustände und Korrelationen bleiben Folgearbeiten.
+Phase 1 ist seit `v0.0.1-beta.23` umgesetzt: numerische Gauge-Zeitreihen,
+robuste Abweichungen, Datenlücken-Kandidaten und das LLM-Gate (rollierendes
+24h-Fenster gegen 7 Tage davor). Phase 2 ergänzt Zähler
+(`daily_reset_counter`, `cumulative_total`, `event_count`) und
+`boolean_state` (Einschaltdauer) über einen Tagesvergleich (letzter
+vollständiger Kalendertag gegen 7 Kalendertage davor); siehe
+[Spec](specs/2026-09-04-hybride-anomalieerkennung-phase2.md). Korrelationen
+mehrerer Datenpunkte (Punkt 7) bleiben eine eigene Folgearbeit.
 
 ### 2. Belege und Nachvollziehbarkeit pro Aussage
 
