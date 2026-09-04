@@ -6,13 +6,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/anomalieerkennung-phase2`
-- Ziel: Hybride Anomalieerkennung Phase 2 (Zähler + `boolean_state`), siehe
-  Spec `docs/specs/2026-09-04-hybride-anomalieerkennung-phase2.md`, Plan
-  `docs/plans/2026-09-04-hybride-anomalieerkennung-phase2.md`.
-- Stand: Code + Tests + Doku fertig, `npm test`/`npm run lint` grün. Noch
-  offen: `npm run build:admin` (nicht betroffen, kann übersprungen werden),
-  finale Diff-Prüfung, Commit/Merge/Push.
+- Branch: `master`.
+- Status: Hybride Anomalieerkennung Phase 2 committed (`fede8d2`), nach
+  `master` gemergt (`2f13a27`) und nach `origin/master` gepusht.
+  Feature-Branch gelöscht.
 
 ## TODO
 
