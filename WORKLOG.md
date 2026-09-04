@@ -16,7 +16,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - PR #3 gegen `master` erstellt und gemergt; Release `0.0.1-beta.38` veröffentlicht.
 - PR #4 gegen `master` erstellt und gemergt; Release `0.0.1-beta.39` veröffentlicht.
 - Aktueller Stand: OpenCode Zen mit automatischem Endpoint, sechs Modellvorschlägen und freiem Modellnamen implementiert. 358 Unit-Tests, Adaptertest, Lint und Admin-Build erfolgreich.
-- Nächster Schritt: Commit, PR und Release durchführen.
+- PR #5 gegen `master` erstellt und gemergt. Release `0.0.1-beta.40` wird direkt veröffentlicht.
 - Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
 - Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
 - Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.

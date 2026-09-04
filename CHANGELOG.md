@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.40] - 2026-09-04
+
+### Hinzugefügt
+- OpenCode Zen als Anbieter mit automatischem Endpoint und sechs kostenlosen Modellvorschlägen ergänzt.
+- Benutzerdefinierte Modellnamen bleiben als Freitext möglich.
+
 ## [0.0.1-beta.39] - 2026-09-04
 
 ### Sicherheit und Zuverlässigkeit
