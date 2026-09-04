@@ -15,6 +15,15 @@ function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
 
+function formatUsageLine(entry) {
+    const usage = entry && entry.usage;
+    if (!usage || !Number.isFinite(usage.inputTokens) || !Number.isFinite(usage.outputTokens)) return '';
+    const format = new Intl.NumberFormat('de-DE');
+    const total = usage.inputTokens + usage.outputTokens;
+    const cost = Number.isFinite(entry.cost) ? ` · Kosten: ${Number(entry.cost).toFixed(6)}` : '';
+    return `Verbrauch: ${format.format(total)} Tokens (Input ${format.format(usage.inputTokens)}, Output ${format.format(usage.outputTokens)})${cost}`;
+}
+
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -188,6 +197,13 @@ function renderHistory(history) {
         time.textContent = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
         line.appendChild(bubble);
         line.appendChild(time);
+        const usage = formatUsageLine(entry);
+        if (usage) {
+            const usageLine = document.createElement('div');
+            usageLine.className = 'chat-usage';
+            usageLine.textContent = usage;
+            line.appendChild(usageLine);
+        }
         container.appendChild(line);
     });
     container.scrollTop = container.scrollHeight;
@@ -784,5 +800,6 @@ if (typeof module !== 'undefined') {
         parseBridgeResponse,
         extractChatHistory,
         markdownToHtml,
+        formatUsageLine,
     };
 }

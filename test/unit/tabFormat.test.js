@@ -13,6 +13,7 @@ const {
     parseBridgeResponse,
     extractChatHistory,
     markdownToHtml,
+    formatUsageLine,
 } = require('../../admin/tab.js');
 
 describe('formatMessageLine', () => {
@@ -41,6 +42,12 @@ describe('markdownToHtml', () => {
         expect(html).to.include('<strong>bold</strong>');
         expect(html).not.to.include('<img');
         expect(html).not.to.include('<svg');
+    });
+});
+
+describe('formatUsageLine', () => {
+    it('formats tokens and configured cost', () => {
+        expect(formatUsageLine({ usage: { inputTokens: 1000, outputTokens: 250 }, cost: 0.0123 })).to.include('1.250 Tokens').and.to.include('Kosten: 0.012300');
     });
 });
 

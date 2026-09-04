@@ -86,6 +86,19 @@ describe('chatLog', () => {
         expect(result.map(entry => entry.text)).to.deep.equal(['neu']);
     });
 
+    it('persists usage and optional cost metadata without changing the answer text', async () => {
+        const adapter = {
+            getStateAsync: sinon.stub().resolves(null),
+            setStateAsync: sinon.stub().resolves(),
+        };
+        const result = await appendChatMessage(adapter, 'assistant', 'Antwort', {
+            usage: { inputTokens: 100, outputTokens: 20 },
+            cost: 0.0042,
+        });
+        expect(result[0]).to.include({ role: 'assistant', text: 'Antwort', cost: 0.0042 });
+        expect(result[0].usage).to.deep.equal({ inputTokens: 100, outputTokens: 20 });
+    });
+
     describe('getRecentChatHistory', () => {
         it('returns the last N entries in chronological order', async () => {
             const history = Array.from({ length: 15 }, (_, i) => ({ role: 'user', text: `m${i}`, timestamp: i }));
