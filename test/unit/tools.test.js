@@ -28,6 +28,7 @@ describe('buildTools', () => {
             'compareTimeframes',
             'getPeriodTotal',
             'comparePeriods',
+            'getSelfConsumption',
             'updateCatalogEntry',
             'updateCatalogEntries',
         ]);
@@ -501,5 +502,79 @@ describe('buildTools', () => {
         });
         expect(result.periods[0]).to.deep.include({ total: 40, deltaTotal: 0, deltaPercent: 0 });
         expect(result.periods[1]).to.deep.include({ total: 50, deltaTotal: 10, deltaPercent: 25 });
+    });
+});
+
+describe('getSelfConsumption', () => {
+    function pvEntry(overrides = {}) {
+        return { sourceId: 'pv.0.total', historyInstance: 'history.0', description: 'PV-Erzeugung', room: 'Dach', valueKind: 'cumulative_total', derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1', ...overrides };
+    }
+    function feedInEntry(overrides = {}) {
+        return { sourceId: 'grid.0.feedin', historyInstance: 'history.0', description: 'Netzeinspeisung', valueKind: 'cumulative_total', derivedMetricRole: 'grid_feed_in', derivedMetricGroupId: 'pv-1', ...overrides };
+    }
+
+    it('computes the self-consumption ratio for the single available group', async () => {
+        const getHistory = sinon.stub();
+        getHistory.onCall(0).resolves([{ val: 100 }]);
+        getHistory.onCall(1).resolves([{ val: 1100 }]);
+        getHistory.onCall(2).resolves([{ val: 20 }]);
+        getHistory.onCall(3).resolves([{ val: 220 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([pvEntry(), feedInEntry()]),
+            getHistory,
+            getLocalDayBoundaries: (target) => ({ start: target - 1000, end: target }),
+            getLocalTimeZone: sinon.stub().returns('UTC'),
+        });
+        const { execute } = buildTools({});
+
+        const result = await execute('getSelfConsumption', { periods: [{ dayOffset: -1 }] });
+
+        expect(result.periods).to.have.lengthOf(1);
+        expect(result.periods[0]).to.include({ pvTotal: 1000, feedInTotal: 200 });
+        expect(result.periods[0].selfConsumptionRatio).to.be.closeTo(0.8, 1e-9);
+        expect(result).to.include({ pvDescription: 'PV-Erzeugung', feedInDescription: 'Netzeinspeisung', room: 'Dach' });
+    });
+
+    it('returns null ratio without dividing by zero when pvTotal is zero', async () => {
+        const getHistory = sinon.stub().resolves([{ val: 0 }]);
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([pvEntry(), feedInEntry()]),
+            getHistory,
+            getLocalDayBoundaries: (target) => ({ start: target - 1000, end: target }),
+            getLocalTimeZone: sinon.stub().returns('UTC'),
+        });
+        const { execute } = buildTools({});
+
+        const result = await execute('getSelfConsumption', { periods: [{ dayOffset: -1 }] });
+
+        expect(result.periods[0].selfConsumptionRatio).to.equal(null);
+        expect(result.periods[0].note).to.be.a('string');
+    });
+
+    it('throws a clear error when no groupId is given and zero groups exist', async () => {
+        const { buildTools } = loadToolsWithStubs({ getAllCatalogEntries: sinon.stub().resolves([]) });
+        const { execute } = buildTools({});
+
+        let threw;
+        try {
+            await execute('getSelfConsumption', { periods: [{ dayOffset: -1 }] });
+        } catch (error) {
+            threw = error;
+        }
+        expect(threw).to.exist;
+        expect(threw.message).to.include('groupId');
+    });
+
+    it('throws when a group is missing one of the two required roles', async () => {
+        const { buildTools } = loadToolsWithStubs({ getAllCatalogEntries: sinon.stub().resolves([pvEntry()]) });
+        const { execute } = buildTools({});
+
+        let threw;
+        try {
+            await execute('getSelfConsumption', { groupId: 'pv-1', periods: [{ dayOffset: -1 }] });
+        } catch (error) {
+            threw = error;
+        }
+        expect(threw.message).to.include('grid_feed_in');
     });
 });

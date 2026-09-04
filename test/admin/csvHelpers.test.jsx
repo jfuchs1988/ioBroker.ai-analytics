@@ -36,6 +36,8 @@ describe('admin CSV helpers', () => {
         expect(() => parseBoolean('yes', 'ignored')).toThrow('true oder false');
         expect(validateCatalogImportValue('valueKind', 'gauge')).toBe('gauge');
         expect(() => validateCatalogImportValue('valueKind', 'command')).toThrow('valueKind');
+        expect(validateCatalogImportValue('derivedMetricRole', 'pv_generation')).toBe('pv_generation');
+        expect(() => validateCatalogImportValue('derivedMetricRole', 'unknown')).toThrow('derivedMetricRole');
     });
 
     it('strictly validates settings numbers, booleans, and providers', () => {

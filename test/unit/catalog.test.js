@@ -7,6 +7,7 @@ const {
     markInactive,
     removeCatalogEntry,
     catalogStateId,
+    validateCatalogEntry,
     CATEGORIES,
 } = require('../../lib/catalog');
 
@@ -178,5 +179,36 @@ describe('catalog', () => {
         await removeCatalogEntry(adapter, 'javascript.0.x');
 
         expect(adapter.delObjectAsync.calledOnce).to.equal(true);
+    });
+
+    it('accepts a valid derivedMetricRole/derivedMetricGroupId pair', () => {
+        const entry = validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv',
+            derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1',
+        });
+        expect(entry.derivedMetricRole).to.equal('pv_generation');
+    });
+
+    it('rejects an unknown derivedMetricRole', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv',
+            derivedMetricRole: 'not-a-role', derivedMetricGroupId: 'pv-1',
+        })).to.throw('derivedMetricRole');
+    });
+
+    it('rejects derivedMetricRole without derivedMetricGroupId and vice versa', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv', derivedMetricRole: 'pv_generation',
+        })).to.throw('derivedMetricRole');
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv', derivedMetricGroupId: 'pv-1',
+        })).to.throw('derivedMetricGroupId');
+    });
+
+    it('rejects an oversized derivedMetricGroupId', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv',
+            derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'x'.repeat(129),
+        })).to.throw('derivedMetricGroupId');
     });
 });
