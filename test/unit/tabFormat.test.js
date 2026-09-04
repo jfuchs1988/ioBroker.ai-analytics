@@ -47,7 +47,7 @@ describe('markdownToHtml', () => {
 
 describe('formatUsageLine', () => {
     it('formats tokens and configured cost', () => {
-        expect(formatUsageLine({ usage: { inputTokens: 1000, outputTokens: 250 }, cost: 0.0123 })).to.include('1.250 Tokens').and.to.include('Kosten: 0.012300');
+        expect(formatUsageLine({ usage: { inputTokens: 1000, outputTokens: 250 } }, { chatIn: 3, chatOut: 15 })).to.include('1.250 Tokens').and.to.include('Kosten: 0.006750');
     });
 });
 
@@ -192,7 +192,7 @@ describe('recommendLimits', () => {
 describe('formatCostLine', () => {
     it('formats total, chat, and onboarding cost to 4 decimal places', () => {
         expect(formatCostLine({ chatCost: 1.5, onboardingCost: 0.25, totalCost: 1.75 })).to.equal(
-            'Kosten im Zeitraum: 1.7500 (Chat: 1.5000, Onboarding: 0.2500)'
+            'Kosten im Zeitraum: 1.7500 (Normales Modell: 1.5000, Onboarding-Modell: 0.2500)'
         );
     });
 });

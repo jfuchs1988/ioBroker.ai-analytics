@@ -259,6 +259,20 @@
           "lg": 2,
           "xl": 2
         },
+        "usageReset": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/UsageResetComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
+          "label": "Tokenzähler",
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 12,
+          "lg": 12,
+          "xl": 12
+        },
         "maxAgentIterations": {
           "type": "number",
           "label": "Maximale KI-Schritte pro Anfrage (1-32)",

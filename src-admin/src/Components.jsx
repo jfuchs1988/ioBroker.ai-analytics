@@ -172,6 +172,37 @@ export class ModelSelectComponent extends ConfigGeneric {
     }
 }
 
+export class UsageResetComponent extends ConfigGeneric {
+    async reset() {
+        if (!window.confirm('Tokenzähler und Kostenhistorie wirklich zurücksetzen?')) return;
+        const socket = this.props.socket || this.props.oContext.socket;
+        const instance = `ai-analytics.${this.props.oContext.instance}`;
+        const requestId = `usage-reset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id: requestId, command: 'resetUsage', message: {} }), ack: false });
+        const deadline = Date.now() + 60000;
+        while (Date.now() < deadline) {
+            const state = await socket.getState(`${instance}.admin.bridge`);
+            if (state && state.ack === true && typeof state.val === 'string') {
+                const response = JSON.parse(state.val);
+                if (response.id === requestId) {
+                    if (!response.ok) throw new Error(response.error || 'Zurücksetzen fehlgeschlagen.');
+                    this.setState({ status: 'Tokenzähler und Kostenhistorie wurden zurückgesetzt.' });
+                    return;
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+        throw new Error('Keine Antwort beim Zurücksetzen.');
+    }
+
+    renderItem() {
+        return <div>
+            <button onClick={() => this.reset().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Tokenzähler zurücksetzen</button>
+            <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status || 'Setzt usage.today und usage.history zurück.'}</span>
+        </div>;
+    }
+}
+
 export default class CatalogDevicesComponent extends ConfigGeneric {
     constructor(props) {
         super(props);

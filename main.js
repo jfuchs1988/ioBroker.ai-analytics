@@ -44,16 +44,10 @@ function isTrustedAdminSender(sender) {
     return sender === 'system.admin' || /^system\.adapter\.admin\.\d+$/.test(sender || '');
 }
 
-function buildUsageMetadata(usage, config = {}) {
+function buildUsageMetadata(usage) {
     const inputTokens = Number.isFinite(usage && usage.inputTokens) ? usage.inputTokens : 0;
     const outputTokens = Number.isFinite(usage && usage.outputTokens) ? usage.outputTokens : 0;
-    const inputPrice = Number(config.chatPricePerMillionInputTokens) || 0;
-    const outputPrice = Number(config.chatPricePerMillionOutputTokens) || 0;
-    const metadata = { usage: { inputTokens, outputTokens } };
-    if (inputPrice > 0 || outputPrice > 0) {
-        metadata.cost = (inputTokens * inputPrice + outputTokens * outputPrice) / 1000000;
-    }
-    return metadata;
+    return { usage: { inputTokens, outputTokens } };
 }
 
 class AiAnalytics extends utils.Adapter {
@@ -614,7 +608,7 @@ class AiAnalytics extends utils.Adapter {
         }
 
         await this.appendHistoryFailureReports();
-        await appendChatMessage(this, 'assistant', finalText, buildUsageMetadata(usage, this.config));
+        await appendChatMessage(this, 'assistant', finalText, buildUsageMetadata(usage));
         await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
         return { skipped: false };
     }
@@ -703,7 +697,7 @@ class AiAnalytics extends utils.Adapter {
             finishedAt: new Date().toISOString(),
         });
 
-        const result = await appendChatMessage(this, 'assistant', finalText, buildUsageMetadata(usage, this.config));
+        const result = await appendChatMessage(this, 'assistant', finalText, buildUsageMetadata(usage));
         if (!license.fullAccess) {
             await this.setStateAsync(LICENSE_CHAT_LAST_USED_STATE, { val: today, ack: true });
         }

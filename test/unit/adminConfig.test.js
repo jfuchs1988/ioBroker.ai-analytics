@@ -37,6 +37,11 @@ describe('admin configuration links and model discovery', () => {
         expect(settings.maxPeriodsPerToolCall.max).to.equal(120);
     });
 
+    it('provides a token counter reset component', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        expect(config.items.settingsTab.items.usageReset.name).to.equal('AiAnalyticsConfig/Components/UsageResetComponent');
+    });
+
     it('provides the required size for the onboarding section header', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         expect(config.items.settingsTab.items.onboardingHeader.size).to.equal(3);
