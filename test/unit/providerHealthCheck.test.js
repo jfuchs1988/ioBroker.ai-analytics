@@ -75,6 +75,7 @@ describe('providerHealthCheck', () => {
             expect(result.reachable).to.equal(false);
             expect(result.error).to.match(/Zeit/i);
             expect(result.error).to.include('20');
+            expect(provider.chat.firstCall.args[0].signal.aborted).to.equal(true);
         });
 
         it('does not time out when the provider answers within the limit', async () => {

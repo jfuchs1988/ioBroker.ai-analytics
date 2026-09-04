@@ -154,6 +154,83 @@ describe('buildTools', () => {
         expect(threw).to.equal(true);
     });
 
+    it('offers a read-only tool set and blocks write execution in that mode', async () => {
+        const { buildTools } = require('../../lib/tools');
+        const tools = buildTools({}, { readOnly: true });
+
+        expect(tools.definitions.map((definition) => definition.name)).not.to.include('updateCatalogEntry');
+        expect(tools.definitions.map((definition) => definition.name)).not.to.include('updateCatalogEntries');
+        let error;
+        try {
+            await tools.execute('updateCatalogEntries', { entries: [{ sourceId: 'x', room: 'y' }] });
+        } catch (caught) {
+            error = caught;
+        }
+        expect(error.message).to.include('Nur-Lese-Modus');
+    });
+
+    it('rejects malformed and excessive history ranges before data access', async () => {
+        const getHistory = sinon.stub();
+        const { buildTools, MAX_TIME_RANGE_MS } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'known', historyInstance: 'history.0' }]),
+            getHistory,
+        });
+        const execute = buildTools({}).execute;
+        const invalidInputs = [
+            { sourceId: 'known', start: 10, end: 10 },
+            { sourceId: 'known', start: '0', end: 10 },
+            { sourceId: 'known', start: 0, end: MAX_TIME_RANGE_MS + 1 },
+            { sourceId: 'known', start: 0, end: 10, aggregate: 'evil' },
+        ];
+
+        for (const input of invalidInputs) {
+            let error;
+            try {
+                await execute('getHistory', input);
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error).to.be.an('error');
+        }
+        expect(getHistory.notCalled).to.equal(true);
+    });
+
+    it('rejects too many periods and ambiguous period forms', async () => {
+        const { buildTools, MAX_PERIODS_PER_CALL } = require('../../lib/tools');
+        const execute = buildTools({}).execute;
+        for (const periods of [
+            Array.from({ length: MAX_PERIODS_PER_CALL + 1 }, () => ({ start: 0, end: 1 })),
+            [{ dayOffset: 0, start: 0, end: 1 }],
+            [{ start: 0 }],
+        ]) {
+            let error;
+            try {
+                await execute('getPeriodTotal', { sourceId: 'known', periods });
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error).to.be.an('error');
+        }
+    });
+
+    it('does not expose ignored or inactive catalog entries through history tools', async () => {
+        for (const unavailable of [{ active: false }, { ignored: true }]) {
+            const getHistory = sinon.stub();
+            const { buildTools } = loadToolsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'hidden', historyInstance: 'history.0', ...unavailable }]),
+                getHistory,
+            });
+            let error;
+            try {
+                await buildTools({}).execute('getHistory', { sourceId: 'hidden', start: 0, end: 1 });
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error.message).to.include('nicht verfuegbar');
+            expect(getHistory.notCalled).to.equal(true);
+        }
+    });
+
     it('listCatalog with needsReviewOnly returns only entries pending review', async () => {
         const entries = [
             { sourceId: 'a', category: 'lighting', active: true, needsReview: false },

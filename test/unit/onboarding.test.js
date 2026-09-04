@@ -228,7 +228,7 @@ describe('runOnboarding', () => {
         expect(result.needsReview[0].needsReview).to.equal(true);
     });
 
-    it('defaults PV and heat-pump objects to Keller without requesting review', async () => {
+    it('defaults PV and heat-pump rooms to Keller but retains review for uncertain semantics', async () => {
         const discovered = [
             { id: 'sun2000.0.meter.activePower', historyInstance: 'history.0', common: { name: 'Active power', unit: 'W' } },
             { id: 'viessmannapi.0.1.0.features.heating.sensors.temperature.value', historyInstance: 'history.0', common: { name: 'Temperature', unit: '°C' } },
@@ -249,10 +249,10 @@ describe('runOnboarding', () => {
 
         const result = await runOnboarding({}, provider, discovered);
 
-        expect(result.needsReview).to.deep.equal([]);
+        expect(result.needsReview).to.have.lengthOf(2);
         expect(setCatalogEntry.callCount).to.equal(2);
         for (const call of setCatalogEntry.getCalls()) {
-            expect(call.args[1]).to.include({ room: 'Keller', needsReview: false, confidence: 'low', classificationSource: 'default' });
+            expect(call.args[1]).to.include({ room: 'Keller', needsReview: true, confidence: 'low', classificationSource: 'llm' });
         }
     });
 
@@ -339,11 +339,94 @@ describe('runOnboarding', () => {
 
         const result = await runOnboarding(adapter, provider, discovered);
 
-        expect(result.classifiedCount).to.equal(1);
+        expect(result.classifiedCount).to.equal(0);
         expect(result.needsReview).to.deep.equal([]);
         expect(errorStub.calledOnce).to.equal(true);
         expect(errorStub.firstCall.args[0]).to.include('Onboarding-Batch fehlgeschlagen');
         expect(setCatalogEntry.called).to.equal(false);
+    });
+
+    it('rejects a non-array classification response without aborting onboarding', async () => {
+        const setCatalogEntry = sinon.stub().resolves();
+        const provider = { chat: sinon.stub().resolves({ content: '{"sourceId":"javascript.0.x"}' }) };
+        const adapter = { log: { error: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, makeDiscovered(1));
+
+        expect(result.classifiedCount).to.equal(0);
+        expect(setCatalogEntry.notCalled).to.equal(true);
+        expect(adapter.log.error.calledOnce).to.equal(true);
+    });
+
+    it('rejects an oversized classification response', async () => {
+        const setCatalogEntry = sinon.stub().resolves();
+        const provider = { chat: sinon.stub().resolves({ content: `[${' '.repeat(128 * 1024)}]` }) };
+        const adapter = { log: { error: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, makeDiscovered(1));
+
+        expect(result.classifiedCount).to.equal(0);
+        expect(setCatalogEntry.notCalled).to.equal(true);
+    });
+
+    it('rejects duplicate, unknown, and oversized classification result sets', async () => {
+        const discovered = makeDiscovered(2);
+        const invalidResults = [
+            [
+                { sourceId: discovered[0].id, category: 'lighting', confidence: 'high' },
+                { sourceId: discovered[0].id, category: 'lighting', confidence: 'high' },
+            ],
+            [{ sourceId: 'unknown.0.x', category: 'lighting', confidence: 'high' }],
+            Array.from({ length: 3 }, (_, index) => ({ sourceId: `javascript.0.obj${index}`, category: 'lighting', confidence: 'high' })),
+        ];
+
+        for (const classifications of invalidResults) {
+            const setCatalogEntry = sinon.stub().resolves();
+            const provider = { chat: sinon.stub().resolves({ content: JSON.stringify(classifications) }) };
+            const adapter = { log: { error: sinon.stub() } };
+            const { runOnboarding } = loadOnboardingWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([]),
+                setCatalogEntry,
+            });
+
+            const result = await runOnboarding(adapter, provider, discovered);
+            expect(result.classifiedCount).to.equal(0);
+            expect(setCatalogEntry.notCalled).to.equal(true);
+        }
+    });
+
+    it('counts only classifications that were persisted successfully', async () => {
+        const discovered = makeDiscovered(2);
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify(discovered.map(source => ({
+                    sourceId: source.id,
+                    description: source.id,
+                    category: 'lighting',
+                    confidence: 'high',
+                }))),
+            }),
+        };
+        const setCatalogEntry = sinon.stub();
+        setCatalogEntry.onFirstCall().resolves();
+        setCatalogEntry.onSecondCall().rejects(new Error('write failed'));
+        const adapter = { log: { error: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(result.classifiedCount).to.equal(1);
     });
 
     it('logs a silly-level summary per batch and per classified object', async () => {

@@ -33,8 +33,15 @@ const { version: PACKAGE_VERSION } = require('./package.json');
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
 const DATA_QUALITY_BACKFILL_BATCH_SIZE = 20;
 const CATALOG_SYNC_STATE = 'catalogSync';
+const CHAT_PROGRESS_STATE = 'chatProgress';
+const MAX_CHAT_QUESTION_LENGTH = 16000;
+const MAX_TIMER_MS = 2147483647;
 // Filled with the public keys of the separate entitlement web application.
 const LICENSE_PUBLIC_KEYS = Object.freeze({});
+
+function isTrustedAdminSender(sender) {
+    return sender === 'system.admin' || /^system\.adapter\.admin\.\d+$/.test(sender || '');
+}
 
 class AiAnalytics extends utils.Adapter {
     constructor(options) {
@@ -48,6 +55,10 @@ class AiAnalytics extends utils.Adapter {
         this.chatProviderOk = false;
         this.onboardingProviderOk = false;
         this.catalogSyncState = { running: false, phase: 'idle', processed: 0, total: 0, message: '' };
+        this.chatProgressState = { running: false, phase: 'idle', processed: 0, total: MAX_ITERATIONS, message: '' };
+        this.chatRunPromise = null;
+        this.proactiveCheckPromise = null;
+        this.catalogSyncPromise = null;
         this.licenseState = { status: 'beta', fullAccess: true };
     }
 
@@ -86,6 +97,20 @@ class AiAnalytics extends utils.Adapter {
         return checkProviderReachable(provider);
     }
 
+    async refreshLicenseState() {
+        if (PACKAGE_VERSION.includes('-beta.')) return this.licenseState;
+        const nextState = evaluateLicense({
+            version: PACKAGE_VERSION,
+            token: this.config && this.config.licenseToken,
+            publicKeys: LICENSE_PUBLIC_KEYS,
+        });
+        this.licenseState = nextState;
+        if (typeof this.setStateAsync === 'function') {
+            await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(nextState), ack: true });
+        }
+        return nextState;
+    }
+
     async ensureCatalogSyncState() {
         await this.setObjectNotExistsAsync(CATALOG_SYNC_STATE, {
             type: 'state',
@@ -106,6 +131,20 @@ class AiAnalytics extends utils.Adapter {
         await this.setStateAsync(CATALOG_SYNC_STATE, { val: JSON.stringify(this.catalogSyncState), ack: true });
     }
 
+    async ensureChatProgressState() {
+        await this.setObjectNotExistsAsync(CHAT_PROGRESS_STATE, {
+            type: 'state',
+            common: { name: 'Chat progress', type: 'string', role: 'json', read: true, write: false },
+            native: {},
+        });
+        await this.setStateAsync(CHAT_PROGRESS_STATE, { val: JSON.stringify(this.chatProgressState), ack: true });
+    }
+
+    async updateChatProgressState(partial) {
+        this.chatProgressState = { ...this.chatProgressState, ...partial };
+        await this.setStateAsync(CHAT_PROGRESS_STATE, { val: JSON.stringify(this.chatProgressState), ack: true });
+    }
+
     async onReady() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
@@ -115,6 +154,7 @@ class AiAnalytics extends utils.Adapter {
         await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(this.licenseState), ack: true });
         await ensureReachabilityStates(this);
         await this.ensureCatalogSyncState();
+        await this.ensureChatProgressState();
         await adminBridge.ensureBridgeState(this);
         await this.subscribeStatesAsync(adminBridge.BRIDGE_STATE);
 
@@ -139,6 +179,7 @@ class AiAnalytics extends utils.Adapter {
             : this.chatProvider;
 
         this.tools = buildTools(this);
+        this.readOnlyTools = buildTools(this, { readOnly: true });
 
         const chatCheck = await this.checkProviderConfigured(this.chatProvider, chatProviderConfig, 'Chat/Pruefungs-Modell');
         this.chatProviderOk = chatCheck.reachable;
@@ -162,7 +203,7 @@ class AiAnalytics extends utils.Adapter {
 
         const configuredHours = Number(this.config.checkIntervalHours);
         const intervalHours = Number.isFinite(configuredHours) && configuredHours >= 1 ? configuredHours : 24;
-        const intervalMs = intervalHours * 3600 * 1000;
+        const intervalMs = Math.min(intervalHours * 3600 * 1000, MAX_TIMER_MS);
         this.stopScheduler = startProactiveScheduler(this, {
             intervalMs,
             runCheck: () => this.runProactiveCheck(),
@@ -172,6 +213,18 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async syncCatalog(options = {}) {
+        if (this.catalogSyncPromise) throw new Error('Eine Katalog-Synchronisierung läuft bereits.');
+        if (this.chatRunPromise || this.proactiveCheckPromise) throw new Error('Eine KI-Anfrage läuft bereits.');
+        const run = this.executeCatalogSync(options);
+        this.catalogSyncPromise = run;
+        try {
+            return await run;
+        } finally {
+            if (this.catalogSyncPromise === run) this.catalogSyncPromise = null;
+        }
+    }
+
+    async executeCatalogSync(options = {}) {
         await this.updateCatalogSyncState({
             running: true,
             phase: 'discover',
@@ -414,10 +467,23 @@ class AiAnalytics extends utils.Adapter {
      * @returns {Promise<{skipped: boolean, reason?: string}>} `skipped: true` wenn der Lauf gar nicht stattfand
      */
     async runProactiveCheck() {
+        if (this.proactiveCheckPromise) return { skipped: true, reason: 'alreadyRunning' };
+        if (this.chatRunPromise || this.catalogSyncPromise) return { skipped: true, reason: 'anotherOperationRunning' };
+        const run = this.executeProactiveCheck();
+        this.proactiveCheckPromise = run;
+        try {
+            return await run;
+        } finally {
+            if (this.proactiveCheckPromise === run) this.proactiveCheckPromise = null;
+        }
+    }
+
+    async executeProactiveCheck() {
         this.log.silly('Proaktive Pruefung: Lauf gestartet');
         await this.updateCatalogSyncState({ running: true, phase: 'check', processed: 0, total: MAX_ITERATIONS, message: 'Prüfung der Geräte läuft ...', error: null });
 
-        if (this.licenseState && !canRunProactive(this.licenseState)) {
+        const licenseState = await this.refreshLicenseState();
+        if (licenseState && !canRunProactive(licenseState)) {
             this.log.warn('Proaktive Pruefung uebersprungen, da kein gueltiges Sponsoring-Entitlement vorliegt.');
             await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung übersprungen: Sponsoring-Entitlement erforderlich.' });
             return { skipped: true, reason: 'licenseLimited' };
@@ -438,6 +504,7 @@ class AiAnalytics extends utils.Adapter {
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
         let anomalyCandidates = [];
+        let preAnalysisError = null;
         try {
             const catalogEntries = await getAllCatalogEntries(this);
             const eligibleCount = catalogEntries.filter(isEligibleCatalogEntry).length;
@@ -458,7 +525,24 @@ class AiAnalytics extends utils.Adapter {
                 })
             );
         } catch (error) {
+            preAnalysisError = error;
             this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
+        }
+
+        if (anomalyCandidates.length === 0 && (preAnalysisError || anomalyCandidates.failedCount > 0)) {
+            await this.appendHistoryFailureReports();
+            const failedCount = anomalyCandidates.failedCount || 1;
+            const finalText = `Prüfung unvollständig: ${failedCount} Datenreihe(n) konnten nicht gelesen werden.`;
+            await appendChatMessage(this, 'assistant', finalText);
+            await this.updateCatalogSyncState({
+                running: false,
+                phase: 'error',
+                processed: MAX_ITERATIONS,
+                total: MAX_ITERATIONS,
+                message: finalText,
+                finishedAt: new Date().toISOString(),
+            });
+            return { skipped: false, incomplete: true, failedCount };
         }
 
         if (anomalyCandidates.length === 0) {
@@ -482,7 +566,7 @@ class AiAnalytics extends utils.Adapter {
         try {
             ({ finalText, usage } = await runAgent({
                 provider: this.chatProvider,
-                tools: this.tools,
+                tools: this.readOnlyTools || this.tools,
                 systemPrompt:
                     timeAndLocation +
                     'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
@@ -525,7 +609,7 @@ class AiAnalytics extends utils.Adapter {
      * als {error}-Antwort. Genau dieselben Guard-Texte wie vor dem Refactoring.
      */
     async processChatQuestion(question) {
-        const license = this.licenseState || { fullAccess: true };
+        const license = (await this.refreshLicenseState()) || { fullAccess: true };
         const today = getTodayKey();
         const lastChatState = !license.fullAccess && (await this.getStateAsync(LICENSE_CHAT_LAST_USED_STATE));
         if (!canUseChat(license, lastChatState && lastChatState.val, today)) {
@@ -542,11 +626,11 @@ class AiAnalytics extends utils.Adapter {
             throw new Error('Tagesbudget an Tokens ist erschoepft.');
         }
 
-        await appendChatMessage(this, 'user', question);
         const priorEntries = await getRecentChatHistory(this, 10);
         const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+        await appendChatMessage(this, 'user', question);
 
-        await this.updateCatalogSyncState({
+        await this.updateChatProgressState({
             running: true,
             phase: 'chat',
             processed: 0,
@@ -579,7 +663,7 @@ class AiAnalytics extends utils.Adapter {
                  const processed = Math.min(progress.processed || 0, 8);
                  const total = Math.max(progress.total || 8, 1);
                  const percent = Math.min(100, Math.round((processed / total) * 100));
-                 return this.updateCatalogSyncState({
+                 return this.updateChatProgressState({
                      running: true,
                      phase: 'chat',
                      processed,
@@ -591,9 +675,9 @@ class AiAnalytics extends utils.Adapter {
 
         await recordUsage(this, usage, 'chat');
         await this.appendHistoryFailureReports();
-        this.log.silly(`Chat: Antwort gesendet: ${finalText.slice(0, 200)}`);
+        this.log.silly(`Chat: Antwort gesendet (${finalText.length} Zeichen)`);
 
-        await this.updateCatalogSyncState({
+        await this.updateChatProgressState({
             running: false,
             phase: 'done',
             processed: 8,
@@ -619,8 +703,34 @@ class AiAnalytics extends utils.Adapter {
             if (typeof question !== 'string' || !question.trim()) {
                 throw new Error('Leere Frage');
             }
-            this.log.silly(`Chat: Frage erhalten: ${question.slice(0, 200)}`);
-            return this.processChatQuestion(question);
+            if (question.length > MAX_CHAT_QUESTION_LENGTH) {
+                throw new Error(`Frage ist zu lang (maximal ${MAX_CHAT_QUESTION_LENGTH} Zeichen).`);
+            }
+            if (this.chatRunPromise) {
+                throw new Error('Eine Chat-Anfrage wird bereits verarbeitet.');
+            }
+            if (this.proactiveCheckPromise || this.catalogSyncPromise) {
+                throw new Error('Eine andere Analyse wird bereits verarbeitet.');
+            }
+            this.log.silly(`Chat: Frage erhalten (${question.length} Zeichen)`);
+            const run = this.processChatQuestion(question);
+            this.chatRunPromise = run;
+            try {
+                return await run;
+            } catch (error) {
+                if (typeof this.updateChatProgressState === 'function') {
+                    await this.updateChatProgressState({
+                        running: false,
+                        phase: 'error',
+                        message: 'Antwort konnte nicht erstellt werden.',
+                        error: error.message,
+                        finishedAt: new Date().toISOString(),
+                    }).catch(() => {});
+                }
+                throw error;
+            } finally {
+                if (this.chatRunPromise === run) this.chatRunPromise = null;
+            }
         }
 
         const adminCommandHandlers = {
@@ -648,6 +758,12 @@ class AiAnalytics extends utils.Adapter {
             !adminBridge.ALLOWED_COMMANDS.includes(obj.command)
         )
             return;
+
+        if (!isTrustedAdminSender(obj.from)) {
+            this.log.warn(`Admin-Befehl von nicht autorisiertem Absender abgelehnt: ${obj.from || 'unbekannt'}`);
+            if (obj.callback) this.sendTo(obj.from, obj.command, { error: 'Nicht autorisiert.' }, obj.callback);
+            return;
+        }
 
         try {
             const result = await this.dispatchAdapterCommand(obj.command, obj.message);

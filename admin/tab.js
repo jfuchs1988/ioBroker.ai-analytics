@@ -56,8 +56,8 @@ function markdownToHtml(markdown) {
                 index++;
             }
             index--;
-            html.push(`<table><thead><tr>${cells.map(cell => `<th>${formatMarkdownInline(cell)}</th>`).join('')}</tr></thead><tbody>`);
-            rows.forEach(row => html.push(`<tr>${row.map(cell => `<td>${formatMarkdownInline(cell)}</td>`).join('')}</tr>`));
+            html.push(`<table><thead><tr>${cells.map(cell => `<th>${formatMarkdownInline(escapeHtml(cell))}</th>`).join('')}</tr></thead><tbody>`);
+            rows.forEach(row => html.push(`<tr>${row.map(cell => `<td>${formatMarkdownInline(escapeHtml(cell))}</td>`).join('')}</tr>`));
             html.push('</tbody></table>');
         } else if (/^###\s+/.test(line)) {
             closeList();
@@ -203,10 +203,12 @@ function showConnectionError(message) {
 
 function setLoading(isLoading) {
     const button = document.getElementById('chat-send');
+    const input = document.getElementById('chat-input');
     if (button) {
         button.disabled = isLoading;
         button.textContent = isLoading ? '...' : 'Senden';
     }
+    if (input) input.disabled = isLoading;
 }
 
 function setThinking(isThinking) {
@@ -224,7 +226,7 @@ function setThinking(isThinking) {
 let thinkingPollTimer = null;
 
 function loadThinkingProgress() {
-    socket.emit('getState', `${namespace}.catalogSync`, (err, state) => {
+    socket.emit('getState', `${namespace}.chatProgress`, (err, state) => {
         if (err || !state || !state.val) return;
         try {
             const progress = typeof state.val === 'string' ? JSON.parse(state.val) : state.val;
@@ -241,6 +243,7 @@ function loadThinkingProgress() {
 }
 
 function startThinkingProgress() {
+    if (thinkingPollTimer) clearInterval(thinkingPollTimer);
     setThinking(true);
     loadThinkingProgress();
     thinkingPollTimer = setInterval(loadThinkingProgress, THINKING_POLL_INTERVAL_MS);
@@ -363,6 +366,7 @@ function renderDeviceRow(entry) {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Entfernen';
     removeButton.addEventListener('click', async () => {
+        if (!window.confirm(`Katalogeintrag "${entry.sourceId}" wirklich entfernen?`)) return;
         try {
             await callAdapter('removeCatalogEntry', { sourceId: entry.sourceId });
             loadDevices();
@@ -516,6 +520,23 @@ function appendChatError(message) {
     container.scrollTop = container.scrollHeight;
 }
 
+function appendChatEntry(role, text, timestamp = Date.now()) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return;
+    const line = document.createElement('div');
+    line.className = `chat-message chat-message-${role}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = markdownToHtml(text);
+    const time = document.createElement('div');
+    time.className = 'chat-timestamp';
+    time.textContent = new Date(timestamp).toLocaleTimeString();
+    line.appendChild(bubble);
+    line.appendChild(time);
+    container.appendChild(line);
+    container.scrollTop = container.scrollHeight;
+}
+
 /**
  * `chatQuestion` liefert bei Erfolg die getrimmte Chat-History direkt als Array
  * (Rueckgabewert von appendChatMessage in lib/chatLog.js), nicht als {history: [...]}.
@@ -526,11 +547,16 @@ function extractChatHistory(response) {
     return null;
 }
 
+let chatRequestInFlight = false;
+
 async function sendQuestion() {
+    if (chatRequestInFlight) return;
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
+    chatRequestInFlight = true;
     input.value = '';
+    appendChatEntry('user', text);
     setLoading(true);
     startThinkingProgress();
 
@@ -548,6 +574,8 @@ async function sendQuestion() {
     } finally {
         stopThinkingProgress();
         setLoading(false);
+        chatRequestInFlight = false;
+        input.focus();
     }
 }
 
@@ -722,12 +750,19 @@ function init() {
     loadBudget();
     document.getElementById('chat-send').addEventListener('click', sendQuestion);
     document.getElementById('chat-input').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') sendQuestion();
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendQuestion();
+        }
     });
     document.getElementById('budget-details-toggle').addEventListener('click', toggleBudgetDetails);
     document.getElementById('budget-range-30').addEventListener('click', showBudgetRange30);
     document.getElementById('budget-range-all').addEventListener('click', showBudgetRangeAll);
-    setInterval(loadBudget, BUDGET_REFRESH_INTERVAL_MS);
+    const budgetTimer = setInterval(loadBudget, BUDGET_REFRESH_INTERVAL_MS);
+    window.addEventListener('pagehide', () => {
+        clearInterval(budgetTimer);
+        stopThinkingProgress();
+    }, { once: true });
 }
 
 if (typeof window !== 'undefined') {

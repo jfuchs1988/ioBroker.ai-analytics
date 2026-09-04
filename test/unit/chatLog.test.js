@@ -62,6 +62,30 @@ describe('chatLog', () => {
         expect(result[0].text).to.equal('m1');
     });
 
+    it('serializes concurrent appends so no message is lost', async () => {
+        let stored = { val: '[]' };
+        const adapter = {
+            getStateAsync: sinon.stub().callsFake(async () => stored),
+            setStateAsync: sinon.stub().callsFake(async (_id, state) => { stored = state; }),
+        };
+
+        await Promise.all([
+            appendChatMessage(adapter, 'user', 'eins'),
+            appendChatMessage(adapter, 'assistant', 'zwei'),
+        ]);
+
+        expect(JSON.parse(stored.val).map(entry => entry.text)).to.deep.equal(['eins', 'zwei']);
+    });
+
+    it('recovers from malformed persisted history', async () => {
+        const adapter = {
+            getStateAsync: sinon.stub().resolves({ val: '{invalid' }),
+            setStateAsync: sinon.stub().resolves(),
+        };
+        const result = await appendChatMessage(adapter, 'user', 'neu');
+        expect(result.map(entry => entry.text)).to.deep.equal(['neu']);
+    });
+
     describe('getRecentChatHistory', () => {
         it('returns the last N entries in chronological order', async () => {
             const history = Array.from({ length: 15 }, (_, i) => ({ role: 'user', text: `m${i}`, timestamp: i }));

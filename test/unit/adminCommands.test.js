@@ -183,6 +183,49 @@ describe('adminCommands', () => {
 
             expect(result.entry).to.include({ updateFrequency: 'hourly', dataCompleteness: 'complete' });
         });
+
+        for (const [field, value] of [
+            ['category', 'other'],
+            ['valueKind', 'script'],
+            ['updateFrequency', 'sometimes'],
+            ['dataCompleteness', 'maybe'],
+            ['ignored', 'true'],
+            ['room', 'x'.repeat(201)],
+            ['description', 'x'.repeat(2001)],
+        ]) {
+            it(`rejects an invalid ${field}`, async () => {
+                const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                    getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'lighting' }]),
+                    setCatalogEntry: sinon.stub().resolves(),
+                });
+
+                let error;
+                try {
+                    await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', [field]: value });
+                } catch (caught) {
+                    error = caught;
+                }
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.include(field);
+            });
+        }
+
+        it('rejects missing and oversized source IDs before reading the catalog', async () => {
+            const getAllCatalogEntries = sinon.stub().resolves([]);
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({ getAllCatalogEntries });
+
+            for (const sourceId of [undefined, '', 'x'.repeat(513)]) {
+                let error;
+                try {
+                    await updateCatalogEntryAdmin({}, { sourceId });
+                } catch (caught) {
+                    error = caught;
+                }
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.include('sourceId');
+            }
+            expect(getAllCatalogEntries.notCalled).to.equal(true);
+        });
     });
 
     describe('removeCatalogEntry', () => {

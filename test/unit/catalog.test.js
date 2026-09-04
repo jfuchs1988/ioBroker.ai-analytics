@@ -38,6 +38,26 @@ describe('catalog', () => {
         expect(threw).to.equal(true);
     });
 
+    it('setCatalogEntry rejects malformed identifiers, history instances, and oversized text', async () => {
+        const adapter = makeAdapter();
+        const invalidEntries = [
+            { sourceId: '', category: 'lighting' },
+            { sourceId: 'sensor.0.x', category: 'lighting', historyInstance: 'javascript.0' },
+            { sourceId: 'sensor.0.x', category: 'lighting', description: 'x'.repeat(2001) },
+        ];
+
+        for (const entry of invalidEntries) {
+            let error;
+            try {
+                await setCatalogEntry(adapter, entry);
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error).to.be.an('error');
+        }
+        expect(adapter.setStateAsync.notCalled).to.equal(true);
+    });
+
     it('setCatalogEntry writes a JSON-encoded state', async () => {
         const adapter = makeAdapter();
         const entry = {
@@ -69,6 +89,17 @@ describe('catalog', () => {
         expect(entry).to.equal(null);
     });
 
+    it('getCatalogEntry returns null for malformed JSON or a mismatched entry shape', async () => {
+        const adapter = makeAdapter();
+        adapter.log = { warn: sinon.stub() };
+        adapter.getStateAsync.onFirstCall().resolves({ val: '{broken' });
+        adapter.getStateAsync.onSecondCall().resolves({ val: JSON.stringify({ sourceId: 'other', category: 'lighting' }) });
+
+        expect(await getCatalogEntry(adapter, 'javascript.0.x')).to.equal(null);
+        expect(await getCatalogEntry(adapter, 'javascript.0.x')).to.equal(null);
+        expect(adapter.log.warn.callCount).to.equal(2);
+    });
+
     it('getAllCatalogEntries parses every stored JSON value', async () => {
         const adapter = makeAdapter();
         adapter.getStatesAsync.resolves({
@@ -80,6 +111,20 @@ describe('catalog', () => {
 
         expect(entries).to.have.lengthOf(2);
         expect(entries.map((e) => e.sourceId).sort()).to.deep.equal(['a', 'b']);
+    });
+
+    it('getAllCatalogEntries skips valid JSON with an invalid catalog shape', async () => {
+        const adapter = makeAdapter();
+        adapter.log = { warn: sinon.stub() };
+        adapter.getStatesAsync.resolves({
+            'ai-analytics.0.catalog.good': { val: JSON.stringify({ sourceId: 'good', category: 'lighting' }) },
+            'ai-analytics.0.catalog.scalar': { val: '42' },
+            'ai-analytics.0.catalog.badCategory': { val: JSON.stringify({ sourceId: 'badCategory', category: 'other' }) },
+            'ai-analytics.0.catalog.wrong': { val: JSON.stringify({ sourceId: 'different', category: 'lighting' }) },
+        });
+
+        expect(await getAllCatalogEntries(adapter)).to.deep.equal([{ sourceId: 'good', category: 'lighting' }]);
+        expect(adapter.log.warn.callCount).to.equal(3);
     });
 
     it('markInactive sets active=false on an existing entry', async () => {

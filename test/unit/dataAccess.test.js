@@ -24,6 +24,63 @@ describe('computeIntervalCount', () => {
 });
 
 describe('dataAccess', () => {
+    it('does not contact a history instance during its failure backoff', async () => {
+        const adapter = {
+            getStateAsync: sinon.stub().resolves({
+                val: JSON.stringify({ instances: { 'history.0': { nextRetryAt: new Date(Date.now() + 60000).toISOString() } } }),
+            }),
+            sendToAsync: sinon.stub(),
+        };
+
+        let error;
+        try {
+            await getHistory(adapter, 'history.0', 'sensor.0.x', 100, 200, 'average');
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.message).to.include('pausiert');
+        expect(adapter.sendToAsync.notCalled).to.equal(true);
+    });
+
+    it('rejects invalid history inputs before contacting the history adapter', async () => {
+        const adapter = { sendToAsync: sinon.stub() };
+        const invalidCalls = [
+            () => getHistory(adapter, 'javascript.0', 'sensor.0.x', 100, 200, 'average'),
+            () => getHistory(adapter, 'history.0', '', 100, 200, 'average'),
+            () => getHistory(adapter, 'history.0', 'sensor.0.x', Number.NaN, 200, 'average'),
+            () => getHistory(adapter, 'history.0', 'sensor.0.x', 200, 100, 'average'),
+            () => getHistory(adapter, 'history.0', 'sensor.0.x', 100, 200, 'invalid'),
+        ];
+
+        for (const call of invalidCalls) {
+            let error;
+            try {
+                await call();
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error).to.be.an('error');
+        }
+        expect(adapter.sendToAsync.notCalled).to.equal(true);
+    });
+
+    it('rejects an excessively large history range', async () => {
+        const adapter = { sendToAsync: sinon.stub() };
+        const elevenYears = 11 * 366 * 24 * 3600 * 1000;
+
+        let error;
+        try {
+            await getHistory(adapter, 'history.0', 'sensor.0.x', 0, elevenYears, 'average');
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error).to.be.an('error');
+        expect(error.message).to.include('Zeitraum');
+        expect(adapter.sendToAsync.notCalled).to.equal(true);
+    });
+
     it('getHistory calls sendToAsync with the standard getHistory message shape, including an explicit count', async () => {
         const adapter = {
             sendToAsync: sinon.stub().resolves({ result: [{ ts: 1, val: 10 }, { ts: 2, val: 20 }] }),

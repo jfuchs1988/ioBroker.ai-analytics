@@ -32,6 +32,16 @@ describe('markdownToHtml', () => {
         expect(html).to.include('&lt;script&gt;alert(1)&lt;/script&gt;');
         expect(html).not.to.include('<script>');
     });
+
+    it('escapes HTML in Markdown table headers and cells', () => {
+        const html = markdownToHtml('| <img src=x onerror="alert(1)"> | Safe |\n|---|---|\n| <svg onload="alert(2)"> | **bold** |');
+
+        expect(html).to.include('&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
+        expect(html).to.include('&lt;svg onload=&quot;alert(2)&quot;&gt;');
+        expect(html).to.include('<strong>bold</strong>');
+        expect(html).not.to.include('<img');
+        expect(html).not.to.include('<svg');
+    });
 });
 
 describe('resolveNamespaceFromQuery', () => {
