@@ -6,3 +6,7 @@ node_modules/
 iobroker-access-key.txt
 test-output.txt
 dist/
+
+# AI coding agent instructions: kept locally, not published to the repo
+AGENTS.md
+CLAUDE.md

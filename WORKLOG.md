@@ -4,12 +4,13 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/repo-checker-keywords`
-- Ziel: Verbleibenden Repository-Checker-Befund `W1068` (verbotenes `iobroker`-Keyword in `io-package.json`) beheben.
-- Letzter sicherer Commit: `ff0d443 docs: mark beta.33 release complete`.
-- Aktueller Stand: `ioBroker`-Keyword aus `io-package.json` entfernt (dort verboten, anders als in `package.json`, wo es empfohlen ist), Duplikat in `package.json`-Keywords bereinigt, News-Liste auf 7 Einträge gekürzt (beta.27 entfernt), Version auf `0.0.1-beta.34` angehoben. 297 Unit-Tests, Adapter-Smoke-Test und ESLint erfolgreich.
-- Nächster Schritt: Commit, Push, Merge nach `master`, Release `v0.0.1-beta.34` taggen und veröffentlichen.
-- Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Checker-Lauf hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
+- Branch: `feature/untrack-ai-instruction-files`
+- Ziel: `AGENTS.md`/`CLAUDE.md` auf Nutzerwunsch aus dem öffentlichen GitHub-Repo entfernen, lokal aber für KI-Agenten erhalten.
+- Letzter sicherer Commit: `62d66b0 merge: resolve W1068 repository checker keyword finding`.
+- Aktueller Stand: `git rm --cached AGENTS.md CLAUDE.md` (Dateien bleiben lokal im Arbeitsverzeichnis vorhanden), beide Pfade zu `.gitignore` hinzugefügt.
+- Nächster Schritt: Commit, Push, Merge nach `master`. Kein Release nötig (reine Repo-Sichtbarkeitsänderung, keine Adapter-Funktionalität betroffen).
+- Bekannter Nebeneffekt (bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
+- Offen/Rückfrage an Nutzer (aus vorherigem Task übernommen): `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
 
 ## TODO
 
@@ -57,6 +58,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Repository-Checker-Fixes für Metadaten, Lizenz, News, Dependencies und Paketinhalt integriert.
 - Release `0.0.1-beta.32` erstellt, nach `master` gemergt, als `v0.0.1-beta.32` getaggt, gepusht und auf GitHub veröffentlicht.
 - Nach Abbruch in OpenCode fortgesetzt: ungültiges JSON in `io-package.json` (überzähliges Komma im news-Objekt) behoben, das den vorherigen Task blockiert hatte. Release `0.0.1-beta.33` erstellt, nach `master` gemergt, als `v0.0.1-beta.33` getaggt, gepusht und auf GitHub veröffentlicht.
+- Repository-Checker-Befund `W1068` behoben (verbotenes `iobroker`-Keyword aus `io-package.json` entfernt). Release `0.0.1-beta.34` erstellt, nach `master` gemergt, als `v0.0.1-beta.34` getaggt, gepusht und auf GitHub veröffentlicht.
 
 ## Übergabehinweise
 
