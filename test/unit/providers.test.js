@@ -203,6 +203,14 @@ describe('openai-compatible provider', () => {
         expect(fetchStub.firstCall.args[0]).to.equal('https://openrouter.ai/api/v1/chat/completions');
     });
 
+    it('uses OpenCode Zen defaults and exposes its free model suggestions', async () => {
+        const { OPENCODE_ZEN_BASE_URL, OPENCODE_ZEN_MODELS, resolveOpenAiBaseUrl, listOpenAiCompatibleModels } = require('../../lib/providers/openaiCompatible');
+        expect(resolveOpenAiBaseUrl('opencode', '')).to.equal(OPENCODE_ZEN_BASE_URL);
+        expect(OPENCODE_ZEN_MODELS).to.include('mimo-v2.5-free');
+        expect(OPENCODE_ZEN_MODELS).to.include('muse-spark-1.2-contributor-free');
+        expect(await listOpenAiCompatibleModels({ type: 'opencode' })).to.deep.equal(OPENCODE_ZEN_MODELS.map(id => ({ id, name: id, isFree: true })));
+    });
+
     it('normalizes custom base URLs and requires one for local providers', () => {
         expect(resolveOpenAiBaseUrl('openai', '')).to.equal('https://api.openai.com/v1');
         expect(resolveOpenAiBaseUrl('openrouter', '')).to.equal('https://openrouter.ai/api/v1');
