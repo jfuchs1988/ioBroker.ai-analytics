@@ -4,6 +4,11 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
+- Branch: `fix/budget-summary-readability`
+- Ziel: Nutzer-Feedback zu "Aktuelles Budget (heute)" in den Settings: Tokenzahlen ohne Tausendertrennzeichen kaum lesbar, keine Trennung Chat/Onboarding, keine berechneten Kosten, Reset-Ergebnis (0-Verbrauch) nicht klar erkennbar.
+- Fix: `formatTodaySummary(todayEntry, dailyTokenBudget, prices)` in `lib/usage.js` umgebaut — nutzt `Intl.NumberFormat('de-DE')` für Tausenderpunkte, zeigt Chat- und Onboarding-Tokens getrennt inkl. aus den konfigurierten Preisen live berechneter Kosten (gleiche Rechenweise wie `admin/tab.js: computeCost`). `recordHistoryEntry` gibt jetzt den Tageseintrag zurück, damit `recordUsageUnlocked`/`resetUsageUnlocked` ihn zusammen mit `pricesFromConfig(adapter.config)` an `formatTodaySummary` übergeben können. `admin/jsonConfig.json`: `budgetSummary`-Feld auf volle Breite gesetzt (Text ist jetzt länger) und `sponsorLink` bekommt `newLine: true`, damit es nicht mehr neben das jetzt breitere Feld gequetscht wird.
+- Verifiziert: 370 Unit-Tests, 1 Adaptertest, ESLint erfolgreich. Kein Admin-Build nötig (nur `lib/usage.js` und `admin/jsonConfig.json` geändert, kein `src-admin`).
+
 - Branch: `fix/settings-csv-import-loses-changes`
 - Ziel: Beim Settings-CSV-Import gehen fast alle importierten Werte verloren; Speichern-Button und Formularfelder reagieren nicht.
 - Letzter sicherer Commit: `3fccf0a release: 0.0.1-beta.43`.

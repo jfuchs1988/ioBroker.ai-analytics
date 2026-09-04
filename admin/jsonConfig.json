@@ -11,12 +11,11 @@
           "oid": "usage.todaySummary",
           "control": "text",
           "readOnly": true,
-          "narrow": true,
           "label": "Aktuelles Budget (heute)",
           "sm": 12,
-          "md": 7,
-          "lg": 6,
-          "xl": 6
+          "md": 12,
+          "lg": 12,
+          "xl": 12
         },
          "sponsorLink": {
           "type": "staticLink",
@@ -24,6 +23,7 @@
           "href": "https://github.com/sponsors/jfuchs1988",
           "button": true,
           "variant": "contained",
+          "newLine": true,
           "sm": 12,
           "md": 5,
           "lg": 3,
