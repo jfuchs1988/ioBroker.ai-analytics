@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.38] - 2026-09-04
+
+### Hinzugefügt
+- Der Chat zeigt während der Datenzusammenstellung und Antwortgenerierung einen Status mit Prozentanzeige.
+
 ## [0.0.1-beta.37] - 2026-09-04
 
 ### Geändert
