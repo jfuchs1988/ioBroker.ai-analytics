@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.45] - 2026-09-04
+
+### Behoben
+- "Aktuelles Budget (heute)" zeigt Tokenzahlen jetzt mit Tausenderpunkten, getrennt nach Chat und Onboarding, inklusive live berechneter Kosten aus den eingestellten Preisen; nach dem Zurücksetzen ist der Nullstand klar erkennbar.
+
 ## [0.0.1-beta.44] - 2026-09-04
 
 ### Behoben
