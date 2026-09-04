@@ -6,10 +6,6 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const SPONSOR_URL = 'https://github.com/sponsors/jfuchs1988';
 
 describe('admin configuration links and model discovery', () => {
-    it('opens the settings tab by default', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
-        expect(config.defaultTab).to.equal('settingsTab');
-    });
     it('uses a plain manual text field for both model fields', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         const settings = config.items.settingsTab ? config.items.settingsTab.items : config.items;
@@ -32,10 +28,13 @@ describe('admin configuration links and model discovery', () => {
         expect(configText).to.include(SPONSOR_URL);
     });
 
-    it('keeps the catalog editor on the settings page', () => {
+    it('shows GitHub Sponsors on every JSON configuration tab', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
-        expect(Object.keys(config.items)).to.deep.equal(['settingsTab']);
-        expect(config.items.settingsTab.items.catalogDevices.name).to.equal('AiAnalyticsConfig/Components/CatalogDevicesComponent');
+        const tabs = Object.values(config.items).filter((item) => item.type === 'panel');
+
+        for (const tab of tabs) {
+            expect(JSON.stringify(tab)).to.include(SPONSOR_URL);
+        }
     });
 
     it('shows the sponsor link globally in the custom tab', () => {

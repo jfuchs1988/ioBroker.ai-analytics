@@ -1,6 +1,5 @@
 {
   "type": "tabs",
-  "defaultTab": "settingsTab",
   "items": {
     "settingsTab": {
       "type": "panel",
@@ -294,16 +293,39 @@
           "md": 6,
           "lg": 4,
           "xl": 4
+        }
+      }
+    },
+    "devicesTab": {
+      "type": "panel",
+      "label": "Geräte",
+      "items": {
+        "devicesBudgetSummary": {
+          "type": "state",
+          "oid": "usage.todaySummary",
+          "control": "text",
+          "readOnly": true,
+          "narrow": true,
+          "label": "Aktuelles Budget (heute)",
+          "sm": 12,
+          "md": 7,
+          "lg": 6,
+          "xl": 6
         },
-        "catalogHeader": {
-          "type": "header",
-          "text": "Historisierte Datenpunkte",
-          "size": 3,
-          "newLine": true
+        "devicesSponsorLink": {
+          "type": "staticLink",
+          "label": "Projekt unterstuetzen",
+          "href": "https://github.com/sponsors/jfuchs1988",
+          "button": true,
+          "variant": "outlined",
+          "sm": 12,
+          "md": 5,
+          "lg": 3,
+          "xl": 3
         },
-        "catalogHint": {
+        "devicesHint": {
           "type": "staticText",
-          "text": "Datenpunkte auswählen, Änderungen vornehmen und anschließend einmal speichern. Räume sind freie Eingaben, zum Beispiel Keller, Heizraum, Technikraum oder Garage.",
+          "text": "Hier werden alle historisierten und katalogisierten Datenpunkte verwaltet. Änderungen werden direkt im Katalog gespeichert.",
           "newLine": true
         },
         "catalogDevices": {

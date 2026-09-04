@@ -4,9 +4,7 @@ import { ConfigGeneric } from '@iobroker/json-config';
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
 const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness'];
-const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness'];
-const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
-const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
+const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored'];
 const SETTINGS_COLUMNS = [
     'providerType', 'baseUrl', 'model', 'apiKey',
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
@@ -20,7 +18,6 @@ const SETTINGS_NUMBER_COLUMNS = new Set([
     'checkIntervalHours', 'dailyTokenBudget',
 ]);
 const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
-const SETTINGS_SECRET_COLUMNS = new Set(['apiKey', 'onboardingApiKey']);
 
 function csvEscape(value) {
     const str = value === null || value === undefined ? '' : String(value);
@@ -75,7 +72,7 @@ function parseCsv(text) {
 export default class CatalogDevicesComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
-        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], drafts: {} };
+        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null };
         this.fileInputRef = React.createRef();
         this.progressTimer = null;
     }
@@ -116,7 +113,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         this.setState({ loading: true });
         try {
             const response = await this.callAdapter('listCatalogEntries');
-            this.setState({ entries: (response && response.entries) || [], loading: false, status: '', selected: [], drafts: {} });
+            this.setState({ entries: (response && response.entries) || [], loading: false, status: '' });
         } catch (error) {
             this.setState({ entries: [], loading: false, status: `Fehler: ${error.message || error}` });
         }
@@ -129,35 +126,6 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         } catch (error) {
             this.setState({ status: `Fehler: ${error.message || error}` });
         }
-    }
-
-    setDraft(sourceId, values) {
-        this.setState(state => ({ drafts: { ...state.drafts, [sourceId]: { ...(state.drafts[sourceId] || {}), ...values } } }));
-    }
-
-    toggleSelected(sourceId) {
-        this.setState(state => ({ selected: state.selected.includes(sourceId) ? state.selected.filter(id => id !== sourceId) : [...state.selected, sourceId] }));
-    }
-
-    async saveSelected() {
-        const selected = this.state.selected;
-        const drafts = this.state.drafts;
-        if (!selected.length) {
-            this.setState({ status: 'Bitte zuerst mindestens einen Datenpunkt auswählen.' });
-            return;
-        }
-        this.setState({ status: `Speichere ${selected.length} Datenpunkte ...` });
-        let failed = 0;
-        for (const sourceId of selected) {
-            try {
-                const values = drafts[sourceId];
-                if (values && Object.keys(values).length) await this.callAdapter('updateCatalogEntryAdmin', { sourceId, ...values });
-            } catch (_error) {
-                failed++;
-            }
-        }
-        this.setState({ status: failed ? `${selected.length - failed} gespeichert, ${failed} fehlgeschlagen.` : `${selected.length} Datenpunkte gespeichert.` });
-        await this.loadEntries();
     }
 
     async removeEntry(entry) {
@@ -286,30 +254,26 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
     }
 
     renderRow(entry) {
-        const draft = this.state.drafts[entry.sourceId] || {};
-        const value = key => draft[key] !== undefined ? draft[key] : (entry[key] || '');
-        const ignored = draft.ignored !== undefined ? draft.ignored : Boolean(entry.ignored);
-        const update = values => this.setDraft(entry.sourceId, values);
+        const update = values => this.updateEntry(entry, values);
         return (
             <tr key={entry.sourceId}>
-                <td><input type="checkbox" checked={this.state.selected.includes(entry.sourceId)} onChange={() => this.toggleSelected(entry.sourceId)} /></td>
                 <td>{entry.sourceId}</td>
-                <td><input value={value('description')} onChange={event => update({ description: event.target.value })} /></td>
-                <td><select value={value('category')} onChange={event => update({ category: event.target.value })}>
+                <td><input defaultValue={entry.description || ''} onBlur={event => update({ description: event.target.value })} /></td>
+                <td><select defaultValue={entry.category || ''} onChange={event => update({ category: event.target.value })}>
                     {CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
                 </select></td>
-                <td><select value={value('valueKind')} onChange={event => update({ valueKind: event.target.value })}>
+                <td><select defaultValue={entry.valueKind || ''} onChange={event => event.target.value && update({ valueKind: event.target.value })}>
                     <option value="">nicht klassifiziert</option>
                     {VALUE_KINDS.map(kind => <option key={kind} value={kind}>{kind}</option>)}
                 </select></td>
                 <td>{entry.unit || ''}</td>
                 <td>{entry.writable === true ? '✓' : entry.writable === false ? '–' : ''}</td>
-                <td><select value={value('updateFrequency')} onChange={event => update({ updateFrequency: event.target.value })}>{UPDATE_FREQUENCIES.map(item => <option key={item} value={item}>{item}</option>)}</select></td>
-                <td><select value={value('dataCompleteness')} onChange={event => update({ dataCompleteness: event.target.value })}>{DATA_COMPLETENESS.map(item => <option key={item} value={item}>{item}</option>)}</select></td>
-                <td><input value={value('room')} placeholder="z. B. Keller" onChange={event => update({ room: event.target.value })} /></td>
-                <td>{ignored ? 'ignoriert' : entry.active === false ? 'inaktiv' : entry.needsReview ? 'Prüfung nötig' : 'aktiv'}</td>
+                <td>{entry.updateFrequency || ''}</td>
+                <td>{entry.dataCompleteness || ''}</td>
+                <td><input defaultValue={entry.room || ''} onBlur={event => update({ room: event.target.value })} /></td>
+                <td>{entry.ignored ? 'ignoriert' : entry.active === false ? 'inaktiv' : entry.needsReview ? 'Prüfung nötig' : 'aktiv'}</td>
                 <td>
-                    <button onClick={() => update({ ignored: !ignored })}>{ignored ? 'Aktivieren' : 'Ignorieren'}</button>
+                    <button onClick={() => update({ ignored: !entry.ignored })}>{entry.ignored ? 'Aktivieren' : 'Ignorieren'}</button>
                     <button onClick={() => this.removeEntry(entry)}>Entfernen</button>
                 </td>
             </tr>
@@ -327,8 +291,6 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <button onClick={() => this.runCommand('runDiscoveryNow', 'Re-Scan läuft ...', 'Re-Scan abgeschlossen.')}>Geräte neu einlesen</button>
                     <button onClick={() => this.runCommand('runDiscoveryOnly', 'Sync läuft ...', 'Sync abgeschlossen.')}>Nur Updates einlesen</button>
                     <button onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
-                    <button onClick={() => this.saveSelected()}>Auswahl speichern</button>
-                    <button onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle auswählen</button>
                     <button onClick={() => this.exportCsv()}>Als CSV exportieren</button>
                     <button onClick={() => this.triggerCsvImport()}>CSV importieren</button>
                     <input
@@ -346,10 +308,9 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <progress max="100" value={this.state.progress.total ? Math.round((this.state.progress.processed / this.state.progress.total) * 100) : 0} style={{ width: '100%' }} />
                     <span>{this.state.progress.total ? Math.round((this.state.progress.processed / this.state.progress.total) * 100) : 0}%</span>
                 </div> : null}
-                <div style={{ marginBottom: 8, fontSize: 12 }}>Verhalten: <b>Gauge</b> = kontinuierlicher Messwert, z. B. Temperatur. Zähler und Zustände werden separat erkannt. Update-Frequenz und Vollständigkeit können hier manuell korrigiert werden. Räume wie Keller, Heizraum, Technikraum oder Garage sind freie Eingaben.</div>
                 {this.state.loading ? <div>Geräte werden geladen ...</div> : <div style={{ overflowX: 'auto', maxHeight: 600 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead><tr><th>Auswahl</th><th>Objekt-ID</th><th>Beschreibung</th><th>Kategorie</th><th>Verhalten</th><th>Einheit</th><th>Schreibbar</th><th>Update-Frequenz</th><th>Vollständigkeit</th><th>Raum</th><th>Status</th><th>Aktionen</th></tr></thead>
+                        <thead><tr><th>Objekt-ID</th><th>Beschreibung</th><th>Kategorie</th><th>Verhalten</th><th>Einheit</th><th>Schreibbar</th><th>Update-Frequenz</th><th>Vollständigkeit</th><th>Raum</th><th>Status</th><th>Aktionen</th></tr></thead>
                         <tbody>{entries.map(entry => this.renderRow(entry))}</tbody>
                     </table>
                 </div>}
@@ -368,7 +329,7 @@ export class SettingsCsvComponent extends ConfigGeneric {
     exportCsv() {
         const data = this.props.data || {};
         const lines = [SETTINGS_COLUMNS.join(',')];
-        lines.push(SETTINGS_COLUMNS.map(key => csvEscape(SETTINGS_SECRET_COLUMNS.has(key) ? '' : data[key])).join(','));
+        lines.push(SETTINGS_COLUMNS.map(key => csvEscape(data[key])).join(','));
         const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -388,23 +349,20 @@ export class SettingsCsvComponent extends ConfigGeneric {
             this.setState({ status: 'Fehler: Settings-CSV enthält keine Datenzeile.' });
             return;
         }
-        const header = rows[0].map((value, index) => index === 0 ? value.replace(/^\uFEFF/, '') : value.trim());
+        const header = rows[0];
         const values = rows[1];
         const nextData = { ...(this.props.data || {}) };
         let imported = 0;
         SETTINGS_COLUMNS.forEach(key => {
             const index = header.indexOf(key);
             if (index === -1 || values[index] === undefined) return;
-            if (SETTINGS_SECRET_COLUMNS.has(key)) return;
             let value = values[index];
             if (SETTINGS_NUMBER_COLUMNS.has(key)) value = value === '' ? 0 : Number(value);
             if (SETTINGS_BOOLEAN_COLUMNS.has(key)) value = value.toLowerCase() === 'true';
             nextData[key] = value;
             imported++;
         });
-        for (const key of SETTINGS_COLUMNS) {
-            if (nextData[key] !== undefined) await this.onChange(key, nextData[key]);
-        }
+        this.onChange(nextData);
         this.setState({ status: `${imported} Settings importiert. Bitte mit Speichern übernehmen.` });
     }
 

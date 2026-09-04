@@ -1,7 +1,7 @@
-import{n as e,t}from"./assets/chunk-wAaOllP5.js";export{t as get,e as init};
+import{n as e,t}from"./assets/chunk-C7_KUUqH.js";export{t as get,e as init};
 if (typeof document !== 'undefined' && document.head) {
   try {
-    for (const __mfWarmupPath of ["assets/chunk-wAaOllP5.js","assets/chunk-npu7aSFH.js","assets/chunk-XhGH1yec.js","assets/chunk-BqOvXJa1.js","assets/chunk-B7qeedMF.js"]) {
+    for (const __mfWarmupPath of ["assets/chunk-C7_KUUqH.js","assets/chunk-BH0nrFcW.js","assets/chunk-hCD3I9PM.js","assets/chunk-BqOvXJa1.js","assets/chunk-B7qeedMF.js"]) {
       const __mfWarmupLink = document.createElement('link');
       __mfWarmupLink.rel = 'modulepreload';
       __mfWarmupLink.crossOrigin = '';

@@ -14,79 +14,6 @@ function formatMessageLine(entry) {
     return `[${entry.role}] ${entry.text}`;
 }
 
-function escapeHtml(value) {
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function formatMarkdownInline(value) {
-    return value
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/_([^_]+)_/g, '<em>$1</em>');
-}
-
-function markdownToHtml(markdown) {
-    const lines = String(markdown || '').replace(/\r/g, '').split('\n');
-    const html = [];
-    let listOpen = false;
-    const closeList = () => {
-        if (listOpen) {
-            html.push('</ul>');
-            listOpen = false;
-        }
-    };
-    for (let index = 0; index < lines.length; index++) {
-        const raw = lines[index];
-        const line = escapeHtml(raw);
-        const next = lines[index + 1] || '';
-        if (/^\|?\s*:?-{3,}:?\s*\|/.test(next)) {
-            closeList();
-            const cells = raw.split('|').slice(1, -1).map(cell => cell.trim());
-            const rows = [];
-            index += 2;
-            while (index < lines.length && lines[index].includes('|') && lines[index].trim()) {
-                rows.push(lines[index].split('|').slice(1, -1).map(cell => cell.trim()));
-                index++;
-            }
-            index--;
-            html.push(`<table><thead><tr>${cells.map(cell => `<th>${formatMarkdownInline(cell)}</th>`).join('')}</tr></thead><tbody>`);
-            rows.forEach(row => html.push(`<tr>${row.map(cell => `<td>${formatMarkdownInline(cell)}</td>`).join('')}</tr>`));
-            html.push('</tbody></table>');
-        } else if (/^###\s+/.test(line)) {
-            closeList();
-            html.push(`<h3>${formatMarkdownInline(line.slice(4))}</h3>`);
-        } else if (/^##\s+/.test(line)) {
-            closeList();
-            html.push(`<h2>${formatMarkdownInline(line.slice(3))}</h2>`);
-        } else if (/^#\s+/.test(line)) {
-            closeList();
-            html.push(`<h1>${formatMarkdownInline(line.slice(2))}</h1>`);
-        } else if (/^[-*]\s+/.test(line)) {
-            if (!listOpen) {
-                html.push('<ul>');
-                listOpen = true;
-            }
-            html.push(`<li>${formatMarkdownInline(line.slice(2))}</li>`);
-        } else if (/^\d+\.\s+/.test(line)) {
-            closeList();
-            html.push(`<p>${formatMarkdownInline(line)}</p>`);
-        } else if (!line.trim()) {
-            closeList();
-        } else {
-            closeList();
-            html.push(`<p>${formatMarkdownInline(line)}</p>`);
-        }
-    }
-    closeList();
-    return html.join('');
-}
-
 function resolveNamespaceFromQuery(searchString) {
     const params = new URLSearchParams(searchString || '');
     const instance = params.get('instance') || params.get('i') || '0';
@@ -181,7 +108,7 @@ function renderHistory(history) {
         line.className = `chat-message chat-message-${entry.role}`;
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble';
-        bubble.innerHTML = markdownToHtml(entry.text);
+        bubble.textContent = entry.text;
         const time = document.createElement('div');
         time.className = 'chat-timestamp';
         time.textContent = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
@@ -702,6 +629,5 @@ if (typeof module !== 'undefined') {
         CATEGORIES,
         parseBridgeResponse,
         extractChatHistory,
-        markdownToHtml,
     };
 }
