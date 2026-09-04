@@ -156,7 +156,7 @@ describe('adminCommands', () => {
             });
         });
 
-        it('leaves valueKind untouched when not provided', async () => {
+    it('leaves valueKind untouched when not provided', async () => {
             const existing = { sourceId: 'javascript.0.x', category: 'lighting', valueKind: 'gauge', valueKindSource: 'sampled' };
             const setCatalogEntry = sinon.stub().resolves();
             const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
@@ -167,6 +167,21 @@ describe('adminCommands', () => {
             const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', room: 'Keller' });
 
             expect(result.entry).to.deep.include({ valueKind: 'gauge', valueKindSource: 'sampled' });
+        });
+
+        it('updates data quality values manually', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'device_usage', updateFrequency: 'unknown', dataCompleteness: 'unknown' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, {
+                sourceId: 'javascript.0.x', updateFrequency: 'hourly', dataCompleteness: 'complete',
+            });
+
+            expect(result.entry).to.include({ updateFrequency: 'hourly', dataCompleteness: 'complete' });
         });
     });
 
