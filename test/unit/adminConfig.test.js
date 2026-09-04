@@ -29,6 +29,14 @@ describe('admin configuration links and model discovery', () => {
         expect(fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.jsx'), 'utf8')).to.include('https://opencode.ai/zen/v1');
     });
 
+    it('exposes configurable safe workload limits', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        const settings = config.items.settingsTab.items;
+        expect(settings.maxToolCalls.max).to.equal(128);
+        expect(settings.maxPeriodsPerRequest.max).to.equal(1024);
+        expect(settings.maxPeriodsPerToolCall.max).to.equal(120);
+    });
+
     it('provides the required size for the onboarding section header', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         expect(config.items.settingsTab.items.onboardingHeader.size).to.equal(3);

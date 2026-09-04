@@ -77,7 +77,11 @@
     "onboardingPricePerMillionOutputTokens": 0,
     "checkIntervalHours": 24,
     "silentIfNothingFound": false,
-    "dailyTokenBudget": 0,
+     "dailyTokenBudget": 0,
+     "maxAgentIterations": 8,
+     "maxToolCalls": 32,
+     "maxPeriodsPerRequest": 256,
+     "maxPeriodsPerToolCall": 72,
     "licenseToken": ""
   },
   "objects": [],

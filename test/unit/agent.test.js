@@ -196,7 +196,7 @@ describe('runAgent', () => {
             error = caught;
         }
 
-        expect(error.message).to.include('Maximale Anzahl');
+        expect(error.message).to.include('Maximale Anzahl').and.to.include(`Limit ${MAX_TOOL_CALLS}`).and.to.include(`benoetigt ${MAX_TOOL_CALLS + 1}`);
         expect(execute.notCalled).to.equal(true);
     });
 
@@ -217,7 +217,7 @@ describe('runAgent', () => {
             error = caught;
         }
 
-        expect(error.message).to.include('Zeitraeumen');
+        expect(error.message).to.include('Zeitraeumen').and.to.include(`Limit ${MAX_PERIODS}`).and.to.include(`benoetigt ${MAX_PERIODS + 1}`);
         expect(tools.execute.calledOnce).to.equal(true);
     });
 

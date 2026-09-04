@@ -8,6 +8,7 @@ const { createProvider } = require('./lib/providers');
 const { checkProviderReachable, ensureReachabilityStates, CHAT_STATE, ONBOARDING_STATE } = require('./lib/providerHealthCheck');
 const { buildTools } = require('./lib/tools');
 const { runAgent, MAX_ITERATIONS } = require('./lib/agent');
+const { getLimits } = require('./lib/limits');
 const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
@@ -60,6 +61,7 @@ class AiAnalytics extends utils.Adapter {
         this.proactiveCheckPromise = null;
         this.catalogSyncPromise = null;
         this.licenseState = { status: 'beta', fullAccess: true };
+        this.runtimeLimits = getLimits(this.config || {});
     }
 
     /**
@@ -178,8 +180,9 @@ class AiAnalytics extends utils.Adapter {
             ? this.buildProviderSafely(onboardingProviderConfig, 'Onboarding-Modell')
             : this.chatProvider;
 
-        this.tools = buildTools(this);
-        this.readOnlyTools = buildTools(this, { readOnly: true });
+        this.runtimeLimits = getLimits(this.config);
+        this.tools = buildTools(this, { limits: this.runtimeLimits });
+        this.readOnlyTools = buildTools(this, { readOnly: true, limits: this.runtimeLimits });
 
         const chatCheck = await this.checkProviderConfigured(this.chatProvider, chatProviderConfig, 'Chat/Pruefungs-Modell');
         this.chatProviderOk = chatCheck.reachable;
@@ -567,6 +570,7 @@ class AiAnalytics extends utils.Adapter {
             ({ finalText, usage } = await runAgent({
                 provider: this.chatProvider,
                 tools: this.readOnlyTools || this.tools,
+                limits: this.runtimeLimits,
                 systemPrompt:
                     timeAndLocation +
                     'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
@@ -634,7 +638,7 @@ class AiAnalytics extends utils.Adapter {
             running: true,
             phase: 'chat',
             processed: 0,
-            total: 8,
+            total: this.runtimeLimits.maxAgentIterations,
             message: 'Daten werden zusammengestellt ... 0%',
             error: null,
         });
@@ -643,6 +647,7 @@ class AiAnalytics extends utils.Adapter {
         const { finalText, usage } = await runAgent({
             provider: this.chatProvider,
             tools: this.tools,
+            limits: this.runtimeLimits,
             systemPrompt:
                 timeAndLocation +
                 'Du beantwortest Fragen zu Smart-Home-Verbrauchsdaten anhand der katalogisierten Objekte. ' +
@@ -660,8 +665,8 @@ class AiAnalytics extends utils.Adapter {
              userMessage: question,
              priorMessages,
              onProgress: progress => {
-                 const processed = Math.min(progress.processed || 0, 8);
-                 const total = Math.max(progress.total || 8, 1);
+                 const processed = Math.min(progress.processed || 0, this.runtimeLimits.maxAgentIterations);
+                 const total = Math.max(progress.total || this.runtimeLimits.maxAgentIterations, 1);
                  const percent = Math.min(100, Math.round((processed / total) * 100));
                  return this.updateChatProgressState({
                      running: true,
@@ -680,8 +685,8 @@ class AiAnalytics extends utils.Adapter {
         await this.updateChatProgressState({
             running: false,
             phase: 'done',
-            processed: 8,
-            total: 8,
+            processed: this.runtimeLimits.maxAgentIterations,
+            total: this.runtimeLimits.maxAgentIterations,
             message: 'Antwort fertig.',
             finishedAt: new Date().toISOString(),
         });

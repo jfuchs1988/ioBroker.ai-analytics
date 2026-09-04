@@ -259,6 +259,54 @@
           "lg": 2,
           "xl": 2
         },
+        "maxAgentIterations": {
+          "type": "number",
+          "label": "Maximale KI-Schritte pro Anfrage (1-32)",
+          "default": 8,
+          "min": 1,
+          "max": 32,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "maxToolCalls": {
+          "type": "number",
+          "label": "Maximale Werkzeug-Aufrufe (1-128)",
+          "default": 32,
+          "min": 1,
+          "max": 128,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "maxPeriodsPerRequest": {
+          "type": "number",
+          "label": "Maximale Zeiträume pro Anfrage (1-1024)",
+          "default": 256,
+          "min": 1,
+          "max": 1024,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
+        "maxPeriodsPerToolCall": {
+          "type": "number",
+          "label": "Maximale Zeiträume je Werkzeug (1-120)",
+          "default": 72,
+          "min": 1,
+          "max": 120,
+          "xs": 12,
+          "sm": 6,
+          "md": 3,
+          "lg": 2,
+          "xl": 2
+        },
         "licenseToken": {
           "type": "password",
           "label": "Sponsoring-Entitlement-Token (ab Version 0.1.0)",
