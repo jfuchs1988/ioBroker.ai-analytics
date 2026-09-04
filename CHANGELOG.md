@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.37] - 2026-09-04
+
+### Geändert
+- Historisierte Datenpunkte wieder in einen eigenen Tab innerhalb der Adapter-Einstellungen verschoben.
+
 ## [0.0.1-beta.36] - 2026-09-04
 
 ### Behoben
