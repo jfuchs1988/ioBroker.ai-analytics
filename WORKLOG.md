@@ -12,6 +12,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Test: `test/unit/settingsCsvImport.test.js` extrahiert die JSX-freien Teile von `SettingsCsvComponent` per VM-Sandbox (wie in `adminComponents.test.js`) und simuliert das reale Framework-Zeitverhalten (verzögerter Callback via Promise/Timer), um den Datenverlust reproduzierbar zu machen.
 - Verifiziert: 368 Unit-Tests, 1 Adaptertest, ESLint und Admin-Build erfolgreich.
 - Nebeneffekt aus dem Debugging (kein Code-Bug, aber wichtig): Beim Live-Test im Browser wurde versehentlich ein Test-API-Key gespeichert und der echte Chat-API-Key von `system.adapter.ai-analytics.0` überschrieben. Nutzer wurde informiert, muss den echten Key manuell neu eintragen.
+- PR #10 gegen `master` erstellt und gemergt; Release `0.0.1-beta.44` manuell auf GitHub veröffentlicht (ohne Tarball-Asset — GitHub-Actions-Release-Workflow ist deaktiviert, Release wird ab jetzt manuell per `gh release create` ohne `.tgz`-Anhang erstellt). DONE.
 - Aktueller Stand: In Arbeit. CSV-Import korrigiert, geschützte API-Schlüssel werden nicht mehr als unbrauchbare verschlüsselte Werte exportiert/importiert. Geräte-Komponente nutzt Auswahl plus Sammelspeicherung; Kategorie, Raum, Verhalten, Update-Frequenz, Vollständigkeit und Ignorieren sind editierbar. Automatische Keller-Zuordnung für PV, Wärmepumpen, Heizungs- und Weichwasseranlagen erweitert. Markdown-Renderer und Tests ergänzt.
 - Verifiziert: `npm test` mit 300 Unit-Tests und 1 Adaptertest, ESLint und `npm run build:admin` erfolgreich. Admin-Bundle neu gebaut.
 - PR #1 gegen `master` erstellt und gemergt; Release `0.0.1-beta.36` veröffentlicht. GitHub-Actions-CI bleibt deaktiviert.
@@ -37,6 +38,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## DONE
 
+- Settings-CSV-Import-Bug behoben (`this.onChangeAsync` statt `this.onChange` in `SettingsCsvComponent.handleFileSelected`), Regressionstest ergänzt; PR #10 gemergt, Release `0.0.1-beta.44` veröffentlicht.
 - Admin-Einstellungen, CSV-Import, gebündelte Katalogbearbeitung und Markdown-Chatdarstellung verbessert; PR #1 gemergt.
 - Historisierte Datenpunkte als eigener Tab in den Adapter-Einstellungen wiederhergestellt; PR #2 gemergt.
 
