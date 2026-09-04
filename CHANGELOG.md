@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.46] - 2026-09-04
+
+### Geändert
+- Tagesbudget ist jetzt ein EUR-Betrag (`dailyBudgetEur` statt `dailyTokenBudget`) und wird gegen die aus den Preisen berechneten Ist-Kosten geprüft statt gegen eine rohe Tokenzahl. Ohne gesetzten Preis kann ein Budget > 0 nicht gespeichert werden.
+- Alle Kostenanzeigen (Settings, Chat-Tab) zeigen Beträge jetzt einheitlich in € mit deutscher Zahlenformatierung.
+
+### Behoben
+- Die Tagesbudget-Anzeige wird jetzt auch beim Adapterstart neu berechnet, damit eine geänderte Preis- oder Budgetkonfiguration sofort sichtbar ist statt erst nach der nächsten Anfrage.
+
 ## [0.0.1-beta.45] - 2026-09-04
 
 ### Behoben
