@@ -20,6 +20,7 @@ const { classifyValueKind } = require('./lib/valueKindClassifier');
 const { classifyDataQuality } = require('./lib/dataQualityClassifier');
 const { findAnomalyCandidates, isEligibleCatalogEntry } = require('./lib/anomalyDetector');
 const { findHvacCorrelationCandidates } = require('./lib/hvacCorrelation');
+const { findEnergyBalanceCandidates } = require('./lib/energyBalance');
 const {
     evaluateLicense,
     canUseChat,
@@ -545,6 +546,14 @@ class AiAnalytics extends utils.Adapter {
             } catch (error) {
                 this.log.warn(`HVAC-Korrelation fehlgeschlagen: ${error.message}`);
             }
+
+            try {
+                const energyResult = await findEnergyBalanceCandidates(this, catalogEntries, Date.now());
+                anomalyCandidates = [...anomalyCandidates, ...energyResult.candidates];
+                totalFailedCount += energyResult.failedCount || 0;
+            } catch (error) {
+                this.log.warn(`Energiebilanz-Korrelation fehlgeschlagen: ${error.message}`);
+            }
         } catch (error) {
             preAnalysisError = error;
             this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
@@ -595,7 +604,9 @@ class AiAnalytics extends utils.Adapter {
                     'Verbrauch, PV-Einspeisung). Momentanwerte (gauge) beziehen sich auf die letzten 24 Stunden, ' +
                     'Zaehler und Schalter (boolean_state) auf den letzten vollstaendigen Kalendertag. Begruende Auffaelligkeiten mit konkreten Werten. ' +
                     'Kandidaten koennen auch raumbezogene Korrelationen enthalten (reason: "window_open_while_heating" — ' +
-                    'Fenster war laengere Zeit offen, waehrend die Heizung im selben Raum lief). ' +
+                    'Fenster war laengere Zeit offen, waehrend die Heizung im selben Raum lief) oder Energiebilanz-Auffaelligkeiten ' +
+                    '(reason: "energy_balance_deviation" — PV-Erzeugung, Netzbezug, Netzeinspeisung, Batterie und Verbrauch einer ' +
+                    'Energie-Gruppe ergeben in Summe nicht die erwartete Bilanz). ' +
                     'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                     'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +

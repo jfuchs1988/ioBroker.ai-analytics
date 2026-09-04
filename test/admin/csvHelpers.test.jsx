@@ -38,6 +38,7 @@ describe('admin CSV helpers', () => {
         expect(() => validateCatalogImportValue('valueKind', 'command')).toThrow('valueKind');
         expect(validateCatalogImportValue('derivedMetricRole', 'pv_generation')).toBe('pv_generation');
         expect(() => validateCatalogImportValue('derivedMetricRole', 'unknown')).toThrow('derivedMetricRole');
+        expect(validateCatalogImportValue('derivedMetricRole', 'battery_charge')).toBe('battery_charge');
         expect(validateCatalogImportValue('hvacRole', 'window')).toBe('window');
         expect(() => validateCatalogImportValue('hvacRole', 'unknown')).toThrow('hvacRole');
     });

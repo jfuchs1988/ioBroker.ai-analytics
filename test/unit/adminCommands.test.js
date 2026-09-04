@@ -271,6 +271,18 @@ describe('adminCommands', () => {
             expect(setCatalogEntry.calledOnce).to.equal(true);
         });
 
+        it('accepts the new energy balance roles', async () => {
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption' }]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' });
+
+            expect(result.entry).to.deep.include({ derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' });
+        });
+
         it('rejects hvacRole when the existing entry is not boolean_state', async () => {
             const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
                 getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'device_usage', valueKind: 'gauge' }]),
