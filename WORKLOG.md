@@ -4,13 +4,13 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/untrack-ai-instruction-files`
-- Ziel: `AGENTS.md`/`CLAUDE.md` auf Nutzerwunsch aus dem öffentlichen GitHub-Repo entfernen, lokal aber für KI-Agenten erhalten.
-- Letzter sicherer Commit: `62d66b0 merge: resolve W1068 repository checker keyword finding`.
-- Aktueller Stand: `git rm --cached AGENTS.md CLAUDE.md` (Dateien bleiben lokal im Arbeitsverzeichnis vorhanden), beide Pfade zu `.gitignore` hinzugefügt.
-- Nächster Schritt: Commit, Push, Merge nach `master`. Kein Release nötig (reine Repo-Sichtbarkeitsänderung, keine Adapter-Funktionalität betroffen).
+- Branch: `master`
+- Ziel: keins (zwischen Tasks).
+- Letzter sicherer Commit: `0400ba3 merge: untrack AI coding agent instruction files`.
+- Aktueller Stand: `AGENTS.md`/`CLAUDE.md` aus dem öffentlichen GitHub-Repo entfernt (lokal per `git rm --cached` + `.gitignore` erhalten, auf GitHub bestätigt 404). GitHub-Actions-Workflows `CI` und `Release` auf Nutzerwunsch ("wir sind in der Entwicklung") per `gh workflow disable` deaktiviert — Workflow-Dateien unverändert, Reaktivierung jederzeit über `gh workflow enable CI`/`gh workflow enable Release` möglich.
+- Nächster Schritt: keiner. Vor dem nächsten Release daran denken, dass CI/Release-Workflows aktuell nicht automatisch laufen.
 - Bekannter Nebeneffekt (bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
-- Offen/Rückfrage an Nutzer (aus vorherigem Task übernommen): `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
+- Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
 
 ## TODO
 
