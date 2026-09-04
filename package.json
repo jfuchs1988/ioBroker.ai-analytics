@@ -1,6 +1,6 @@
 {
   "name": "iobroker.ai-analytics",
-  "version": "0.0.1-beta.33",
+  "version": "0.0.1-beta.34",
   "description": "KI-gestuetzte Analyse und proaktive Pruefungen fuer historisierte ioBroker-Objekte",
   "main": "main.js",
   "repository": {
@@ -9,7 +9,6 @@
   },
   "keywords": [
     "ioBroker",
-    "iobroker",
     "analytics",
     "history",
     "influxdb",

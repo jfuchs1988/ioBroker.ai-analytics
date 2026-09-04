@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.34] - 2026-09-04
+
+### Behoben
+- `common.keywords` in `io-package.json` enthielt `ioBroker` und löste damit den Repository-Checker-Befund `W1068` aus (dieses Keyword ist dort explizit verboten, im Gegensatz zu `package.json`, wo es empfohlen ist); Keyword entfernt. Redundantes Duplikat `iobroker`/`ioBroker` in `package.json`-Keywords bereinigt.
+
 ## [0.0.1-beta.33] - 2026-09-03
 
 ### Behoben

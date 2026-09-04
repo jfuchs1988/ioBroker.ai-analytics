@@ -4,11 +4,12 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: Repository-Checker-Befunde und Veröffentlichungskonsistenz beheben.
-- Letzter sicherer Commit: `91f91af merge: finalize repository checker cleanup for beta.33`.
-- Aktueller Stand: Release `v0.0.1-beta.33` veröffentlicht.
-- Nächster Schritt: keiner.
+- Branch: `fix/repo-checker-keywords`
+- Ziel: Verbleibenden Repository-Checker-Befund `W1068` (verbotenes `iobroker`-Keyword in `io-package.json`) beheben.
+- Letzter sicherer Commit: `ff0d443 docs: mark beta.33 release complete`.
+- Aktueller Stand: `ioBroker`-Keyword aus `io-package.json` entfernt (dort verboten, anders als in `package.json`, wo es empfohlen ist), Duplikat in `package.json`-Keywords bereinigt, News-Liste auf 7 Einträge gekürzt (beta.27 entfernt), Version auf `0.0.1-beta.34` angehoben. 297 Unit-Tests, Adapter-Smoke-Test und ESLint erfolgreich.
+- Nächster Schritt: Commit, Push, Merge nach `master`, Release `v0.0.1-beta.34` taggen und veröffentlichen.
+- Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Checker-Lauf hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
 
 ## TODO
 
