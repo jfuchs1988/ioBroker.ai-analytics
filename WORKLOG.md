@@ -6,13 +6,11 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/energie-korrelation-energiebilanz`
-- Ziel: Sub-Projekt B der Korrelations-/Kennzahlen-Zerlegung
-  (Energiebilanz-Anomalie), siehe
-  Spec `docs/specs/2026-09-05-energie-korrelation-energiebilanz.md`,
-  Plan `docs/plans/2026-09-05-energie-korrelation-energiebilanz.md`.
-- Stand: Code + Tests + Doku fertig. `npm test` (429 Unit- + 8 Admin-Tests),
-  `npm run lint`, `npm run build:admin` grün. Noch offen: Commit/Merge/Push.
+- Branch: `master`.
+- Status: Energie-Korrelation (Sub-Projekt B) committed (`16ea154`), nach
+  `master` gemergt (`17f02a5`) und nach `origin/master` gepusht.
+  Feature-Branch gelöscht. Damit haben alle drei Sub-Projekte der
+  Korrelations-Zerlegung (A, B, C) eine erste Ausbaustufe.
 
 ## TODO
 
