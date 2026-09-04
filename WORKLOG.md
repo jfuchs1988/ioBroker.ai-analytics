@@ -4,8 +4,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/long-period-comparisons`
-- Ziel: Mehrjährige Monatsvergleiche ohne zu enge Agent-/Werkzeuglimits ermöglichen.
+- Branch: `feature/chat-usage-display`
+- Ziel: Tokenverbrauch und optionale Kosten direkt an KI-Antworten im Chat anzeigen.
 - Letzter sicherer Commit: `6d33bae merge: exclude .claude/ session state and eslint.config.js from npm package`.
 - Aktueller Stand: In Arbeit. CSV-Import korrigiert, geschützte API-Schlüssel werden nicht mehr als unbrauchbare verschlüsselte Werte exportiert/importiert. Geräte-Komponente nutzt Auswahl plus Sammelspeicherung; Kategorie, Raum, Verhalten, Update-Frequenz, Vollständigkeit und Ignorieren sind editierbar. Automatische Keller-Zuordnung für PV, Wärmepumpen, Heizungs- und Weichwasseranlagen erweitert. Markdown-Renderer und Tests ergänzt.
 - Verifiziert: `npm test` mit 300 Unit-Tests und 1 Adaptertest, ESLint und `npm run build:admin` erfolgreich. Admin-Bundle neu gebaut.
@@ -17,9 +17,10 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - PR #4 gegen `master` erstellt und gemergt; Release `0.0.1-beta.39` veröffentlicht.
 - PR #5 gegen `master` erstellt und gemergt; Release `0.0.1-beta.40` veröffentlicht.
 - Aktueller Stand: OpenCode Zen nutzt für die vier Chat-Modelle `/chat/completions` und für beide Muse-Modelle `/responses`; Wire-Format und Response-Mapping getestet.
-- PR #7 gegen `master` erstellt und gemergt. Release `0.0.1-beta.42` wird direkt veröffentlicht.
-- Aktueller Stand: Limits auf 32 Werkzeug-Aufrufe je Lauf, 256 Zeiträume je Lauf und 72 Zeiträume je Werkzeug erhöht. Überschreitungsfehler nennen jetzt Bedarf, Limit und Differenz. Die vier Arbeitslimits sind auf der Settings-Seite mit sicheren Grenzen editierbar; interne Payload-/Secret-/CSV-Sicherheitslimits bleiben absichtlich fest.
-- Verifiziert: 361 Unit-Tests, 1 Adaptertest, ESLint und Admin-Build erfolgreich.
+- PR #7 gegen `master` erstellt und gemergt; Release `0.0.1-beta.42` veröffentlicht.
+- Aktueller Stand: Antworten speichern Input-/Output-/Gesamttokens und Kostenmetadaten; die Chatdarstellung zeigt diese unter der Antwort an, Kosten nur bei eingetragenen Preisen.
+- Verifiziert: 365 Unit-Tests, 1 Adaptertest und ESLint erfolgreich.
+- Nächster Schritt: Admin-Build, Commit, PR und Release durchführen.
 - PR #6 gegen `master` erstellt und gemergt. Release `0.0.1-beta.41` wird direkt veröffentlicht.
 - Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
 - Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
