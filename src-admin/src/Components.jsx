@@ -12,12 +12,12 @@ const SETTINGS_COLUMNS = [
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'onboardingProviderType', 'onboardingBaseUrl', 'onboardingModel', 'onboardingApiKey',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
-    'checkIntervalHours', 'dailyTokenBudget', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
+    'checkIntervalHours', 'dailyTokenBudget', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
 ];
 const SETTINGS_NUMBER_COLUMNS = new Set([
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
-    'checkIntervalHours', 'dailyTokenBudget',
+    'checkIntervalHours', 'dailyTokenBudget', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall',
 ]);
 const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
 const SETTINGS_SECRET_COLUMNS = new Set(['apiKey', 'onboardingApiKey']);

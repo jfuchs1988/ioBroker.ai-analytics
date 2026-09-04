@@ -8,7 +8,7 @@ Der Adapter muss untrusted LLM-, History-, CSV- und Chat-Eingaben begrenzen und 
 
 - Markdown-Ausgabe darf auch in Tabellen kein HTML ausführen.
 - Provider-Aufrufe müssen zeitlich begrenzt und bei Timeout abgebrochen werden.
-- Agent-Werkzeuge validieren Argumente zur Laufzeit und begrenzen Tool-Aufrufe, Zeiträume und Batch-Größen.
+- Agent-Werkzeuge validieren Argumente zur Laufzeit und begrenzen Tool-Aufrufe, Zeiträume und Batch-Größen. Für mehrjährige Monatsvergleiche sind bis zu 72 Zeiträume je Werkzeug und 256 je Lauf erlaubt.
 - Proaktive Prüfungen erhalten ausschließlich lesende Werkzeuge.
 - Chat- und proaktive Läufe dürfen pro Instanz nicht überlappen; die tägliche eingeschränkte Chat-Nutzung wird vor dem Modellaufruf reserviert.
 - Chat-Fortschritt verwendet einen eigenen State und endet auch bei Fehlern zuverlässig.
