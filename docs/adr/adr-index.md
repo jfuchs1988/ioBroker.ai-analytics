@@ -23,7 +23,7 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0015](0015-dokumentationsstruktur.md) | Dokumentationsstruktur: arc42 Multi-File + ADRs + Obsidian-MOCs | Angenommen | 2026-08-21 |
 | [0016](0016-git-branching-modell.md) | Git-Branching-Modell: develop/master mit manueller Freigabe | Angenommen | 2026-08-21 |
 | [0017](0017-scoped-catalog-write-capability.md) | Scoped Catalog Write Capability für Onboarding-Rückfragen | Angenommen | 2026-08-21 |
-| [0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) | Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Vorbild evcc) | Angenommen (Phase 1 von 2) | 2026-08-22 |
+| [0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) | Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Referenzprojekt) | Angenommen (Phase 1 von 2) | 2026-08-22 |
 | [0019](0019-feature-branch-pro-task.md) | Feature-/Bugfix-Branch pro Umsetzungsplan-Task, lokal nach develop gemergt | Angenommen | 2026-08-22 |
 | [0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) | Admin-Message-Bus bekommt vollen Katalog-Schreibzugriff (unabhängig von needsReview) | Angenommen | 2026-08-22 |
 | [0021](0021-getrennte-provider-pro-zweck.md) | Getrennte LLM-Provider pro Zweck (Onboarding vs. Chat/Prüfung) mit Fallback und Start-Selbstprüfung | Angenommen | 2026-08-22 |
@@ -32,6 +32,6 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0024](0024-zweistufige-valuekind-klassifizierung.md) | Zweistufige `valueKind`-Klassifizierung (Metadaten + Datenprobe), kein LLM-Aufruf | Angenommen | 2026-08-24 |
 | [0025](0025-nutzerbestaetigte-katalogpflege-im-chat.md) | Nutzerbestätigte Katalogpflege im Chat | Angenommen | 2026-09-03 |
 | [0026](0026-schreibmuster-bewusste-datenvollstaendigkeit.md) | Schreibmuster-bewusste Datenvollständigkeits-Erkennung (`writable`/`writePattern`/`updateFrequency`/`dataCompleteness`) | Angenommen | 2026-09-03 |
-| [0027](0027-hybrid-lizenzmodell-nach-evcc.md) | Hybrides Lizenzmodell nach evcc | Angenommen (produktive Aktivierung offen) | 2026-09-03 |
+| [0027](0027-hybrid-lizenzmodell-referenzprojekt.md) | Hybrides Lizenzmodell nach Referenzprojekt | Angenommen (produktive Aktivierung offen) | 2026-09-03 |
 | [0028](0028-tagesbudget-in-eur-statt-token.md) | Tagesbudget in EUR statt Rohtoken, mit Preis-Validierung und Anzeige-Refresh beim Start | Angenommen | 2026-09-04 |
 | [0029](0029-progressive-disclosure-fuer-session-kontext.md) | Progressive Disclosure für Session-Kontext | Angenommen | 2026-09-04 |

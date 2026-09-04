@@ -1,8 +1,8 @@
-# ADR-0018: Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Vorbild evcc)
+# ADR-0018: Lizenzmodell — Beta frei, danach Sponsoring-Pflicht (Referenzprojekt)
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Ersetzt für die Gesamt-Lizenzierung durch [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md)
+**Status:** Ersetzt für die Gesamt-Lizenzierung durch [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md)
 **Datum:** 2026-08-22
 
 ## Kontext
@@ -14,8 +14,8 @@ npm-/Katalog-Veröffentlichung als offene Entscheidung vor.
 
 Der Nutzer möchte die Software während der Beta-Phase kostenlos anbieten,
 danach aber eine Nutzungsgebühr von ca. 0,99 EUR/Monat verlangen — als
-Vorbild genannt wurde das Lizenz-/Sponsoring-Modell von
-[evcc](https://github.com/evcc-io/evcc): quelloffener Kern, der nach einer
+  Vorbild genannt wurde ein Referenzprojekt mit Lizenz-/Sponsoring-Modell:
+  quelloffener Kern, der nach einer
 Testphase ohne aktives Sponsoring (via GitHub Sponsors) nicht mehr
 weiterläuft.
 
@@ -29,7 +29,7 @@ Zweiphasiges Vorgehen:
    aktiven Sponsoring ab 0,99 EUR/Monat (Kanal: GitHub Sponsors). Kein
    Code-seitiger Check, keine Zahlungs-Infrastruktur.
 2. **Später (eigene Spec/Plan, noch nicht terminiert):** technische
-   Durchsetzung nach evcc-Vorbild — Adapter läuft nach Beta-Ende eine
+   Durchsetzung nach dem Referenzprojekt-Vorbild — Adapter läuft nach Beta-Ende eine
    begrenzte Zeit (Zielgröße laut Nutzer: 1 Monat) ohne gültiges
    Sponsoring-Token, danach Funktionssperre, Freischaltung über ein via
    GitHub Sponsors bezogenes Token. Details (Trigger für "Beta-Ende",

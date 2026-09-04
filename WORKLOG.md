@@ -18,7 +18,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## DONE
 
-- Bestehende Struktur mit `evcc-io/evcc` verglichen und veraltete bzw.
+- Bestehende Struktur mit einem Referenzprojekt verglichen und veraltete bzw.
   doppelte Statusangaben identifiziert.
 - Lokale `AGENTS.md` auf Session-Start, Pflichtregeln und aufgabenbezogenes
   Laden reduziert; versionierte Fachkontexte unter `docs/agents/` ergänzt.
@@ -27,7 +27,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Übereinstimmung von Sponsor-Inventar und Dateiköpfen ergänzt.
 - Verifiziert: 378 Unit-Tests und 1 Adaptertest erfolgreich, ESLint und
   Admin-Build erfolgreich, Releasepaket per `npm pack --dry-run` geprüft.
-- Lizenzaudit durchgeführt: kein Hinweis auf kopierten evcc-Anwendungscode;
+- Lizenzaudit durchgeführt: kein Hinweis auf kopierten Anwendungscode des
+  Referenzprojekts;
   Third-Party-Notices für gebündelte Admin-Abhängigkeiten und weitere
   Lizenzfamilien ergänzt. `@iobroker`- und `cropperjs`-Hinweise bleiben im
   Bundle erhalten.

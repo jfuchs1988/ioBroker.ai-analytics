@@ -1,4 +1,4 @@
-# ADR-0027: Hybrides Lizenzmodell nach evcc
+# ADR-0027: Hybrides Lizenzmodell nach Referenzprojekt
 
 [← ADR-Übersicht](adr-index.md)
 
@@ -8,7 +8,7 @@
 ## Kontext
 
 Das bisherige Modell stellte den gesamten Adapter unter eine proprietäre
-Lizenz. Als Vorbild für die weitere Monetarisierung dient evcc: Ein nutzbarer
+Lizenz. Als Referenz für die weitere Monetarisierung dient ein Referenzprojekt: Ein nutzbarer
 Open-Source-Kern bleibt frei, während klar abgegrenzte, wertschöpfende
 Integrationen sponsor-pflichtig sind.
 
