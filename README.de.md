@@ -26,7 +26,7 @@ ungewöhnliche Beobachtungen.
 ## Voraussetzungen
 
 - ioBroker mit JavaScript-Controller 5 oder neuer
-- Node.js 18 oder neuer
+- Node.js 22 oder neuer
 - Mindestens eine aktive `history`-, `influxdb`- oder `sql`-Logging-Instanz
 - API-Key für einen unterstützten Cloud-Provider oder ein erreichbarer lokaler
   OpenAI-kompatibler Endpunkt, z. B. Ollama, LM Studio oder LocalAI
@@ -123,7 +123,7 @@ das Repository Proxyquire-basierte Tests für Orchestrierung und Adapterfluss.
 
 ## Status
 
-Aktuelle Entwicklungsversion: `0.0.1-beta.34`. Der Adapter befindet sich in
+Aktuelle Entwicklungsversion: `0.0.1-beta.35`. Der Adapter befindet sich in
 der Beta-Phase; eine manuelle Abnahme auf einer echten ioBroker-Installation
 gehört weiterhin zum Releaseprozess.
 
