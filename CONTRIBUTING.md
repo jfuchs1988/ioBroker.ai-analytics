@@ -10,8 +10,8 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
   werden sie in sinnvolle, thematisch geschlossene Zwischenstände geteilt.
 - Nach erfolgreicher Verifikation wird nur auf ausdrücklichen Auftrag committed,
   gepusht, nach `master` gemergt oder veröffentlicht.
-- Releases werden derzeit manuell erstellt, weil keine GitHub-Actions-Workflows
-  im Repository aktiv sind. Ein Release-Task aktualisiert Version,
+- Releases werden bewusst manuell erstellt; es gibt keine GitHub-Actions-
+  Workflows im Repository. Ein Release-Task aktualisiert Version,
   `CHANGELOG.md` und `io-package.json`, baut das Paket lokal und erstellt danach
   Tag und GitHub-Release.
 
@@ -68,8 +68,10 @@ Bei jeder Änderung, die eines der folgenden betrifft, wird die entsprechende Do
 5. `npm test`, Build und bei UI-Änderungen die Live-Abnahme durchführen.
 6. Auf ausdrücklichen Auftrag Branch pushen, nach `master` mergen und Branch
    löschen.
-7. Bei einem Release-Auftrag Version/Changelog aktualisieren, Paket prüfen, Tag
-   pushen und GitHub-Release manuell erstellen.
+7. Bei einem Release-Auftrag Version/Changelog aktualisieren, Paket prüfen,
+   `npm run test:e2e` einmal manuell ausführen (echter js-controller-Test,
+   siehe `docs/agents/testing.md`), Tag pushen und GitHub-Release manuell
+   erstellen.
 8. `WORKLOG.md` auf `DONE` setzen und Status sauber hinterlassen.
 
 ## Commits

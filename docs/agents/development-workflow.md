@@ -33,7 +33,8 @@ duplizieren.
   Änderungen nie verwerfen oder überschreiben.
 - Admin-Quellen unter `src-admin/` sind nicht Teil des Releasepakets; das
   gebaute Bundle unter `admin/` muss aktuell sein.
-- GitHub-Actions-Workflows sind derzeit nicht im Repository. Releases werden
-  deshalb nur auf ausdrücklichen Auftrag und nach lokaler Verifikation erstellt.
+- Es gibt bewusst keine GitHub-Actions-Workflows (CI/Release) im Repository;
+  Lint, Tests und Build laufen manuell lokal. Releases werden deshalb nur auf
+  ausdrücklichen Auftrag und nach lokaler Verifikation erstellt.
 - `AGENTS.md` und `CLAUDE.md` bleiben lokal und sind über `.gitignore` sowie
   `.npmignore` von Repository und Paket ausgeschlossen.
