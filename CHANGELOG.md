@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.41] - 2026-09-04
+
+### Geändert
+- Limits für KI-Schritte, Werkzeug-Aufrufe und Zeiträume sind auf der Settings-Seite konfigurierbar.
+- Fehlermeldungen nennen jetzt benötigte Anzahl, aktuelles Limit und Differenz.
+
 ## [0.0.1-beta.40] - 2026-09-04
 
 ### Hinzugefügt
