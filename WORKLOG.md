@@ -4,8 +4,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `fix/deep-security-review`
-- Ziel: Vollständiges tiefes Code- und Sicherheitsreview mit testgetriebener Behebung gefundener Bugs und Risiken.
+- Branch: `feature/opencode-zen-provider`
+- Ziel: OpenCode Zen als vorausgefüllten OpenAI-kompatiblen Anbieter mit Endpoint und Modellvorschlägen ergänzen.
 - Letzter sicherer Commit: `6d33bae merge: exclude .claude/ session state and eslint.config.js from npm package`.
 - Aktueller Stand: In Arbeit. CSV-Import korrigiert, geschützte API-Schlüssel werden nicht mehr als unbrauchbare verschlüsselte Werte exportiert/importiert. Geräte-Komponente nutzt Auswahl plus Sammelspeicherung; Kategorie, Raum, Verhalten, Update-Frequenz, Vollständigkeit und Ignorieren sind editierbar. Automatische Keller-Zuordnung für PV, Wärmepumpen, Heizungs- und Weichwasseranlagen erweitert. Markdown-Renderer und Tests ergänzt.
 - Verifiziert: `npm test` mit 300 Unit-Tests und 1 Adaptertest, ESLint und `npm run build:admin` erfolgreich. Admin-Bundle neu gebaut.
@@ -14,9 +14,9 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Verifiziert: 301 Unit-Tests, 1 Adaptertest, Lint und Admin-Build erfolgreich.
 - PR #2 gegen `master` erstellt und gemergt; Release `0.0.1-beta.37` veröffentlicht.
 - PR #3 gegen `master` erstellt und gemergt; Release `0.0.1-beta.38` veröffentlicht.
-- Aktueller Stand: Tiefenreview und Hardening umgesetzt. Behoben wurden unter anderem XSS in Markdown-Tabellen, fehlende Provider-Timeouts/Redirect-Sperren, unbeschränkte Tool-Aufrufe, Parallelitäts-/Quoten-Races, falsche Gesundmeldungen bei History-Ausfällen, CSV-Formelinjektion, fehlerhafte Onboarding-Zählung und stale Fortschrittszustände. Spec/Plan und Risiko-Update ergänzt.
-- Verifiziert: 356 Unit-Tests, 1 Adaptertest, ESLint, Admin-Build und `npm pack --dry-run` erfolgreich; `npm audit` zeigt nur transitive Entwicklungsabhängigkeiten unter `@iobroker/testing`.
-- PR #4 gegen `master` erstellt und gemergt. Release `0.0.1-beta.39` wird direkt veröffentlicht.
+- PR #4 gegen `master` erstellt und gemergt; Release `0.0.1-beta.39` veröffentlicht.
+- Aktueller Stand: OpenCode Zen mit automatischem Endpoint, sechs Modellvorschlägen und freiem Modellnamen implementiert. 358 Unit-Tests, Adaptertest, Lint und Admin-Build erfolgreich.
+- Nächster Schritt: Commit, PR und Release durchführen.
 - Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
 - Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
 - Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.

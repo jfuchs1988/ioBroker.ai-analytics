@@ -76,15 +76,14 @@
           "newLine": true
         },
         "providerType": {
-          "type": "select",
+          "type": "custom",
+          "urlField": "baseUrl",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/ProviderSelectComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
           "label": "LLM-Provider",
           "newLine": true,
-          "options": [
-            { "label": "Anthropic", "value": "anthropic" },
-            { "label": "OpenAI", "value": "openai" },
-            { "label": "OpenRouter", "value": "openrouter" },
-            { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
-          ],
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -93,7 +92,7 @@
         },
         "baseUrl": {
           "type": "text",
-          "label": "Basis-URL (nur fuer OpenRouter/Lokal)",
+          "label": "Basis-URL (nur fuer OpenRouter/OpenCode/Lokal)",
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -101,7 +100,11 @@
           "xl": 4
         },
         "model": {
-          "type": "text",
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/ModelSelectComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
           "label": "Modell",
           "newLine": true,
           "xs": 12,
@@ -153,16 +156,15 @@
           "newLine": true
         },
         "onboardingProviderType": {
-          "type": "select",
+          "type": "custom",
+          "includeEmpty": true,
+          "urlField": "onboardingBaseUrl",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/ProviderSelectComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
           "label": "LLM-Provider (Onboarding)",
           "newLine": true,
-          "options": [
-            { "label": "Wie oben (Chat/Pruefung)", "value": "" },
-            { "label": "Anthropic", "value": "anthropic" },
-            { "label": "OpenAI", "value": "openai" },
-            { "label": "OpenRouter", "value": "openrouter" },
-            { "label": "Lokal (OpenAI-kompatibel)", "value": "local" }
-          ],
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -171,7 +173,7 @@
         },
         "onboardingBaseUrl": {
           "type": "text",
-          "label": "Basis-URL (Onboarding, nur fuer OpenRouter/Lokal)",
+          "label": "Basis-URL (Onboarding, nur fuer OpenRouter/OpenCode/Lokal)",
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -179,7 +181,11 @@
           "xl": 4
         },
         "onboardingModel": {
-          "type": "text",
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/ModelSelectComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
           "label": "Modell (Onboarding)",
           "newLine": true,
           "xs": 12,

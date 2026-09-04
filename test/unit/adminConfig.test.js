@@ -15,8 +15,18 @@ describe('admin configuration links and model discovery', () => {
         const settings = config.items.settingsTab ? config.items.settingsTab.items : config.items;
 
         for (const field of ['model', 'onboardingModel']) {
-            expect(settings[field].type).to.equal('text');
+            expect(settings[field].name).to.equal('AiAnalyticsConfig/Components/ModelSelectComponent');
         }
+    });
+
+    it('offers OpenCode Zen and auto-fills its endpoint through custom provider selectors', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        const settings = config.items.settingsTab.items;
+        expect(settings.providerType.name).to.equal('AiAnalyticsConfig/Components/ProviderSelectComponent');
+        expect(settings.providerType.urlField).to.equal('baseUrl');
+        expect(settings.onboardingProviderType.includeEmpty).to.equal(true);
+        expect(fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.jsx'), 'utf8')).to.include('OpenCode Zen');
+        expect(fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.jsx'), 'utf8')).to.include('https://opencode.ai/zen/v1');
     });
 
     it('provides the required size for the onboarding section header', () => {

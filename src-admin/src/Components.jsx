@@ -21,7 +21,9 @@ const SETTINGS_NUMBER_COLUMNS = new Set([
 ]);
 const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
 const SETTINGS_SECRET_COLUMNS = new Set(['apiKey', 'onboardingApiKey']);
-const PROVIDER_TYPES = new Set(['anthropic', 'openai', 'openrouter', 'local']);
+const PROVIDER_TYPES = new Set(['anthropic', 'openai', 'openrouter', 'opencode', 'local']);
+const OPENCODE_ZEN_BASE_URL = 'https://opencode.ai/zen/v1';
+const OPENCODE_ZEN_MODELS = ['mimo-v2.5-free', 'ling-3.0-flash-fin-free', 'nemotron-3-ultra-free', 'nemotron-3.5-lightning-free', 'muse-spark-1.3-contributor-free', 'muse-spark-1.2-contributor-free'];
 const MAX_CSV_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_CSV_ROWS = 10000;
 const MAX_CSV_FIELD_LENGTH = 4096;
@@ -140,6 +142,34 @@ export function validateSettingImportValue(key, rawValue) {
     if (key === 'providerType' && !PROVIDER_TYPES.has(value)) throw new Error(`Ungültiger providerType: ${value}`);
     if (key === 'onboardingProviderType' && value !== '' && !PROVIDER_TYPES.has(value)) throw new Error(`Ungültiger onboardingProviderType: ${value}`);
     return value;
+}
+
+export class ProviderSelectComponent extends ConfigGeneric {
+    renderItem() {
+        const value = (this.props.data && this.props.data[this.props.attr]) || '';
+        const options = [ ...(this.props.schema.includeEmpty ? [['', 'Wie oben (Chat/Pruefung)']] : []), ['anthropic', 'Anthropic'], ['openai', 'OpenAI'], ['openrouter', 'OpenRouter'], ['opencode', 'OpenCode Zen'], ['local', 'Lokal (OpenAI-kompatibel)'] ];
+        return <select value={value} aria-label={this.props.schema.label || 'LLM-Provider'} onChange={async event => {
+            const next = event.target.value;
+            await this.onChange(this.props.attr, next);
+            if (next === 'opencode' && this.props.schema.urlField) await this.onChange(this.props.schema.urlField, OPENCODE_ZEN_BASE_URL);
+        }}>{options.map(([optionValue, label]) => <option key={optionValue} value={optionValue}>{label}</option>)}</select>;
+    }
+}
+
+export class ModelSelectComponent extends ConfigGeneric {
+    renderItem() {
+        const value = (this.props.data && this.props.data[this.props.attr]) || '';
+        const isPreset = OPENCODE_ZEN_MODELS.includes(value);
+        return <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <select aria-label="Modellvorschläge" value={isPreset ? value : '__custom__'} onChange={event => {
+                if (event.target.value !== '__custom__') this.onChange(this.props.attr, event.target.value);
+            }}>
+                <option value="__custom__">Benutzerdefiniertes Modell</option>
+                {OPENCODE_ZEN_MODELS.map(model => <option key={model} value={model}>{model}</option>)}
+            </select>
+            <input aria-label={this.props.schema.label || 'Modell'} value={value} placeholder="Modellname frei eingeben" onChange={event => this.onChange(this.props.attr, event.target.value)} />
+        </div>;
+    }
 }
 
 export default class CatalogDevicesComponent extends ConfigGeneric {

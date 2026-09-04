@@ -7,7 +7,7 @@ function loadHelpers() {
     const filename = path.resolve(__dirname, '..', '..', 'src-admin', 'src', 'Components.jsx');
     const source = fs.readFileSync(filename, 'utf8');
     const helpers = source
-        .slice(source.indexOf('const CATEGORIES'), source.indexOf('export default class'))
+        .slice(source.indexOf('const CATEGORIES'), source.indexOf('export class ProviderSelectComponent'))
         .replace(/^export /gm, '');
     const context = { module: { exports: {} } };
     vm.runInNewContext(
@@ -61,6 +61,7 @@ describe('admin CSV helpers', () => {
         expect(validateSettingImportValue('dailyTokenBudget', '42')).to.equal(42);
         expect(validateSettingImportValue('silentIfNothingFound', 'false')).to.equal(false);
         expect(validateSettingImportValue('providerType', 'openrouter')).to.equal('openrouter');
+        expect(validateSettingImportValue('providerType', 'opencode')).to.equal('opencode');
         expect(() => validateSettingImportValue('checkIntervalHours', '0')).to.throw('checkIntervalHours');
         expect(() => validateSettingImportValue('dailyTokenBudget', 'NaN')).to.throw('dailyTokenBudget');
         expect(() => validateSettingImportValue('providerType', 'unknown')).to.throw('providerType');
