@@ -212,6 +212,13 @@ describe('catalog', () => {
         })).to.throw('derivedMetricGroupId');
     });
 
+    it('accepts the new energy balance roles', () => {
+        for (const role of ['grid_import', 'battery_charge', 'battery_discharge', 'consumption']) {
+            const entry = validateCatalogEntry({ sourceId: 'x', category: 'consumption', derivedMetricRole: role, derivedMetricGroupId: 'energy-1' });
+            expect(entry.derivedMetricRole).to.equal(role);
+        }
+    });
+
     it('accepts a valid hvacRole on a boolean_state entry', () => {
         const entry = validateCatalogEntry({
             sourceId: 'x', category: 'device_usage', valueKind: 'boolean_state', hvacRole: 'window',

@@ -6,24 +6,39 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`.
-- Status: HVAC-Korrelation (Sub-Projekt C) committed (`5d69e87`), nach
-  `master` gemergt (`5bc4843`) und nach `origin/master` gepusht.
-  Feature-Branch gelöscht.
+- Branch: `feature/energie-korrelation-energiebilanz`
+- Ziel: Sub-Projekt B der Korrelations-/Kennzahlen-Zerlegung
+  (Energiebilanz-Anomalie), siehe
+  Spec `docs/specs/2026-09-05-energie-korrelation-energiebilanz.md`,
+  Plan `docs/plans/2026-09-05-energie-korrelation-energiebilanz.md`.
+- Stand: Code + Tests + Doku fertig. `npm test` (429 Unit- + 8 Admin-Tests),
+  `npm run lint`, `npm run build:admin` grün. Noch offen: Commit/Merge/Push.
 
 ## TODO
 
 - Nächste Produktaufgabe (nach dieser): aktuellen Adapterstand auf einer
   echten ioBroker-Installation live abnehmen.
-- Sub-Projekt B (Energie-Korrelation) folgt laut
-  `docs/specs/2026-09-04-korrelation-und-abgeleitete-kennzahlen-uebersicht.md`.
-- Spätere Ausbaustufen (bewusst zurückgestellt): Wirkungsgrad (Sub-Projekt A),
-  Temperatur-Stagnations-Regel (Sub-Projekt C).
+- Alle drei Sub-Projekte der Korrelations-Zerlegung (A, B, C) haben jetzt
+  eine erste Ausbaustufe. Spätere Ausbaustufen (bewusst zurückgestellt):
+  Wirkungsgrad (A), Temperatur-Stagnations-Regel (C), bidirektionaler
+  Netzzähler-Support (B).
 - Vor jedem künftigen Release `npm run test:e2e` einmal manuell ausführen
   (js-controller-Installation kann mehrere Minuten dauern).
 
 ## DONE
 
+- Energie-Korrelation (Sub-Projekt B, erste Ausbaustufe): `derivedMetricRole`
+  um vier Rollen erweitert (`grid_import`, `battery_charge`,
+  `battery_discharge`, `consumption`) — dieselbe Energie-Gruppe wie
+  `getSelfConsumption` (Sub-A), keine neue Gruppierungs-Infrastruktur. Neues
+  fokussiertes Modul `lib/energyBalance.js` berechnet die Energiebilanz-
+  Residuen der letzten 8 Kalendertage und nutzt `detectDailyAggregateAnomaly`
+  aus Phase 2 der Anomalieerkennung wieder (keine neue Schwelle). Pflicht-
+  rollen `pv_generation`/`grid_import`/`grid_feed_in`/`consumption`,
+  Batterie-Rollen optional (fehlend = 0). Bewusst keine Onboarding-
+  Heuristik für die vier neuen Rollen (zu hohe Fehlerquote bei
+  herstellerspezifischen Namenskonventionen) — nur manuelle Zuweisung im
+  Geräte-Tab.
 - HVAC-Korrelation (Sub-Projekt C, erste Ausbaustufe): neues Katalogfeld
   `hvacRole` (`window`/`heating`, nur für `boolean_state`, validiert in
   `catalog.js`/`adminCommands.js`); neues fokussiertes Modul
@@ -32,9 +47,9 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Fenster/Heizung-Raumpaar eine Überlappung >= 15 Minuten am letzten
   vollständigen Kalendertag; in `main.js` in die bestehende
   `anomalyCandidates`-Liste eingespeist (`totalFailedCount` statt
-  Hidden-Array-Property, da zwei Kandidatenlisten zusammengeführt werden);
-  rein namensbasierte Onboarding-Heuristik (`suggestHvacRoles`); Admin-UI-
-  CSV-Spalte ergänzt.
+  Hidden-Array-Property, da mehrere Kandidatenlisten zusammengeführt
+  werden); rein namensbasierte Onboarding-Heuristik (`suggestHvacRoles`);
+  Admin-UI-CSV-Spalte ergänzt.
 - Abgeleitete Kennzahlen (Sub-Projekt A): neue Katalogfelder
   `derivedMetricRole`/`derivedMetricGroupId` (validiert in `catalog.js` und
   `adminCommands.js`); neues LLM-Werkzeug `getSelfConsumption` in

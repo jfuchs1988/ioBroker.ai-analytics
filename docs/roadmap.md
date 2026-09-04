@@ -112,9 +112,9 @@ Das stärkt den wichtigsten Qualitätsanspruch: keine vagen KI-Vermutungen.
 
 ### 7. Korrelationen und abgeleitete Kennzahlen
 
-**Nutzen: hoch · Risiko: hoch · Status: Sub-Projekte A+C umgesetzt, B offen**
+**Nutzen: hoch · Risiko: hoch · Status: alle drei Sub-Projekte in erster Ausbaustufe umgesetzt**
 
-- PV, Netzbezug, Batterie und Verbraucher gemeinsam analysieren (Sub-Projekt B, offen)
+- PV, Netzbezug, Batterie und Verbraucher gemeinsam analysieren (Sub-Projekt B: Energiebilanz-Anomalie umgesetzt, kein Support für einen einzelnen bidirektionalen Netzzähler)
 - Raumtemperatur, Heizung und Fensterzustände korrelieren (Sub-Projekt C: Fenster/Heizung-Überlappung umgesetzt, Temperatur-Stagnation offen)
 - abgeleitete Kennzahlen wie Eigenverbrauch, Laufzeit oder Wirkungsgrad (Sub-Projekt A: Laufzeit + Eigenverbrauch umgesetzt, Wirkungsgrad offen)
 

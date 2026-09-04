@@ -355,17 +355,19 @@ describe('AiAnalytics syncCatalog flow', () => {
 });
 
 describe('AiAnalytics proactive anomaly gate', () => {
-    function loadMainWithProactiveStubs({ candidates, runAgent, hvacCandidates, hvacFailedCount } = {}) {
+    function loadMainWithProactiveStubs({ candidates, runAgent, hvacCandidates, hvacFailedCount, energyCandidates, energyFailedCount } = {}) {
         const appendChatMessage = sinon.stub().resolves();
         const recordUsage = sinon.stub().resolves();
         const findAnomalyCandidates = sinon.stub().resolves(candidates || []);
         const findHvacCorrelationCandidates = sinon.stub().resolves({ candidates: hvacCandidates || [], failedCount: hvacFailedCount || 0 });
+        const findEnergyBalanceCandidates = sinon.stub().resolves({ candidates: energyCandidates || [], failedCount: energyFailedCount || 0 });
         const isEligibleCatalogEntry = sinon.stub().returns(true);
         const isBudgetExceeded = sinon.stub().resolves(false);
         const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
             '@iobroker/adapter-core': { Adapter: class {} },
             './lib/anomalyDetector': { findAnomalyCandidates, isEligibleCatalogEntry },
             './lib/hvacCorrelation': { findHvacCorrelationCandidates },
+            './lib/energyBalance': { findEnergyBalanceCandidates },
             './lib/catalog': { getAllCatalogEntries: sinon.stub().resolves([]), setCatalogEntry: sinon.stub(), markInactive: sinon.stub() },
             './lib/usage': { isBudgetExceeded, recordUsage },
             './lib/chatLog': { appendChatMessage, ensureChatHistoryState: sinon.stub(), getRecentChatHistory: sinon.stub() },
@@ -373,7 +375,7 @@ describe('AiAnalytics proactive anomaly gate', () => {
             './lib/promptContext': { buildTimeAndLocationContext: sinon.stub().resolves('Zeitkontext\n') },
             './lib/agent': { MAX_ITERATIONS: 3, runAgent: runAgent || sinon.stub().resolves({ finalText: 'Auffaelligkeit gefunden.', usage: {} }) },
         });
-        return { TestAdapter, appendChatMessage, findAnomalyCandidates, findHvacCorrelationCandidates, recordUsage, runAgent };
+        return { TestAdapter, appendChatMessage, findAnomalyCandidates, findHvacCorrelationCandidates, findEnergyBalanceCandidates, recordUsage, runAgent };
     }
 
     function makeAdapter(TestAdapter) {
@@ -439,10 +441,21 @@ describe('AiAnalytics proactive anomaly gate', () => {
         expect(loaded.findHvacCorrelationCandidates.calledOnce).to.equal(true);
     });
 
-    it('combines statistical and HVAC failure counts into one incomplete report', async () => {
+    it('merges energy balance candidates with the other candidates', async () => {
+        const energyCandidates = [{ groupId: 'energy-1', reason: 'energy_balance_deviation', currentResidual: 45 }];
+        const loaded = loadMainWithProactiveStubs({ energyCandidates });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.equal({ skipped: false });
+        expect(loaded.findEnergyBalanceCandidates.calledOnce).to.equal(true);
+    });
+
+    it('combines statistical, HVAC, and energy balance failure counts', async () => {
         const candidates = [];
         Object.defineProperty(candidates, 'failedCount', { value: 1 });
-        const loaded = loadMainWithProactiveStubs({ candidates, hvacFailedCount: 2 });
+        const loaded = loadMainWithProactiveStubs({ candidates, hvacFailedCount: 1, energyFailedCount: 1 });
         const adapter = makeAdapter(loaded.TestAdapter);
 
         const result = await adapter.runProactiveCheck();
