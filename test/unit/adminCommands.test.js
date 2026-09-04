@@ -192,6 +192,7 @@ describe('adminCommands', () => {
             ['ignored', 'true'],
             ['room', 'x'.repeat(201)],
             ['description', 'x'.repeat(2001)],
+            ['derivedMetricRole', 'not-a-role'],
         ]) {
             it(`rejects an invalid ${field}`, async () => {
                 const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
@@ -225,6 +226,48 @@ describe('adminCommands', () => {
                 expect(error.message).to.include('sourceId');
             }
             expect(getAllCatalogEntries.notCalled).to.equal(true);
+        });
+
+        it('rejects an unknown derivedMetricRole even when paired with a groupId', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'lighting' }]),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'nope', derivedMetricGroupId: 'g1' });
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error.message).to.include('derivedMetricRole');
+        });
+
+        it('rejects derivedMetricGroupId without derivedMetricRole', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'lighting' }]),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricGroupId: 'g1' });
+            } catch (caught) {
+                error = caught;
+            }
+            expect(error.message).to.include('derivedMetricRole');
+        });
+
+        it('accepts and stores a valid derivedMetricRole/derivedMetricGroupId pair', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'generation_pv' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
+
+            expect(result.entry).to.deep.include({ derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
+            expect(setCatalogEntry.calledOnce).to.equal(true);
         });
     });
 

@@ -3,8 +3,9 @@ import { ConfigGeneric } from '@iobroker/json-config';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
-const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness'];
-const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness'];
+const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in'];
+const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId'];
+const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
 const SETTINGS_COLUMNS = [
@@ -124,6 +125,7 @@ export function validateCatalogImportValue(field, value) {
     if (field === 'room' && value.length > MAX_ROOM_LENGTH) throw new Error(`room darf maximal ${MAX_ROOM_LENGTH} Zeichen enthalten.`);
     if (field === 'category' && !CATEGORIES.includes(value)) throw new Error(`Ungültige category: ${value}`);
     if (field === 'valueKind' && !VALUE_KINDS.includes(value)) throw new Error(`Ungültiger valueKind: ${value}`);
+    if (field === 'derivedMetricRole' && !DERIVED_METRIC_ROLES.includes(value)) throw new Error(`Ungültige derivedMetricRole: ${value}`);
     if (field === 'updateFrequency' && !UPDATE_FREQUENCIES.includes(value)) throw new Error(`Ungültige updateFrequency: ${value}`);
     if (field === 'dataCompleteness' && !DATA_COMPLETENESS.includes(value)) throw new Error(`Ungültige dataCompleteness: ${value}`);
     return field === 'ignored' ? parseBoolean(value, field) : value;

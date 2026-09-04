@@ -839,4 +839,61 @@ describe('runOnboarding', () => {
         });
         expect(adapter.log.warn.called).to.equal(true);
     });
+
+    it('still runs the self-consumption suggestion even with no newly discovered objects', async () => {
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([
+                { sourceId: 'pv.0.total', description: 'PV Erzeugung', category: 'generation_pv', valueKind: 'cumulative_total' },
+                { sourceId: 'grid.0.feedin', description: 'Netzeinspeisung', category: 'consumption', valueKind: 'cumulative_total' },
+            ]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding({ log: {} }, {}, []);
+
+        expect(setCatalogEntry.callCount).to.equal(2);
+        const [, pvUpdate] = setCatalogEntry.getCalls()[0].args;
+        expect(pvUpdate.derivedMetricRole).to.equal('pv_generation');
+        expect(pvUpdate.derivedMetricGroupId).to.be.a('string');
+        const [, feedInUpdate] = setCatalogEntry.getCalls()[1].args;
+        expect(feedInUpdate.derivedMetricRole).to.equal('grid_feed_in');
+        expect(feedInUpdate.derivedMetricGroupId).to.equal(pvUpdate.derivedMetricGroupId);
+    });
+});
+
+describe('suggestSelfConsumptionPair', () => {
+    const { suggestSelfConsumptionPair } = require('../../lib/onboarding');
+
+    function pvCandidate(overrides = {}) {
+        return { sourceId: 'pv.0.total', description: 'PV Erzeugung gesamt', category: 'generation_pv', valueKind: 'cumulative_total', derivedMetricGroupId: undefined, ...overrides };
+    }
+    function feedInCandidate(overrides = {}) {
+        return { sourceId: 'grid.0.feedin', description: 'Netzeinspeisung', category: 'consumption', valueKind: 'cumulative_total', derivedMetricGroupId: undefined, ...overrides };
+    }
+
+    it('suggests a pair when exactly one candidate exists for each role', () => {
+        const result = suggestSelfConsumptionPair([pvCandidate(), feedInCandidate()]);
+        expect(result).to.deep.equal({ pvSourceId: 'pv.0.total', feedInSourceId: 'grid.0.feedin' });
+    });
+
+    it('suggests nothing when a candidate is a gauge instead of a counter kind', () => {
+        const result = suggestSelfConsumptionPair([pvCandidate({ valueKind: 'gauge' }), feedInCandidate()]);
+        expect(result).to.equal(null);
+    });
+
+    it('suggests nothing when multiple pv candidates exist (ambiguous)', () => {
+        const result = suggestSelfConsumptionPair([pvCandidate(), pvCandidate({ sourceId: 'pv.1.total' }), feedInCandidate()]);
+        expect(result).to.equal(null);
+    });
+
+    it('suggests nothing when a candidate already has a derivedMetricGroupId', () => {
+        const result = suggestSelfConsumptionPair([pvCandidate({ derivedMetricGroupId: 'existing' }), feedInCandidate()]);
+        expect(result).to.equal(null);
+    });
+
+    it('suggests nothing when no feed-in candidate exists', () => {
+        const result = suggestSelfConsumptionPair([pvCandidate()]);
+        expect(result).to.equal(null);
+    });
 });
