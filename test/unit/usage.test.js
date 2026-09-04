@@ -117,16 +117,34 @@ describe('usage', () => {
     });
 
     describe('formatTodaySummary', () => {
-        it('returns "150 Tokens heute (kein Limit)" when budget is 0', () => {
-            expect(formatTodaySummary(150, 0)).to.equal('150 Tokens heute (kein Limit)');
+        it('formats zero usage with thousand separators and no budget line', () => {
+            expect(formatTodaySummary(null, 0, {})).to.equal(
+                '0 Tokens heute (kein Limit) · Chat: 0 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+            );
         });
 
-        it('returns "150 Tokens heute (kein Limit)" when budget is undefined', () => {
-            expect(formatTodaySummary(150, undefined)).to.equal('150 Tokens heute (kein Limit)');
+        it('treats a missing budget the same as no limit', () => {
+            expect(formatTodaySummary(null, undefined, {})).to.equal(
+                '0 Tokens heute (kein Limit) · Chat: 0 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+            );
         });
 
-        it('returns "150 / 1000 Tokens heute" when budget is 1000', () => {
-            expect(formatTodaySummary(150, 1000)).to.equal('150 / 1000 Tokens heute');
+        it('formats large token counts with German thousand separators against the configured budget', () => {
+            const entry = { chat: { inputTokens: 100000, outputTokens: 20000 }, onboarding: { inputTokens: 0, outputTokens: 0 } };
+            expect(formatTodaySummary(entry, 500000, {})).to.equal(
+                '120.000 / 500.000 Tokens heute · Chat: 120.000 Tokens · Kosten: 0.0000 · Onboarding: 0 Tokens · Kosten: 0.0000'
+            );
+        });
+
+        it('splits chat and onboarding usage and calculates cost per purpose from configured prices', () => {
+            const entry = {
+                chat: { inputTokens: 100000, outputTokens: 20000 },
+                onboarding: { inputTokens: 5000, outputTokens: 1000 },
+            };
+            const prices = { chatIn: 0.4, chatOut: 1.8, onboardingIn: 0.1, onboardingOut: 0.3 };
+            expect(formatTodaySummary(entry, 500000, prices)).to.equal(
+                '126.000 / 500.000 Tokens heute · Chat: 120.000 Tokens · Kosten: 0.0760 · Onboarding: 6.000 Tokens · Kosten: 0.0008'
+            );
         });
     });
 
@@ -275,6 +293,7 @@ describe('usage', () => {
         });
 
         it('recordUsage also writes TODAY_SUMMARY_STATE with formatted string', async () => {
+            const today = new Date().toISOString().slice(0, 10);
             const adapter = makeAdapter({ dailyTokenBudget: 1000 });
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
@@ -283,7 +302,24 @@ describe('usage', () => {
 
             const summaryCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === TODAY_SUMMARY_STATE);
             expect(summaryCall).to.exist;
-            expect(summaryCall.args[1].val).to.equal(formatTodaySummary(120, 1000));
+            expect(summaryCall.args[1].val).to.equal(
+                formatTodaySummary(
+                    { date: today, chat: { inputTokens: 100, outputTokens: 20 }, onboarding: { inputTokens: 0, outputTokens: 0 } },
+                    1000,
+                    {}
+                )
+            );
+        });
+
+        it('recordUsage computes summary cost from the configured per-purpose prices', async () => {
+            const adapter = makeAdapter({ chatPricePerMillionInputTokens: 0.4, chatPricePerMillionOutputTokens: 1.8 });
+            adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
+            adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
+
+            await recordUsage(adapter, { inputTokens: 1000000, outputTokens: 0 });
+
+            const summaryCall = adapter.setStateAsync.getCalls().find((call) => call.args[0] === TODAY_SUMMARY_STATE);
+            expect(summaryCall.args[1].val).to.include('Chat: 1.000.000 Tokens · Kosten: 0.4000');
         });
     });
 });
