@@ -32,10 +32,11 @@ describe('admin configuration links and model discovery', () => {
         expect(configText).to.include(SPONSOR_URL);
     });
 
-    it('keeps the catalog editor on the settings page', () => {
+    it('keeps the catalog editor in its own adapter settings tab', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
-        expect(Object.keys(config.items)).to.deep.equal(['settingsTab']);
-        expect(config.items.settingsTab.items.catalogDevices.name).to.equal('AiAnalyticsConfig/Components/CatalogDevicesComponent');
+        expect(Object.keys(config.items)).to.deep.equal(['settingsTab', 'catalogTab']);
+        expect(config.items.catalogTab.label).to.equal('Historisierte Datenpunkte');
+        expect(config.items.catalogTab.items.catalogDevices.name).to.equal('AiAnalyticsConfig/Components/CatalogDevicesComponent');
     });
 
     it('shows the sponsor link globally in the custom tab', () => {
