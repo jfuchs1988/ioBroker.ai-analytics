@@ -19,6 +19,7 @@ const { buildTimeAndLocationContext } = require('./lib/promptContext');
 const { classifyValueKind } = require('./lib/valueKindClassifier');
 const { classifyDataQuality } = require('./lib/dataQualityClassifier');
 const { findAnomalyCandidates, isEligibleCatalogEntry } = require('./lib/anomalyDetector');
+const { findHvacCorrelationCandidates } = require('./lib/hvacCorrelation');
 const {
     evaluateLicense,
     canUseChat,
@@ -514,6 +515,7 @@ class AiAnalytics extends utils.Adapter {
         const silentIfNothingFound = this.config.silentIfNothingFound === true;
 
         let anomalyCandidates = [];
+        let totalFailedCount = 0;
         let preAnalysisError = null;
         try {
             const catalogEntries = await getAllCatalogEntries(this);
@@ -534,14 +536,23 @@ class AiAnalytics extends utils.Adapter {
                     message: progress.message,
                 })
             );
+            totalFailedCount += anomalyCandidates.failedCount || 0;
+
+            try {
+                const hvacResult = await findHvacCorrelationCandidates(this, catalogEntries, Date.now());
+                anomalyCandidates = [...anomalyCandidates, ...hvacResult.candidates];
+                totalFailedCount += hvacResult.failedCount || 0;
+            } catch (error) {
+                this.log.warn(`HVAC-Korrelation fehlgeschlagen: ${error.message}`);
+            }
         } catch (error) {
             preAnalysisError = error;
             this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
         }
 
-        if (anomalyCandidates.length === 0 && (preAnalysisError || anomalyCandidates.failedCount > 0)) {
+        if (anomalyCandidates.length === 0 && (preAnalysisError || totalFailedCount > 0)) {
             await this.appendHistoryFailureReports();
-            const failedCount = anomalyCandidates.failedCount || 1;
+            const failedCount = totalFailedCount || 1;
             const finalText = `Prüfung unvollständig: ${failedCount} Datenreihe(n) konnten nicht gelesen werden.`;
             await appendChatMessage(this, 'assistant', finalText);
             await this.updateCatalogSyncState({
@@ -583,6 +594,8 @@ class AiAnalytics extends utils.Adapter {
                     'Du pruefst katalogisierte Smart-Home-Objekte auf Auffaelligkeiten (Geraetenutzung, Beleuchtung, ' +
                     'Verbrauch, PV-Einspeisung). Momentanwerte (gauge) beziehen sich auf die letzten 24 Stunden, ' +
                     'Zaehler und Schalter (boolean_state) auf den letzten vollstaendigen Kalendertag. Begruende Auffaelligkeiten mit konkreten Werten. ' +
+                    'Kandidaten koennen auch raumbezogene Korrelationen enthalten (reason: "window_open_while_heating" — ' +
+                    'Fenster war laengere Zeit offen, waehrend die Heizung im selben Raum lief). ' +
                     'Zeitangaben fuer getHistory/compareTimeframes sind IMMER Unix-Millisekunden relativ zur oben genannten aktuellen Zeit. ' +
                     'Bevorzuge getPeriodTotal/comparePeriods, sobald fuer ein Objekt ein valueKind bekannt ist (siehe listCatalog), ' +
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +

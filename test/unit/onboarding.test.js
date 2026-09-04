@@ -897,3 +897,42 @@ describe('suggestSelfConsumptionPair', () => {
         expect(result).to.equal(null);
     });
 });
+
+describe('suggestHvacRoles', () => {
+    const { suggestHvacRoles } = require('../../lib/onboarding');
+
+    function windowCandidate(overrides = {}) {
+        return { sourceId: 'contact.0.window', description: 'Fensterkontakt Wohnzimmer', room: 'Wohnzimmer', valueKind: 'boolean_state', hvacRole: undefined, ...overrides };
+    }
+    function heatingCandidate(overrides = {}) {
+        return { sourceId: 'relay.0.heating', description: 'Heizungsventil Wohnzimmer', room: 'Wohnzimmer', valueKind: 'boolean_state', hvacRole: undefined, ...overrides };
+    }
+
+    it('suggests window/heating roles for an unambiguous room', () => {
+        const result = suggestHvacRoles([windowCandidate(), heatingCandidate()]);
+        expect(result).to.deep.equal([
+            { sourceId: 'contact.0.window', hvacRole: 'window' },
+            { sourceId: 'relay.0.heating', hvacRole: 'heating' },
+        ]);
+    });
+
+    it('suggests nothing for a room with two window candidates', () => {
+        const result = suggestHvacRoles([windowCandidate(), windowCandidate({ sourceId: 'contact.0.window2' }), heatingCandidate()]);
+        expect(result).to.deep.equal([]);
+    });
+
+    it('suggests nothing for entries that already have an hvacRole', () => {
+        const result = suggestHvacRoles([windowCandidate({ hvacRole: 'window' }), heatingCandidate()]);
+        expect(result).to.deep.equal([]);
+    });
+
+    it('handles multiple unambiguous rooms independently', () => {
+        const result = suggestHvacRoles([
+            windowCandidate(),
+            heatingCandidate(),
+            windowCandidate({ sourceId: 'contact.1.window', room: 'Kueche' }),
+            heatingCandidate({ sourceId: 'relay.1.heating', room: 'Kueche' }),
+        ]);
+        expect(result).to.have.lengthOf(4);
+    });
+});

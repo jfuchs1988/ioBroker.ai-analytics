@@ -38,6 +38,8 @@ describe('admin CSV helpers', () => {
         expect(() => validateCatalogImportValue('valueKind', 'command')).toThrow('valueKind');
         expect(validateCatalogImportValue('derivedMetricRole', 'pv_generation')).toBe('pv_generation');
         expect(() => validateCatalogImportValue('derivedMetricRole', 'unknown')).toThrow('derivedMetricRole');
+        expect(validateCatalogImportValue('hvacRole', 'window')).toBe('window');
+        expect(() => validateCatalogImportValue('hvacRole', 'unknown')).toThrow('hvacRole');
     });
 
     it('strictly validates settings numbers, booleans, and providers', () => {

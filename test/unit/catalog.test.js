@@ -211,4 +211,23 @@ describe('catalog', () => {
             derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'x'.repeat(129),
         })).to.throw('derivedMetricGroupId');
     });
+
+    it('accepts a valid hvacRole on a boolean_state entry', () => {
+        const entry = validateCatalogEntry({
+            sourceId: 'x', category: 'device_usage', valueKind: 'boolean_state', hvacRole: 'window',
+        });
+        expect(entry.hvacRole).to.equal('window');
+    });
+
+    it('rejects an unknown hvacRole', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'device_usage', valueKind: 'boolean_state', hvacRole: 'nope',
+        })).to.throw('hvacRole');
+    });
+
+    it('rejects hvacRole on a non-boolean_state entry', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'device_usage', valueKind: 'gauge', hvacRole: 'window',
+        })).to.throw('hvacRole');
+    });
 });

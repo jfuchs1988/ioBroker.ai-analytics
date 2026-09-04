@@ -355,15 +355,17 @@ describe('AiAnalytics syncCatalog flow', () => {
 });
 
 describe('AiAnalytics proactive anomaly gate', () => {
-    function loadMainWithProactiveStubs({ candidates, runAgent } = {}) {
+    function loadMainWithProactiveStubs({ candidates, runAgent, hvacCandidates, hvacFailedCount } = {}) {
         const appendChatMessage = sinon.stub().resolves();
         const recordUsage = sinon.stub().resolves();
         const findAnomalyCandidates = sinon.stub().resolves(candidates || []);
+        const findHvacCorrelationCandidates = sinon.stub().resolves({ candidates: hvacCandidates || [], failedCount: hvacFailedCount || 0 });
         const isEligibleCatalogEntry = sinon.stub().returns(true);
         const isBudgetExceeded = sinon.stub().resolves(false);
         const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
             '@iobroker/adapter-core': { Adapter: class {} },
             './lib/anomalyDetector': { findAnomalyCandidates, isEligibleCatalogEntry },
+            './lib/hvacCorrelation': { findHvacCorrelationCandidates },
             './lib/catalog': { getAllCatalogEntries: sinon.stub().resolves([]), setCatalogEntry: sinon.stub(), markInactive: sinon.stub() },
             './lib/usage': { isBudgetExceeded, recordUsage },
             './lib/chatLog': { appendChatMessage, ensureChatHistoryState: sinon.stub(), getRecentChatHistory: sinon.stub() },
@@ -371,7 +373,7 @@ describe('AiAnalytics proactive anomaly gate', () => {
             './lib/promptContext': { buildTimeAndLocationContext: sinon.stub().resolves('Zeitkontext\n') },
             './lib/agent': { MAX_ITERATIONS: 3, runAgent: runAgent || sinon.stub().resolves({ finalText: 'Auffaelligkeit gefunden.', usage: {} }) },
         });
-        return { TestAdapter, appendChatMessage, findAnomalyCandidates, recordUsage, runAgent };
+        return { TestAdapter, appendChatMessage, findAnomalyCandidates, findHvacCorrelationCandidates, recordUsage, runAgent };
     }
 
     function makeAdapter(TestAdapter) {
@@ -424,5 +426,27 @@ describe('AiAnalytics proactive anomaly gate', () => {
 
         expect(result).to.deep.include({ skipped: false, incomplete: true, failedCount: 2 });
         expect(loaded.appendChatMessage.firstCall.args[2]).to.include('unvollständig');
+    });
+
+    it('merges HVAC correlation candidates with the statistical candidates', async () => {
+        const hvacCandidates = [{ room: 'Wohnzimmer', reason: 'window_open_while_heating', overlapMs: 1200000 }];
+        const loaded = loadMainWithProactiveStubs({ hvacCandidates });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.equal({ skipped: false });
+        expect(loaded.findHvacCorrelationCandidates.calledOnce).to.equal(true);
+    });
+
+    it('combines statistical and HVAC failure counts into one incomplete report', async () => {
+        const candidates = [];
+        Object.defineProperty(candidates, 'failedCount', { value: 1 });
+        const loaded = loadMainWithProactiveStubs({ candidates, hvacFailedCount: 2 });
+        const adapter = makeAdapter(loaded.TestAdapter);
+
+        const result = await adapter.runProactiveCheck();
+
+        expect(result).to.deep.include({ skipped: false, incomplete: true, failedCount: 3 });
     });
 });
