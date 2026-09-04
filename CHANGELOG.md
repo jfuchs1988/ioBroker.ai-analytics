@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.44] - 2026-09-04
+
+### Behoben
+- Settings-CSV-Import übernimmt jetzt zuverlässig alle importierten Werte; zuvor gingen bei vielen gleichzeitig geänderten Feldern fast alle Werte verloren und der Speichern-Button reagierte nicht.
+
 ## [0.0.1-beta.43] - 2026-09-04
 
 ### Hinzugefügt
