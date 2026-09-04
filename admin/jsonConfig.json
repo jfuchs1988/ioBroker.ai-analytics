@@ -294,7 +294,13 @@
           "md": 6,
           "lg": 4,
           "xl": 4
-        },
+        }
+      }
+    },
+    "catalogTab": {
+      "type": "panel",
+      "label": "Historisierte Datenpunkte",
+      "items": {
         "catalogHeader": {
           "type": "header",
           "text": "Historisierte Datenpunkte",
