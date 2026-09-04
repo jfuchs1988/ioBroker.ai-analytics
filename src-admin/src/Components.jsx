@@ -607,7 +607,7 @@ export class SettingsCsvComponent extends ConfigGeneric {
                 imported++;
             });
             for (const [key, value] of importedValues) {
-                await this.onChange(key, value);
+                await this.onChangeAsync(key, value);
             }
             this.setState({ status: `${imported} Settings importiert. Bitte mit Speichern übernehmen.` });
         } catch (error) {

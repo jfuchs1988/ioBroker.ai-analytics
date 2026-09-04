@@ -4,9 +4,14 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `feature/usage-reset-live-costs`
-- Ziel: Tokenzähler zurücksetzen und Kosten aus aktuellen Preisen live berechnen.
-- Letzter sicherer Commit: `6d33bae merge: exclude .claude/ session state and eslint.config.js from npm package`.
+- Branch: `fix/settings-csv-import-loses-changes`
+- Ziel: Beim Settings-CSV-Import gehen fast alle importierten Werte verloren; Speichern-Button und Formularfelder reagieren nicht.
+- Letzter sicherer Commit: `3fccf0a release: 0.0.1-beta.43`.
+- Root Cause (per Live-Debugging in Chrome verifiziert): `SettingsCsvComponent.handleFileSelected` (`src-admin/src/Components.jsx`) ruft für jede importierte Spalte `await this.onChange(key, value)` auf. `ConfigGeneric.onChange()` aus `@iobroker/json-config` löst sein zurückgegebenes Promise sofort auf, ohne auf den echten Callback zu warten, der erst feuert, wenn der übergeordnete State die Änderung tatsächlich übernommen hat. Bei vielen schnellen Aufrufen hintereinander überschreiben sich die Änderungen gegenseitig anhand veralteter Datenschnappschüsse; nur die letzte Spalte kommt (zufällig) teilweise an. Reproduziert im Browser: Import mit 1 Spalte funktioniert, Import mit 19 Spalten verliert fast alle Werte.
+- Fix: `this.onChangeAsync(key, value)` statt `this.onChange(key, value)` verwenden — wartet korrekt auf den echten Callback, bevor die nächste Spalte importiert wird.
+- Test: `test/unit/settingsCsvImport.test.js` extrahiert die JSX-freien Teile von `SettingsCsvComponent` per VM-Sandbox (wie in `adminComponents.test.js`) und simuliert das reale Framework-Zeitverhalten (verzögerter Callback via Promise/Timer), um den Datenverlust reproduzierbar zu machen.
+- Verifiziert: 368 Unit-Tests, 1 Adaptertest, ESLint und Admin-Build erfolgreich.
+- Nebeneffekt aus dem Debugging (kein Code-Bug, aber wichtig): Beim Live-Test im Browser wurde versehentlich ein Test-API-Key gespeichert und der echte Chat-API-Key von `system.adapter.ai-analytics.0` überschrieben. Nutzer wurde informiert, muss den echten Key manuell neu eintragen.
 - Aktueller Stand: In Arbeit. CSV-Import korrigiert, geschützte API-Schlüssel werden nicht mehr als unbrauchbare verschlüsselte Werte exportiert/importiert. Geräte-Komponente nutzt Auswahl plus Sammelspeicherung; Kategorie, Raum, Verhalten, Update-Frequenz, Vollständigkeit und Ignorieren sind editierbar. Automatische Keller-Zuordnung für PV, Wärmepumpen, Heizungs- und Weichwasseranlagen erweitert. Markdown-Renderer und Tests ergänzt.
 - Verifiziert: `npm test` mit 300 Unit-Tests und 1 Adaptertest, ESLint und `npm run build:admin` erfolgreich. Admin-Bundle neu gebaut.
 - PR #1 gegen `master` erstellt und gemergt; Release `0.0.1-beta.36` veröffentlicht. GitHub-Actions-CI bleibt deaktiviert.
