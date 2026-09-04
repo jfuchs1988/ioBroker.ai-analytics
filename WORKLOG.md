@@ -4,12 +4,13 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 
 ## WIP
 
-- Branch: `master`
-- Ziel: keins (zwischen Tasks).
-- Letzter sicherer Commit: `0400ba3 merge: untrack AI coding agent instruction files`.
-- Aktueller Stand: `AGENTS.md`/`CLAUDE.md` aus dem öffentlichen GitHub-Repo entfernt (lokal per `git rm --cached` + `.gitignore` erhalten, auf GitHub bestätigt 404). GitHub-Actions-Workflows `CI` und `Release` auf Nutzerwunsch ("wir sind in der Entwicklung") per `gh workflow disable` deaktiviert — Workflow-Dateien unverändert, Reaktivierung jederzeit über `gh workflow enable CI`/`gh workflow enable Release` möglich.
-- Nächster Schritt: keiner. Vor dem nächsten Release daran denken, dass CI/Release-Workflows aktuell nicht automatisch laufen.
-- Bekannter Nebeneffekt (bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
+- Branch: `feature/nodejs22-dependency-upgrade`
+- Ziel: Node.js-Mindestversion auf 22 anheben und alle Abhängigkeiten auf die neueste damit kompatible Version bringen (Nutzerwunsch).
+- Letzter sicherer Commit: `8ffe5c4 merge: record CI/Release workflow deactivation in worklog`.
+- Aktueller Stand: `engines.node` auf `>=22`, CI/Release-Workflow-Node-Version und READMEs/Architekturdoku entsprechend angepasst. ESLint 8→10 inkl. Migration von `.eslintrc.cjs` auf Flat-Config (`eslint.config.js`, neue Deps `@eslint/js`+`globals`); dabei einen echten `no-useless-assignment`-Fund in `lib/license.js` gefixt. `mocha` 11→12, `@iobroker/gui-components`/`@types/react-dom` patch-aktualisiert. `chai` bewusst auf `^4.5.0` belassen (5/6 ist ESM-only, würde alle `require('chai')`-Testdateien brechen). `@module-federation/vite` zunächst auf 1.21.3 gebracht — dieses ließ `vite build` beim Modul-Transform kommentarlos hängen (vom Nutzer live reproduziert und bestätigt), auf `1.21.2` zurückgesetzt, danach lief der Build in ~25s durch. Admin-Bundle neu gebaut (Chunk-Hashes geändert, `admin/custom/` ist im Repo getrackt, kein Build-Artefakt-Ignore). 297 Tests, Lint und Admin-Build grün. Version auf `0.0.1-beta.35` angehoben, CHANGELOG/News aktualisiert.
+- Nächster Schritt: Commit, Push, Merge nach `master`. Kein Tag/Release, da `Release`-Workflow aktuell deaktiviert ist (siehe vorheriger Eintrag) — bei Bedarf manuell nachholen.
+- Erkenntnis für künftige Sessions: Bash-Tool-Aufrufe in diesem Environment sind für npm-/node_modules-lastige Befehle (Git-Bash/POSIX-Emulation auf OneDrive-Pfad) spürbar langsamer als natives PowerShell — bei Hängern zuerst mit dem PowerShell-Tool gegenprüfen, bevor man von einem echten Bug ausgeht. Nach mehreren Backgroundcommand-Läufen können verwaiste `node`/`vite`-Prozesse übrig bleiben (`ps aux`), die neue Läufe zusätzlich ausbremsen.
+- Bekannter Nebeneffekt (aus vorherigem Task, bewusst nicht angefasst): `docs/adr/0016-git-branching-modell.md` und `docs/adr/0019-feature-branch-pro-task.md` verlinken `AGENTS.md` — die Links zeigen auf GitHub künftig ins Leere, da die Datei dort nicht mehr existiert. ADR-Historie wurde nicht nachträglich verändert.
 - Offen/Rückfrage an Nutzer: `[E250]`/`[E999]`/`[W401]` aus dem Repository-Checker hängen daran, dass der Adapter nie `npm publish`t und nie beim offiziellen ioBroker-Repository eingereicht wurde — das war in ADR-0018 eine bewusste Entscheidung, die aber durch ADR-0027 (MIT-Kern) inzwischen technisch möglich wäre. Keine ADR hat bisher entschieden, das tatsächlich zu tun; nicht ungefragt umgesetzt.
 
 ## TODO
@@ -59,6 +60,8 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - Release `0.0.1-beta.32` erstellt, nach `master` gemergt, als `v0.0.1-beta.32` getaggt, gepusht und auf GitHub veröffentlicht.
 - Nach Abbruch in OpenCode fortgesetzt: ungültiges JSON in `io-package.json` (überzähliges Komma im news-Objekt) behoben, das den vorherigen Task blockiert hatte. Release `0.0.1-beta.33` erstellt, nach `master` gemergt, als `v0.0.1-beta.33` getaggt, gepusht und auf GitHub veröffentlicht.
 - Repository-Checker-Befund `W1068` behoben (verbotenes `iobroker`-Keyword aus `io-package.json` entfernt). Release `0.0.1-beta.34` erstellt, nach `master` gemergt, als `v0.0.1-beta.34` getaggt, gepusht und auf GitHub veröffentlicht.
+- `AGENTS.md`/`CLAUDE.md` aus dem öffentlichen GitHub-Repo entfernt (lokal erhalten). GitHub-Actions-Workflows `CI`/`Release` auf Nutzerwunsch deaktiviert.
+- Node.js-Mindestversion auf 22 angehoben, alle Abhängigkeiten auf neueste kompatible Version aktualisiert (ESLint 10 Flat-Config-Migration, mocha 12); `0.0.1-beta.35`, nach `master` gemergt. Kein Release-Tag, da `Release`-Workflow deaktiviert ist.
 
 ## Übergabehinweise
 

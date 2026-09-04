@@ -4,7 +4,7 @@
 
 ## 2.1 Technische Randbedingungen (verbindlich, aus dem Implementierungsplan)
 
-- Node.js >= 18 (nutzt das eingebaute globale `fetch`, keine HTTP-Client-Abhängigkeit).
+- Node.js >= 22 (nutzt das eingebaute globale `fetch`, keine HTTP-Client-Abhängigkeit; folgt der aktuellen ioBroker-Empfehlung).
 - Reines JavaScript (CommonJS `require`/`module.exports`), kein TypeScript, kein Build-Schritt/Bundler.
 - Keine offiziellen Vendor-SDKs für LLM-Provider — Provider-Clients rufen die REST-APIs direkt über `fetch` auf.
 - Historische Daten werden ausschließlich über ioBrokers generische Message-API gelesen: `adapter.sendToAsync(historyInstance, 'getHistory', { id, options: { start, end, aggregate } })`. Keine direkte InfluxDB-/SQL-Treiber-Abhängigkeit.

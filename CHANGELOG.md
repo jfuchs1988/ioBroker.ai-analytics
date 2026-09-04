@@ -3,6 +3,18 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.35] - 2026-09-04
+
+### Geändert
+- Node.js-Mindestversion von `>=18` auf `>=22` angehoben (aktuelle ioBroker-Empfehlung); CI- und Release-Workflow, README (EN/DE) und Architektur-Randbedingungen entsprechend aktualisiert.
+- Alle Abhängigkeiten auf die neueste mit Node 22 kompatible Version angehoben: `@iobroker/gui-components`, `@types/react-dom`, `mocha` (11 → 12).
+- ESLint von 8.x auf 10.x angehoben; dabei von der Legacy-`.eslintrc.cjs`-Konfiguration auf die verbindliche Flat-Config (`eslint.config.js`, neue Dependencies `@eslint/js` + `globals`) migriert. Ein dadurch aufgedeckter echter `no-useless-assignment`-Befund in `lib/license.js` behoben (totes `= false`-Initial in `evaluateLicense`).
+
+### Bekannt/bewusst nicht geändert
+- `chai` bleibt auf `^4.5.0` (bereits neueste 4.x-Version): `chai` 5/6 ist ESM-only und würde das `require('chai')` in allen bestehenden CommonJS-Testdateien brechen — außerhalb des Umfangs dieses Tasks.
+- `@module-federation/vite@1.21.3` ließ `vite build --config src-admin/vite.config.mjs` beim Modul-Transform ohne Fehlermeldung hängenbleiben (reproduziert, live vom Nutzer bestätigt); auf `^1.21.2` zurückgesetzt (bereits vorher gepinnte Version), Build läuft wieder in ~25s durch.
+- `npm audit` meldet 6 Schwachstellen, alle transitiv unterhalb von `@iobroker/testing@5.3.0` (bereits neueste Version) und nur in dessen intern gebündeltem Test-Tooling (mocha/diff/serialize-javascript/esbuild), nicht im Adapter-Laufzeitcode. Kein Fix von unserer Seite möglich, vorbestehend.
+
 ## [0.0.1-beta.34] - 2026-09-04
 
 ### Behoben
