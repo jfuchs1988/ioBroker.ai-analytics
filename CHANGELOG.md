@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.48] - 2026-09-04
+
+### Geändert
+
+- Alle expliziten Referenzen auf das Vergleichsprojekt aus Dokumentation,
+  Arbeitsstand und ADR-Dateinamen entfernt und neutral als
+  `Referenzprojekt` bezeichnet.
+
 ## [0.0.1-beta.47] - 2026-09-04
 
 ### Geändert
@@ -137,7 +145,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionieru
 ## [0.0.1-beta.26] - 2026-09-03
 
 ### Geändert
-- Lizenzmodell auf einen MIT-Kern mit separat dokumentierten sponsor-pflichtigen KI-Komponenten nach evcc-Vorbild umgestellt. Die technische Entitlement-Prüfung bleibt ein separater Folgetask.
+- Lizenzmodell auf einen MIT-Kern mit separat dokumentierten sponsor-pflichtigen KI-Komponenten nach dem Referenzprojekt-Vorbild umgestellt. Die technische Entitlement-Prüfung bleibt ein separater Folgetask.
 
 ## [0.0.1-beta.25] - 2026-09-03
 

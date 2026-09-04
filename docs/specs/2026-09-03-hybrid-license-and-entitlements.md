@@ -2,7 +2,7 @@
 
 ## Kontext
 
-Der Adapter soll wie evcc einen frei nutzbaren Open-Source-Kern mit klar
+Der Adapter soll wie das Referenzprojekt einen frei nutzbaren Open-Source-Kern mit klar
 abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
 
 ## Verhalten

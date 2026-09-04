@@ -24,9 +24,9 @@ Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt.
 
 `test/adapter.test.js` ist durch eine veraltete `@iobroker/testing`-Verhaltensänderung faktisch wirkungslos (bestätigt weiterhin der Fall auch nach dem Dependency-Bump auf v5.3.0). Zu klären: `tests.integration` (echter js-controller, schwerer, näher an der Realität) oder ein proxyquire-basierter Fake-Adapter-Test (leichter, aber weniger realistisch)?
 
-## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (evcc-Vorbild)
+## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (Referenzprojekt)
 
-Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-nach-evcc.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
+Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
 
 ## 5. CI-Aktivierung — zurückgestellt
 

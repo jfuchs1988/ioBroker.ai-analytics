@@ -24,7 +24,7 @@
   [ADR-0016](../adr/0016-git-branching-modell.md) ist historischer Kontext.
 - GitHub-Repository `jfuchs1988/ioBroker.ai-analytics` mit MIT-lizenziertem
   Kern und separat dokumentierten sponsor-pflichtigen KI-Komponenten, siehe
-  [ADR-0027](../adr/0027-hybrid-lizenzmodell-nach-evcc.md). Eine Aufnahme in
+  [ADR-0027](../adr/0027-hybrid-lizenzmodell-referenzprojekt.md). Eine Aufnahme in
   den offiziellen ioBroker-Adapter-Katalog wird erst nach Prüfung der
   Katalogregeln und der Komponentenabgrenzung entschieden.
 
