@@ -6,13 +6,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/hvac-korrelation-fenster-heizung`
-- Ziel: Sub-Projekt C der Korrelations-/Kennzahlen-Zerlegung (Fenster offen
-  bei laufender Heizung), siehe
-  Spec `docs/specs/2026-09-05-hvac-korrelation-fenster-heizung.md`,
-  Plan `docs/plans/2026-09-05-hvac-korrelation-fenster-heizung.md`.
-- Stand: Code + Tests + Doku fertig. `npm test` (418 Unit- + 8 Admin-Tests),
-  `npm run lint`, `npm run build:admin` grün. Noch offen: Commit/Merge/Push.
+- Branch: `master`.
+- Status: HVAC-Korrelation (Sub-Projekt C) committed (`5d69e87`), nach
+  `master` gemergt (`5bc4843`) und nach `origin/master` gepusht.
+  Feature-Branch gelöscht.
 
 ## TODO
 
