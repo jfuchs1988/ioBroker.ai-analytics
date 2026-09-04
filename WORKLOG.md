@@ -6,16 +6,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/abgeleitete-kennzahlen-eigenverbrauch`
-- Ziel: Sub-Projekt A der Korrelations-/Kennzahlen-Zerlegung (Laufzeit +
-  Eigenverbrauch), siehe
-  Spec `docs/specs/2026-09-04-abgeleitete-kennzahlen-laufzeit-eigenverbrauch.md`,
-  Plan `docs/plans/2026-09-04-abgeleitete-kennzahlen-laufzeit-eigenverbrauch.md`.
-- Stand: Code + Tests + Doku fertig. `npm test` (398 Unit- + 8 Admin-Tests),
-  `npm run lint`, `npm run build:admin` grün. Laufzeit brauchte keinen neuen
-  Code — bereits durch den bestehenden Test `'calculates on-duration and
-  switch count for boolean states'` (`test/unit/tools.test.js`) abgedeckt.
-  Noch offen: Commit/Merge/Push.
+- Branch: `master`.
+- Status: Abgeleitete Kennzahlen (Sub-Projekt A) committed (`f1d2bc5`), nach
+  `master` gemergt (`a30060e`) und nach `origin/master` gepusht.
+  Feature-Branch gelöscht.
 
 ## TODO
 
