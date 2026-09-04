@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.42] - 2026-09-04
+
+### Behoben
+- OpenCode-Zen-Muse-Modelle verwenden jetzt die korrekte Responses API statt Chat Completions.
+
 ## [0.0.1-beta.41] - 2026-09-04
 
 ### Geändert

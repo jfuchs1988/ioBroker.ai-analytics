@@ -17,7 +17,7 @@ Dieser kurze Handoff-Stand wird während jedes Tasks live gepflegt. Er soll eine
 - PR #4 gegen `master` erstellt und gemergt; Release `0.0.1-beta.39` veröffentlicht.
 - PR #5 gegen `master` erstellt und gemergt; Release `0.0.1-beta.40` veröffentlicht.
 - Aktueller Stand: OpenCode Zen nutzt für die vier Chat-Modelle `/chat/completions` und für beide Muse-Modelle `/responses`; Wire-Format und Response-Mapping getestet.
-- Nächster Schritt: Tests, PR und Release durchführen.
+- PR #7 gegen `master` erstellt und gemergt. Release `0.0.1-beta.42` wird direkt veröffentlicht.
 - Aktueller Stand: Limits auf 32 Werkzeug-Aufrufe je Lauf, 256 Zeiträume je Lauf und 72 Zeiträume je Werkzeug erhöht. Überschreitungsfehler nennen jetzt Bedarf, Limit und Differenz. Die vier Arbeitslimits sind auf der Settings-Seite mit sicheren Grenzen editierbar; interne Payload-/Secret-/CSV-Sicherheitslimits bleiben absichtlich fest.
 - Verifiziert: 361 Unit-Tests, 1 Adaptertest, ESLint und Admin-Build erfolgreich.
 - PR #6 gegen `master` erstellt und gemergt. Release `0.0.1-beta.41` wird direkt veröffentlicht.
