@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.48] - 2026-09-04
+
+### Geändert
+
+- Alle expliziten Referenzen auf das Vergleichsprojekt aus Dokumentation,
+  Arbeitsstand und ADR-Dateinamen entfernt und neutral als
+  `Referenzprojekt` bezeichnet.
+
 ## [0.0.1-beta.47] - 2026-09-04
 
 ### Geändert

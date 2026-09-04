@@ -7,14 +7,13 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `feature/session-context-docs`
-- Status: Release `0.0.1-beta.47` veröffentlicht, Handoff abgeschlossen.
+- Status: Release `0.0.1-beta.48` vorbereitet, noch nicht veröffentlicht.
 - Spec: `docs/specs/2026-09-04-session-kontext-und-dokumentation.md`
 - Plan: `docs/plans/2026-09-04-session-kontext-und-dokumentation.md`
 
 ## TODO
 
-- Nächste Produktaufgabe: aktuellen Adapterstand auf einer echten ioBroker-
-  Installation live abnehmen.
+- Release `0.0.1-beta.48` committen, pushen, mergen, taggen und veröffentlichen.
 
 ## DONE
 
