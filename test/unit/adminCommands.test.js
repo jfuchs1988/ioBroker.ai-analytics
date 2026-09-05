@@ -309,6 +309,47 @@ describe('adminCommands', () => {
             expect(result.entry).to.deep.include({ hvacRole: 'heating' });
             expect(setCatalogEntry.calledOnce).to.equal(true);
         });
+
+        it('clears derivedMetricRole and derivedMetricGroupId together via the empty-string sentinel', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'consumption', derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: '' });
+
+            expect(result.entry).to.not.have.property('derivedMetricRole');
+            expect(result.entry).to.not.have.property('derivedMetricGroupId');
+        });
+
+        it('ignores a derivedMetricGroupId sent alongside the derivedMetricRole clear sentinel', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'consumption', derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: '', derivedMetricGroupId: 'should-be-ignored' });
+
+            expect(result.entry).to.not.have.property('derivedMetricRole');
+            expect(result.entry).to.not.have.property('derivedMetricGroupId');
+        });
+
+        it('clears only hvacRole via the empty-string sentinel, without a valueKind check', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'device_usage', valueKind: 'gauge', hvacRole: 'window' };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', hvacRole: '' });
+
+            expect(result.entry).to.not.have.property('hvacRole');
+        });
     });
 
     describe('removeCatalogEntry', () => {
