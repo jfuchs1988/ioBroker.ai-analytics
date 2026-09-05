@@ -75,6 +75,22 @@ zeigt und editiert:
   (aktuell Spalten in der Haupttabelle) — reine Umsortierung, keine
   Verhaltensänderung dieser beiden Felder.
 
+**Zurücksetzen auf "keine":** Weder `lib/adminCommands.js` noch der
+bestehende CSV-Import können `derivedMetricRole`/`derivedMetricGroupId`/
+`hvacRole` aktuell wieder löschen (ein einmal gesetztes Feld bleibt
+bestehen; leere CSV-Zellen werden beim Import stillschweigend übersprungen).
+Damit die "keine"-Option tatsächlich wirkt, bekommt
+`updateCatalogEntryAdminUnlocked` einen Lösch-Sentinel: der leere String
+`''` bedeutet ab jetzt "Feld entfernen" (statt "nicht ändern", was weiterhin
+`undefined` bedeutet). `derivedMetricRole: ''` löscht `derivedMetricRole`
+**und** `derivedMetricGroupId` zusammen (die UI schickt beim Zurücksetzen
+kein `derivedMetricGroupId` mehr mit); `hvacRole: ''` löscht nur `hvacRole`.
+`validateCatalogUpdate` überspringt für den Sentinel-Wert die
+Enum-/Paar-Prüfung. `lib/catalog.js`s `validateCatalogEntry` braucht dafür
+keine Änderung, da ein Eintrag ohne diese Schlüssel bereits heute gültig
+ist. CSV-Import bleibt bewusst unverändert (Nicht-Ziel, siehe unten) — der
+Sentinel ist nur über die neuen Dropdowns erreichbar.
+
 Haupttabelle behält: Auswahl, Objekt-ID, Beschreibung, Kategorie, Verhalten,
 Einheit, Schreibbar, Raum, Status, Aktionen — plus die neue Sortierung
 (Abschnitt 5).
@@ -99,7 +115,8 @@ den heutigen "Auswahl speichern"-Button:
   `sourceId`s bleiben ausgewählt, erfolgreiche werden abgewählt.
 
 Kein neuer Backend-Command nötig — `updateCatalogEntryAdmin` und
-`removeCatalogEntry` unterstützen bereits alle beteiligten Felder.
+`removeCatalogEntry` unterstützen bereits alle beteiligten Felder (inkl. des
+neuen Lösch-Sentinels aus Abschnitt 2 für die "keine"-Fälle).
 
 ## 4. Gruppen-Auswahl (`derivedMetricGroupId`)
 
@@ -164,6 +181,15 @@ extrahiert, um die wachsende Feldmenge testbar zu halten (bisher eine
   bestehen (keine Änderung an der bestehenden Validierung nötig).
 
 ## 8. Testkonzept
+
+Erweiterung von `test/unit/adminCommands.test.js` (Mocha):
+
+- Lösch-Sentinel `derivedMetricRole: ''` entfernt `derivedMetricRole` und
+  `derivedMetricGroupId` aus dem gespeicherten Eintrag.
+- Lösch-Sentinel `hvacRole: ''` entfernt nur `hvacRole`, lässt `valueKind`
+  unverändert und prüft in diesem Fall nicht auf `boolean_state`.
+- Bestehende Enum-/Paar-Validierung bleibt für alle Nicht-Sentinel-Werte
+  unverändert (Regressionstest).
 
 Neue Vitest-Dateien unter `test/admin/`:
 
