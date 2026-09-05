@@ -7,21 +7,20 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `master`.
-- Status: Energie-Korrelation (Sub-Projekt B) committed (`16ea154`), nach
-  `master` gemergt (`17f02a5`) und nach `origin/master` gepusht.
-  Feature-Branch gelöscht. Damit haben alle drei Sub-Projekte der
-  Korrelations-Zerlegung (A, B, C) eine erste Ausbaustufe.
+- Status: Release `0.0.1-beta.49` vorbereitet (Version/Changelog/News
+  aktualisiert, `npm test`, Lint, Admin-Build und `npm run test:e2e`
+  manuell verifiziert, Paket per `npm pack` geprüft), noch nicht
+  veröffentlicht.
 
 ## TODO
 
-- Nächste Produktaufgabe (nach dieser): aktuellen Adapterstand auf einer
-  echten ioBroker-Installation live abnehmen.
+- Release `0.0.1-beta.49` committen, pushen, taggen und veröffentlichen.
+- Nächste Produktaufgabe (danach): aktuellen Adapterstand auf einer echten
+  ioBroker-Installation live abnehmen.
 - Alle drei Sub-Projekte der Korrelations-Zerlegung (A, B, C) haben jetzt
   eine erste Ausbaustufe. Spätere Ausbaustufen (bewusst zurückgestellt):
   Wirkungsgrad (A), Temperatur-Stagnations-Regel (C), bidirektionaler
   Netzzähler-Support (B).
-- Vor jedem künftigen Release `npm run test:e2e` einmal manuell ausführen
-  (js-controller-Installation kann mehrere Minuten dauern).
 
 ## DONE
 

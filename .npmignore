@@ -15,4 +15,5 @@ test/
 src-admin/
 eslint.config.js
 .mocharc.json
+vitest.config.mjs
 .claude/

@@ -3,6 +3,33 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.49] - 2026-09-05
+
+### Hinzugefügt
+
+- Statistische Voranalyse der proaktiven Prüfung erkennt jetzt auch
+  Zähler (`daily_reset_counter`, `cumulative_total`, `event_count`) und
+  Schalter (`boolean_state`) über einen Tagesvergleich (letzter
+  vollständiger Kalendertag gegen 7 Kalendertage davor), zusätzlich zu den
+  bisherigen Gauge-Zeitreihen.
+- Neue abgeleitete Kennzahl Eigenverbrauch (neues Werkzeug
+  `getSelfConsumption`) für ein per Katalogfeldern verknüpftes
+  PV-Erzeugung/Netzeinspeisung-Paar; Laufzeit von Schaltern war bereits
+  über das bestehende Werkzeug `getPeriodTotal` verfügbar.
+- Neue raumbezogene HVAC-Korrelation: erkennt, wenn ein Fenster länger
+  geöffnet war, während im selben Raum die Heizung lief.
+- Neue Energiebilanz-Korrelation: prüft PV-Erzeugung, Netzbezug,
+  Netzeinspeisung, Batterie und Verbrauch einer Energie-Gruppe gemeinsam
+  auf eine unstimmige Bilanz.
+- Echter End-to-End-Test gegen einen echten js-controller
+  (`npm run test:e2e`, manueller Pre-Release-Schritt) sowie
+  Admin-UI-Komponententests mit Vitest/React-Testing-Library.
+
+### Entfernt
+
+- Ungenutzte, seit einiger Zeit nur deaktivierte GitHub-Actions-Workflows
+  (`CI`, `Release`) — Prüfung und Release bleiben bewusst manuell.
+
 ## [0.0.1-beta.48] - 2026-09-04
 
 ### Geändert
