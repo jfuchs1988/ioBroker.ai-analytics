@@ -63,6 +63,15 @@ describe('DeviceRow', () => {
         await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Server abgelehnt'));
     });
 
+    it('shows an inline error next to the updateFrequency field when onFieldChange fails', async () => {
+        const user = userEvent.setup();
+        renderRow({ expanded: true, onFieldChange: vi.fn().mockResolvedValue({ error: 'Server abgelehnt' }) });
+
+        await user.selectOptions(screen.getByLabelText('Update-Frequenz für javascript.0.x'), 'hourly');
+
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Server abgelehnt'));
+    });
+
     it('toggles the detail panel via onToggleExpanded', async () => {
         const user = userEvent.setup();
         const { props } = renderRow();

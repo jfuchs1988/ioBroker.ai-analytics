@@ -144,12 +144,14 @@ export default class DeviceRow extends React.Component {
                                     <select aria-label={`Update-Frequenz für ${entry.sourceId}`} value={entry.updateFrequency || ''} onChange={event => this.save({ updateFrequency: event.target.value })}>
                                         {UPDATE_FREQUENCIES.map(item => <option key={item} value={item}>{item}</option>)}
                                     </select>
+                                    {fieldErrors.updateFrequency ? <span role="alert">{fieldErrors.updateFrequency}</span> : null}
                                 </label>
                                 <label>
                                     Vollständigkeit{' '}
                                     <select aria-label={`Vollständigkeit für ${entry.sourceId}`} value={entry.dataCompleteness || ''} onChange={event => this.save({ dataCompleteness: event.target.value })}>
                                         {DATA_COMPLETENESS.map(item => <option key={item} value={item}>{item}</option>)}
                                     </select>
+                                    {fieldErrors.dataCompleteness ? <span role="alert">{fieldErrors.dataCompleteness}</span> : null}
                                 </label>
                                 <label>
                                     Energie-Rolle{' '}
