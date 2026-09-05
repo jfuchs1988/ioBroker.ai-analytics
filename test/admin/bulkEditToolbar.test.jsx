@@ -44,6 +44,15 @@ describe('BulkEditToolbar', () => {
         expect(props.onApplyField).toHaveBeenCalledWith({ derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
     });
 
+    it('keeps apply enabled for derivedMetricRole when the role is left at keine', async () => {
+        const user = userEvent.setup();
+        renderToolbar();
+
+        await user.selectOptions(screen.getByLabelText('Bulk-Feld'), 'derivedMetricRole');
+
+        expect(screen.getByRole('button', { name: /Auf 3 ausgewählte Geräte anwenden/ })).toBeEnabled();
+    });
+
     it('calls onIgnore/onActivate directly without a value', async () => {
         const user = userEvent.setup();
         const props = renderToolbar();

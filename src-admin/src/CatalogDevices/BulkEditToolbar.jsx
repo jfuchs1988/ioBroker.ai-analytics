@@ -55,12 +55,12 @@ export default class BulkEditToolbar extends React.Component {
         }
         if (field === 'updateFrequency') {
             return <select aria-label="Wert für Bulk-Update-Frequenz" value={value} onChange={event => this.setState({ value: event.target.value })}>
-                {UPDATE_FREQUENCIES.map(k => <option key={k} value={k}>{k}</option>)}
+                <option value="">-</option>{UPDATE_FREQUENCIES.map(k => <option key={k} value={k}>{k}</option>)}
             </select>;
         }
         if (field === 'dataCompleteness') {
             return <select aria-label="Wert für Bulk-Vollständigkeit" value={value} onChange={event => this.setState({ value: event.target.value })}>
-                {DATA_COMPLETENESS.map(k => <option key={k} value={k}>{k}</option>)}
+                <option value="">-</option>{DATA_COMPLETENESS.map(k => <option key={k} value={k}>{k}</option>)}
             </select>;
         }
         if (field === 'hvacRole') {
