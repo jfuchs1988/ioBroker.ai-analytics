@@ -7,15 +7,13 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `master`.
-- Status: Release `0.0.1-beta.49` vorbereitet (Version/Changelog/News
-  aktualisiert, `npm test`, Lint, Admin-Build und `npm run test:e2e`
-  manuell verifiziert, Paket per `npm pack` geprüft), noch nicht
-  veröffentlicht.
+- Status: Release `0.0.1-beta.49` committed (`7457906`), getaggt
+  (`v0.0.1-beta.49`) und als GitHub-Release veröffentlicht:
+  https://github.com/jfuchs1988/ioBroker.ai-analytics/releases/tag/v0.0.1-beta.49
 
 ## TODO
 
-- Release `0.0.1-beta.49` committen, pushen, taggen und veröffentlichen.
-- Nächste Produktaufgabe (danach): aktuellen Adapterstand auf einer echten
+- Nächste Produktaufgabe: aktuellen Adapterstand auf einer echten
   ioBroker-Installation live abnehmen.
 - Alle drei Sub-Projekte der Korrelations-Zerlegung (A, B, C) haben jetzt
   eine erste Ausbaustufe. Spätere Ausbaustufen (bewusst zurückgestellt):
