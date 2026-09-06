@@ -39,6 +39,12 @@ const CATALOG_SYNC_STATE = 'catalogSync';
 const CHAT_PROGRESS_STATE = 'chatProgress';
 const MAX_CHAT_QUESTION_LENGTH = 16000;
 const MAX_TIMER_MS = 2147483647;
+
+function textValue(value) {
+    if (typeof value === 'string') return value;
+    if (!value || typeof value !== 'object') return '';
+    return Object.values(value).find((item) => typeof item === 'string') || '';
+}
 // Filled with the public keys of the separate entitlement web application.
 const LICENSE_PUBLIC_KEYS = Object.freeze({});
 
@@ -236,6 +242,35 @@ class AiAnalytics extends utils.Adapter {
         }
     }
 
+    async registerUnclassifiedEntries(discovered, existingById) {
+        let newCount = 0;
+        for (const source of discovered) {
+            if (existingById.has(source.id)) continue;
+            const common = source.common || {};
+            const entry = {
+                sourceId: source.id,
+                description: textValue(common.name) || source.id,
+                unit: textValue(common.unit),
+                category: 'device_usage',
+                room: '',
+                confidence: 'low',
+                needsReview: true,
+                classificationSource: 'metadata',
+                active: true,
+                ignored: false,
+                historyInstance: source.historyInstance,
+                lastSeen: new Date().toISOString(),
+            };
+            try {
+                await setCatalogEntry(this, entry);
+                newCount += 1;
+            } catch (error) {
+                this.log.warn(`Unklassifizierter Katalogeintrag fuer ${source.id} fehlgeschlagen: ${error.message}`);
+            }
+        }
+        return newCount;
+    }
+
     async executeCatalogSync(options = {}) {
         await this.updateCatalogSyncState({
             running: true,
@@ -289,7 +324,8 @@ class AiAnalytics extends utils.Adapter {
             }
 
         if (options.skipClassification) {
-            const result = { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'classification' };
+            const newCount = await this.registerUnclassifiedEntries(discovered, existingById);
+            const result = { foundCount: discovered.length, newCount, reactivatedCount, skipped: 'classification' };
             await this.updateCatalogSyncState({
                 running: false,
                 phase: 'done',
@@ -306,7 +342,8 @@ class AiAnalytics extends utils.Adapter {
         if (!this.onboardingProviderOk) {
             this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
             // `skipped` unterscheidet "nichts Neues gefunden" von "gar nicht erst geschaut".
-            const skippedResult = { foundCount: discovered.length, newCount: 0, reactivatedCount, skipped: 'onboardingProvider' };
+            const newCount = await this.registerUnclassifiedEntries(discovered, existingById);
+            const skippedResult = { foundCount: discovered.length, newCount, reactivatedCount, skipped: 'onboardingProvider' };
             await this.updateCatalogSyncState({
                 running: false,
                 phase: 'done',

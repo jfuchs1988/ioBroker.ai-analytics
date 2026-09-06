@@ -126,11 +126,78 @@ export default class DeviceRow extends React.Component {
         this.save({ derivedMetricRole: role, derivedMetricGroupId: nextGroup });
     }
 
+    feedback(field) {
+        if (this.state.fieldErrors[field]) return <span role="alert">{this.state.fieldErrors[field]}</span>;
+        return this.state.fieldOk[field] ? <span role="status">Gespeichert</span> : null;
+    }
+
+    renderColumnCell(column, entry, effectiveRole, hvacDisabled) {
+        switch (column) {
+            case 'sourceId': return <td key={column}>{entry.sourceId}</td>;
+            case 'description': return <td key={column}>
+                <input aria-label={`Beschreibung für ${entry.sourceId}`} maxLength={MAX_DESCRIPTION_LENGTH} value={this.state.description} onChange={event => this.setState({ description: event.target.value })} onBlur={() => this.handleTextBlur('description', MAX_DESCRIPTION_LENGTH)} />
+                {this.feedback('description')}
+            </td>;
+            case 'category': return <td key={column}>
+                <select aria-label={`Kategorie für ${entry.sourceId}`} value={entry.category || ''} onChange={event => this.save({ category: event.target.value })}>
+                    {CATEGORIES.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('category')}
+            </td>;
+            case 'valueKind': return <td key={column}>
+                <select aria-label={`Verhalten für ${entry.sourceId}`} value={entry.valueKind || ''} onChange={event => this.save({ valueKind: event.target.value })}>
+                    <option value="">nicht klassifiziert</option>{VALUE_KINDS.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('valueKind')}
+            </td>;
+            case 'unit': return <td key={column}>{entry.unit || ''}</td>;
+            case 'writable': return <td key={column}>{entry.writable === true ? 'Ja' : entry.writable === false ? 'Nein' : ''}</td>;
+            case 'room': return <td key={column}>
+                <input aria-label={`Raum für ${entry.sourceId}`} maxLength={MAX_ROOM_LENGTH} value={this.state.room} placeholder="z. B. Keller" onChange={event => this.setState({ room: event.target.value })} onBlur={() => this.handleTextBlur('room', MAX_ROOM_LENGTH)} />
+                {this.feedback('room')}
+            </td>;
+            case 'ignored': return <td key={column}>
+                {entry.ignored ? 'Ja' : 'Nein'} <button onClick={() => this.save({ ignored: !entry.ignored })}>{entry.ignored ? 'Aktivieren' : 'Ignorieren'}</button>{this.feedback('ignored')}
+            </td>;
+            case 'active': return <td key={column}>{entry.active === false ? 'Nein' : 'Ja'}</td>;
+            case 'needsReview': return <td key={column}>{entry.needsReview ? 'Ja' : 'Nein'}</td>;
+            case 'writePattern': return <td key={column}>{entry.writePattern || ''}</td>;
+            case 'updateFrequency': return <td key={column}>
+                <select aria-label={`Update-Frequenz für ${entry.sourceId}`} value={entry.updateFrequency || ''} onChange={event => this.save({ updateFrequency: event.target.value })}>
+                    {UPDATE_FREQUENCIES.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('updateFrequency')}
+            </td>;
+            case 'dataCompleteness': return <td key={column}>
+                <select aria-label={`Vollständigkeit für ${entry.sourceId}`} value={entry.dataCompleteness || ''} onChange={event => this.save({ dataCompleteness: event.target.value })}>
+                    {DATA_COMPLETENESS.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('dataCompleteness')}
+            </td>;
+            case 'derivedMetricRole': return <td key={column}>
+                <select aria-label={`Energie-Rolle für ${entry.sourceId}`} value={effectiveRole} onChange={event => this.handleRoleChange(event.target.value)}>
+                    <option value="">keine</option>{DERIVED_METRIC_ROLES.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('derivedMetricRole')}
+            </td>;
+            case 'derivedMetricGroupId': return <td key={column}>
+                {effectiveRole ? <GroupIdPicker ariaLabel={`Energiebilanz-Gruppe für ${entry.sourceId}`} value={entry.derivedMetricGroupId} existingGroups={this.props.existingGroups} onChange={group => this.handleGroupChange(group)} /> : null}
+                {this.feedback('derivedMetricGroupId')}
+            </td>;
+            case 'hvacRole': return <td key={column}>
+                <select aria-label={`HVAC-Rolle für ${entry.sourceId}`} value={entry.hvacRole || ''} disabled={hvacDisabled} title={hvacDisabled ? 'Nur für Verhalten boolean_state verfügbar' : undefined} onChange={event => this.save({ hvacRole: event.target.value })}>
+                    <option value="">keine</option>{HVAC_ROLES.map(value => <option key={value} value={value}>{value}</option>)}
+                </select>{this.feedback('hvacRole')}
+            </td>;
+            case 'status': return <td key={column}>{statusLabelOf(entry)}</td>;
+            case 'actions': return <td key={column}>
+                <button aria-label={`${entry.sourceId} entfernen`} onClick={() => this.props.onRemove()}>Entfernen</button>
+            </td>;
+            default: return null;
+        }
+    }
+
     render() {
         const { entry, selected, expanded, existingGroups } = this.props;
         const { fieldErrors, pendingRole } = this.state;
         const effectiveRole = pendingRole !== undefined ? pendingRole : (entry.derivedMetricRole || '');
         const hvacDisabled = entry.valueKind !== 'boolean_state';
+        const visibleColumns = this.props.visibleColumns || ['sourceId', 'description', 'category', 'valueKind', 'unit', 'writable', 'room', 'status', 'actions'];
 
         return (
             <>
@@ -141,54 +208,11 @@ export default class DeviceRow extends React.Component {
                         </button>
                         <input type="checkbox" aria-label={`${entry.sourceId} auswählen`} checked={selected} onChange={() => this.props.onToggleSelected()} />
                     </td>
-                    <td>{entry.sourceId}</td>
-                    <td>
-                        <input
-                            aria-label={`Beschreibung für ${entry.sourceId}`}
-                            maxLength={MAX_DESCRIPTION_LENGTH}
-                            value={this.state.description}
-                            onChange={event => this.setState({ description: event.target.value })}
-                            onBlur={() => this.handleTextBlur('description', MAX_DESCRIPTION_LENGTH)}
-                        />
-                        {fieldErrors.description ? <span role="alert">{fieldErrors.description}</span> : null}
-                    </td>
-                    <td>
-                        <select aria-label={`Kategorie für ${entry.sourceId}`} value={entry.category || ''} onChange={event => this.save({ category: event.target.value })}>
-                            {CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
-                        </select>
-                        {fieldErrors.category ? <span role="alert">{fieldErrors.category}</span> : null}
-                    </td>
-                    <td>
-                        <select aria-label={`Verhalten für ${entry.sourceId}`} value={entry.valueKind || ''} onChange={event => this.save({ valueKind: event.target.value })}>
-                            <option value="">nicht klassifiziert</option>
-                            {VALUE_KINDS.map(kind => <option key={kind} value={kind}>{kind}</option>)}
-                        </select>
-                        {fieldErrors.valueKind ? <span role="alert">{fieldErrors.valueKind}</span> : null}
-                    </td>
-                    <td>{entry.unit || ''}</td>
-                    <td>{entry.writable === true ? '✓' : entry.writable === false ? '–' : ''}</td>
-                    <td>
-                        <input
-                            aria-label={`Raum für ${entry.sourceId}`}
-                            maxLength={MAX_ROOM_LENGTH}
-                            value={this.state.room}
-                            placeholder="z. B. Keller"
-                            onChange={event => this.setState({ room: event.target.value })}
-                            onBlur={() => this.handleTextBlur('room', MAX_ROOM_LENGTH)}
-                        />
-                        {fieldErrors.room ? <span role="alert">{fieldErrors.room}</span> : null}
-                    </td>
-                    <td>{statusLabelOf(entry)}</td>
-                    <td>
-                        <button aria-label={`${entry.sourceId} ${entry.ignored ? 'aktivieren' : 'ignorieren'}`} onClick={() => this.save({ ignored: !entry.ignored })}>
-                            {entry.ignored ? 'Aktivieren' : 'Ignorieren'}
-                        </button>
-                        <button aria-label={`${entry.sourceId} entfernen`} onClick={() => this.props.onRemove()}>Entfernen</button>
-                    </td>
+                    {visibleColumns.map(column => this.renderColumnCell(column, entry, effectiveRole, hvacDisabled))}
                 </tr>
                 {expanded ? (
                     <tr>
-                        <td colSpan={10}>
+                        <td colSpan={visibleColumns.length + 1}>
                             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', padding: 8 }}>
                                 <label>
                                     Update-Frequenz{' '}

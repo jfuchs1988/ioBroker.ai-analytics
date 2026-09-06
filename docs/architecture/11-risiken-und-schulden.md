@@ -4,6 +4,16 @@
 
 Aus dem Implementierungsplan übernommen (siehe [Plan, Abschnitt "Known Gaps"](../plans/2026-08-21-ai-analytics-implementation.md)):
 
+## Verbindliche Klassifikationsregel
+
+Hersteller-, Adapter-, Objekt-ID- und Namensheuristiken dürfen keine fachliche
+Klassifikation oder Schreibentscheidung auslösen. Das gilt insbesondere für
+Ableitungen wie Kategorie, PV-/HVAC-Rollen, Räume oder Value-Kinds aus Präfixen
+und Begriffen. Zulässig sind nur explizite Katalogwerte, echte ioBroker-
+Metadaten und beobachtbare History-Muster. Bei verbleibender Unsicherheit muss
+der Eintrag `needsReview` behalten oder durch das KI-Onboarding klassifiziert
+werden. Neue Heuristiken dieser Art sind nicht zulässig.
+
 - **Keine deduplizierten Ausfallmeldungen**: Ein kompletter Ausfall der History-Instanz sollte laut Spec "einmalig gemeldet, nicht bei jedem Lauf erneut" werden. Aktuell werden `getHistory`-Fehler nur als Tool-Fehler an den Agenten zurückgegeben, der sie in Worten einbaut — es gibt keinen persistenten "bereits gemeldet"-Zustand, der Wiederholungen unterdrückt. Vorgesehen für einen Folge-Plan, sobald reales Ausfallverhalten beobachtbar ist.
 - **Keine Katalog-Vorfilterung bei sehr großen Installationen**: Bei stark wachsender Objektzahl könnte der volle Katalog als LLM-Kontext zu groß werden. Von der Spec explizit als spätere Optimierung markiert, kein Blocker für v1.
 - ~~Kein Kosten-/Token-Budget für LLM-Aufrufe~~ — **gelöst** (2026-08-23, EUR-Umstellung 2026-09-04): Ein konfigurierbares Tagesbudget in EUR (`dailyBudgetEur`) begrenzt Chat und proaktive Prüfung anhand der aus den konfigurierten Preisen berechneten Ist-Kosten, und der Token-Kosten-Tab im Admin-UI zeigt Verbrauchshistorie, hochgerechnete Kosten sowie eine Limit-Empfehlung. Ein Preis muss gesetzt sein, damit ein Budget > 0 überhaupt greifen kann (Admin-UI verhindert sonst das Speichern). Siehe [ADR-0022](../adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md), [ADR-0028](../adr/0028-tagesbudget-in-eur-statt-token.md) und die [Spec zum Token-Kosten-Tab](../specs/2026-08-22-token-kosten-tab-design.md).

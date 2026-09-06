@@ -126,7 +126,11 @@ Neue States (Objekte via `setObjectNotExistsAsync`, `type: state, common.type: b
 ## Fehlerverhalten
 
 - **Chat-Provider nicht erreichbar:** `onMessage('chatQuestion', ...)` antwortet sofort mit einer Fehlermeldung ("Chat-Modell derzeit nicht erreichbar, siehe Log/Admin-Konfiguration.") statt den Agenten-Loop zu starten. Der Scheduler überspringt den proaktiven Prüfungslauf für die gesamte Laufzeit dieses Adapter-Starts (kein Retry ohne Neustart).
-- **Onboarding-Provider nicht erreichbar:** `syncCatalog()` überspringt den Klassifikations-Schritt (`runOnboarding`) komplett; neu entdeckte, aber unklassifizierte Objekte bleiben unverändert im Discovery-Ergebnis und werden beim nächsten erfolgreichen Adapter-Start (bzw. manuellen Re-Scan über den Geräte-Tab) nachgeholt. Discovery selbst (Objekte finden) läuft unverändert weiter.
+- **Onboarding-Provider nicht erreichbar:** `syncCatalog()` überspringt den
+  Klassifikations-Schritt (`runOnboarding`) komplett, legt neu entdeckte
+  Objekte aber mit einer sicheren Metadaten-Klassifikation (`device_usage`,
+  `needsReview`) im Katalog an. Nach einem späteren erfolgreichen Lauf können
+  diese Einträge durch die KI-Klassifikation verfeinert werden.
 - Der jeweils andere, funktionierende Zweig ist von einem Fehler im anderen Zweig nicht betroffen.
 - Da der Check nur einmal pro Adapter-Start läuft, ist keine Dedup-Logik wie bei Backlog-Punkt 2 (wiederholte History-Ausfallmeldungen) nötig.
 

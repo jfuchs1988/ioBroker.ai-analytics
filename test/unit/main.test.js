@@ -352,6 +352,45 @@ describe('AiAnalytics syncCatalog flow', () => {
             active: true,
         });
     });
+
+    it('registers new discoveries with a review marker when onboarding is unavailable', async () => {
+        const discovered = [{
+            id: 'mqtt.0.sensor.temperature',
+            historyInstance: 'history.0',
+            common: { name: 'Temperatur', unit: '°C' },
+        }];
+        const findHistorizedObjects = sinon.stub().resolves(discovered);
+        const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
+            '@iobroker/adapter-core': { Adapter: class {} },
+            './lib/discovery': { findHistorizedObjects },
+        });
+        const states = {};
+        const adapter = Object.create(TestAdapter.prototype);
+        adapter.namespace = 'ai-analytics.0';
+        adapter.config = { enableValueKindBackfill: false, enableDataQualityBackfill: false };
+        adapter.onboardingProviderOk = false;
+        adapter.log = { silly: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
+        adapter.getStatesAsync = sinon.stub().callsFake(async () =>
+            Object.fromEntries(Object.entries(states).filter(([id]) => id.startsWith(`${adapter.namespace}.catalog.`)))
+        );
+        adapter.getStateAsync = sinon.stub().callsFake(async id => states[`${adapter.namespace}.${id}`] || null);
+        adapter.setObjectNotExistsAsync = sinon.stub().resolves();
+        adapter.setStateAsync = sinon.stub().callsFake(async (id, state) => {
+            states[`${adapter.namespace}.${id}`] = state;
+        });
+        adapter.updateCatalogSyncState = AiAnalytics.prototype.updateCatalogSyncState;
+
+        const result = await adapter.syncCatalog();
+
+        expect(result).to.deep.include({ foundCount: 1, newCount: 1, reactivatedCount: 0, skipped: 'onboardingProvider' });
+        expect(JSON.parse(states['ai-analytics.0.catalog.mqtt.0.sensor.temperature'].val)).to.deep.include({
+            sourceId: 'mqtt.0.sensor.temperature',
+            description: 'Temperatur',
+            category: 'device_usage',
+            needsReview: true,
+            classificationSource: 'metadata',
+        });
+    });
 });
 
 describe('AiAnalytics proactive anomaly gate', () => {
