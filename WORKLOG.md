@@ -7,8 +7,9 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `master`.
-- Status: Geräteliste-UI-Redesign (Tasks 1-7) gemergt und als `0.0.1-beta.50`
-  veröffentlicht; automatisierte Verifikation und E2E-Test sind grün.
+- Status: Geräteliste-UI-Redesign, Discovery-Fix und Spaltenansicht gemergt und
+  als `0.0.1-beta.51` veröffentlicht; automatisierte Verifikation und E2E-Test
+  sind grün.
 
 ## TODO
 
@@ -19,6 +20,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Gruppen-IDs werden im Picker auf Länge/Steuerzeichen validiert, ungültige
   Bulk-Platzhalter bleiben deaktiviert und die Architektur-Dokumentation nennt
   die echten `src-admin/src/`-Pfade.
+- Namens-/Herstellerheuristiken aus Onboarding und Value-Kind-Klassifikation
+  entfernt; verbindliche Regel in `docs/architecture/11-risiken-und-schulden.md`.
 - Alle drei Sub-Projekte der Korrelations-Zerlegung (A, B, C) haben jetzt
   eine erste Ausbaustufe. Spätere Ausbaustufen (bewusst zurückgestellt):
   Wirkungsgrad (A), Temperatur-Stagnations-Regel (C), bidirektionaler
@@ -29,6 +32,9 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 - Merge und Release `0.0.1-beta.50` (2026-09-06): `master` enthält das
   Geräteliste-Redesign; E2E-Test gegen echten js-controller und Paketbau waren
   erfolgreich. GitHub-Tag und Release folgen nach dem Push.
+- Merge und Release `0.0.1-beta.51` (2026-09-06): neue Katalogeinträge werden
+  ohne KI-Provider als `needsReview` angelegt; lokalisierte Metadaten sind
+  robust; alle Tabellenfelder sind ein-/ausblendbar und direkt bearbeitbar.
 
 - Geräteliste im Admin-UI neu strukturiert (2026-09-05): Sofort-Speichern für
   jedes Einzelfeld statt Entwurf+Auswahl-Modell, aufklappbares Detail-Panel für

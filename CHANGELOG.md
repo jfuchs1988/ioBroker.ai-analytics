@@ -3,6 +3,22 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.51] - 2026-09-06
+
+### Hinzugefügt
+
+- Geräteliste zeigt alle Katalogfelder als ein-/ausblendbare Spalten und merkt
+  sich die Ansicht je Adapter-Instanz im Browser.
+- Neue historisierte Objekte werden auch ohne erreichbaren Onboarding-Provider
+  als `needsReview`-Einträge angelegt.
+
+### Behoben
+
+- Lokalisierte ioBroker-Metadaten wie `common.name` brechen das Onboarding nicht
+  mehr.
+- Hersteller-, Adapter- und Namensheuristiken wurden aus der Klassifikation
+  entfernt; unsichere Werte bleiben offen für KI oder manuelle Zuordnung.
+
 ## [0.0.1-beta.50] - 2026-09-06
 
 ### Hinzugefügt
