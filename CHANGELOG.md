@@ -3,6 +3,21 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.50] - 2026-09-06
+
+### Hinzugefügt
+
+- Geräteliste im Admin-UI mit Sofort-Speichern, Detail-Panel für Analyse-Rollen,
+  Spaltensortierung und Bulk-Aktionen für mehrere Katalogeinträge.
+- Inline-Erfolgs- und Fehlermeldungen für Einzeländerungen sowie validierte
+  Gruppen-ID-Auswahl für Energiebilanz-Gruppen.
+
+### Geändert
+
+- Geräte-Katalogverwaltung in fokussierte Admin-Komponenten aufgeteilt;
+  CSV-Import/-Export bleibt kompatibel.
+- Bulk-Aktionsstatus bleibt auch nach erfolgreicher Auswahl-Aktion sichtbar.
+
 ## [0.0.1-beta.49] - 2026-09-05
 
 ### Hinzugefügt
