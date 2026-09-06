@@ -6,17 +6,14 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/geraeteliste-redesign`.
-- Status: Geräteliste-UI-Redesign (Tasks 1-7) implementiert, Review-Fixwelle
-  abgeschlossen und dokumentiert; automatisierte Verifikation grün. Offen sind
-  Live-Abnahme auf einer echten ioBroker-Installation sowie danach Review/Merge
-  zu `master`.
+- Branch: `master`.
+- Status: Geräteliste-UI-Redesign (Tasks 1-7) gemergt und als `0.0.1-beta.50`
+  veröffentlicht; automatisierte Verifikation und E2E-Test sind grün.
 
 ## TODO
 
-- Nächste Produktaufgabe: aktuellen Adapterstand auf einer echten
-  ioBroker-Installation live abnehmen, inkl. der neuen Geräteliste-UI
-  (Sortierung, Detail-Panel, Bulk-Toolbar).
+- Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
+  zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
 - Review-Fixwelle nach dem Claude-Session-Limit abgeschlossen: Bulk-Status wird
   im Parent angezeigt, Einzel-Erfolge erscheinen ca. 3 Sekunden inline,
   Gruppen-IDs werden im Picker auf Länge/Steuerzeichen validiert, ungültige
@@ -28,6 +25,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Merge und Release `0.0.1-beta.50` (2026-09-06): `master` enthält das
+  Geräteliste-Redesign; E2E-Test gegen echten js-controller und Paketbau waren
+  erfolgreich. GitHub-Tag und Release folgen nach dem Push.
 
 - Geräteliste im Admin-UI neu strukturiert (2026-09-05): Sofort-Speichern für
   jedes Einzelfeld statt Entwurf+Auswahl-Modell, aufklappbares Detail-Panel für
