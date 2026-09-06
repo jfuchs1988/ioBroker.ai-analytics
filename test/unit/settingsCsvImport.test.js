@@ -13,8 +13,19 @@ const vm = require('vm');
 function loadSettingsCsvComponent() {
     const filename = path.resolve(__dirname, '..', '..', 'src-admin', 'src', 'Components.jsx');
     const source = fs.readFileSync(filename, 'utf8');
-    const helpers = source
-        .slice(source.indexOf('const CATEGORIES'), source.indexOf('export class ProviderSelectComponent'))
+    // csvHelpers.js holds the CSV/catalog vocabulary constants and pure CSV
+    // functions (parseCsv, normalizeHeader, validateFile, parseBoolean, ...)
+    // that Components.jsx now imports rather than defines inline. It also
+    // declares its own local `MAX_CSV_FIELD_LENGTH`, so the slice below must
+    // not additionally pull in Components.jsx's own copy of that constant to
+    // avoid a duplicate `const` declaration in the combined vm script.
+    const csvHelpersFilename = path.resolve(__dirname, '..', '..', 'src-admin', 'src', 'csvHelpers.js');
+    const csvHelpers = fs.readFileSync(csvHelpersFilename, 'utf8').replace(/^export /gm, '');
+    const settingsConstants = source
+        .slice(source.indexOf('const SETTINGS_COLUMNS'), source.indexOf('const MAX_CSV_FIELD_LENGTH'))
+        .replace(/^export /gm, '');
+    const validateSettingImportValueSource = source
+        .slice(source.indexOf('export function validateSettingImportValue'), source.indexOf('export class ProviderSelectComponent'))
         .replace(/^export /gm, '');
     const classStart = source.indexOf('export class SettingsCsvComponent');
     const classBody = source
@@ -36,7 +47,11 @@ function loadSettingsCsvComponent() {
         },
     };
     vm.createContext(context);
-    vm.runInContext(`${helpers}\n${classBody}\nmodule.exports = { SettingsCsvComponent };`, context, { filename });
+    vm.runInContext(
+        `${csvHelpers}\n${settingsConstants}\n${validateSettingImportValueSource}\n${classBody}\nmodule.exports = { SettingsCsvComponent };`,
+        context,
+        { filename }
+    );
     return context.module.exports.SettingsCsvComponent;
 }
 

@@ -32,8 +32,15 @@ main.js                  Verdrahtet alles: Adapter-Lifecycle, Katalog-Sync,
 admin/
 ├── jsonConfig.json        Admin-Konfigurationsformular
 ├── tab.html / tab.js       Custom Tab "AI Analytics" mit Sub-Navigation
-                             (Chat / Budget), gemeinsame Socket-Verbindung
-├── custom/                 Gebündelte JSON-Config-Custom-Komponente für die Geräteverwaltung
+                              (Chat / Budget), gemeinsame Socket-Verbindung
+src-admin/src/
+├── CatalogDevices/         `CatalogDevicesComponent` (Hauptkomponente, Editierbar-/Sortier-/Bulk-Logik)
+│   ├── CatalogDevicesComponent.jsx
+│   ├── DeviceRow.jsx        Einzelne Gerätezeile mit Detail-Panel
+│   ├── BulkEditToolbar.jsx  Toolbar für Mehrfachauswahl
+│   ├── GroupIdPicker.jsx    Energie-Gruppen-Auswahldialog
+│   └── catalogTableUtils.js Sortierung/Filterung/Status-Label-Funktionen
+└── csvHelpers.js            Import/Export-Logik für Gerätelistenformat
 ```
 
 ## 5.2 Komponentenverantwortung (Whitebox)
