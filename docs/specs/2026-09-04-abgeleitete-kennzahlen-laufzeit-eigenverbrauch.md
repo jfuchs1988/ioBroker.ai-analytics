@@ -41,22 +41,12 @@ Beide Felder werden nur zusammen gesetzt (beide vorhanden oder beide
 stattdessen validiert das neue Werkzeug (`getSelfConsumption`, siehe unten)
 die Gruppenintegrität zum Abfragezeitpunkt mit einer klaren Fehlermeldung.
 
-### Vorschlag beim Onboarding (Heuristik, kein LLM-Aufruf)
+### Zuweisung beim Onboarding
 
-`lib/onboarding.js` bekommt einen zusätzlichen, rein
-namensbasierten Heuristik-Schritt (kein zusätzlicher LLM-Aufruf, kein
-Kostenrisiko): Wenn nach der Klassifizierung genau ein katalogisiertes
-Objekt mit `category: 'generation_pv'` und `valueKind` in
-(`cumulative_total`, `daily_reset_counter`, `event_count`) existiert, dessen
-Beschreibung/sourceId auf Erzeugung hindeutet, UND genau ein Objekt mit
-passendem Namensmuster für Netzeinspeisung existiert, UND beide noch kein
-`derivedMetricGroupId` haben, werden beide automatisch mit einer neuen
-gemeinsamen `derivedMetricGroupId` und der passenden `derivedMetricRole`
-versehen. Wie bei `category`/`room` ist das ein **Vorschlag, keine
-Bestätigungspflicht** — sichtbar und änderbar im Geräte-Tab (Tabelle + CSV),
-genau wie jedes andere Katalogfeld. Kein neuer Bestätigungsmechanismus
-nötig (kein Konflikt mit `needsReview`, das an `valueKind`-Konfidenz
-gebunden bleibt).
+`derivedMetricRole` und `derivedMetricGroupId` werden nicht aus
+Hersteller-, Objekt-ID- oder Namensmustern abgeleitet. Die KI kann sie nur als
+explizites Klassifikationsergebnis vorschlagen; verbindlich gesetzt oder
+korrigiert werden sie durch den Nutzer im Geräte-Tab oder per CSV.
 
 Bei Mehrdeutigkeit (mehr als ein Kandidat je Rolle) wird **nichts**
 automatisch vorgeschlagen — der Nutzer weist die Rollen manuell im

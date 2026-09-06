@@ -97,11 +97,9 @@ können.
 
 ## Zuweisung von `hvacRole`
 
-Wie bei `derivedMetricRole`: manuell im Geräte-Tab (CSV-Spalte) plus eine
-rein namensbasierte Onboarding-Heuristik (kein LLM-Aufruf), die pro Raum nur
-bei eindeutigem Kandidaten je Rolle vorschlägt (Namensmuster für Fenster:
-`fenster|kontakt|window`; für Heizung: `heizung|thermostat|ventil|heating`,
-nur unter den `boolean_state`-Objekten des jeweiligen Raums).
+Wie bei `derivedMetricRole`: manuell im Geräte-Tab (CSV-Spalte) oder durch die
+KI-Klassifikation. Eine Ableitung aus Hersteller-, Objekt-ID- oder
+Namensmustern findet nicht statt.
 
 ## Nicht-Ziele
 

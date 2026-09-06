@@ -16,14 +16,13 @@ Der Nutzer kann der KI im normalen Chat erklären, wofür ein oder mehrere Daten
 - Erfolgreiche Änderungen setzen `needsReview=false`, `confidence=high`, `classificationSource=user` und einen Zeitstempel `userConfirmedAt`.
 - Fremde ioBroker-Objekte werden nicht verändert. Persistiert wird ausschließlich im Katalog von `ai-analytics`.
 
-## Sichere Defaults beim Onboarding
+## Onboarding ohne Heuristik
 
-- `sun2000.*`, `0_userdata.*.Huawei.*` und `viessmannapi.*` erhalten den Raum `Keller` und lösen keine Rückfrage aus.
-- Shelly-Datenpunkte mit `Switch`, `Power` oder `Energy` erhalten eine neutrale technische Beschreibung und lösen keine Rückfrage aus; der Raum bleibt offen.
-- Homematic-Datenpunkte mit `LEVEL` erhalten eine neutrale Aktor-Beschreibung und lösen keine Rückfrage aus; der Raum bleibt offen.
-- UniFi-`is_online`-Datenpunkte werden als Anwesenheitserkennung behandelt. Wenn der Objektbaum einen Client-/DNS-Namen liefert, wird dieser verwendet, sonst eine neutrale Beschreibung mit der MAC-Adresse.
-
-Die Defaults sind bewusst als `classificationSource=default` und `confidence=low` gekennzeichnet. Sie sind nutzbar, ohne als nutzerbestätigte Wahrheit ausgegeben zu werden.
+Es gibt keine Hersteller-, Adapter-, Objekt-ID- oder Namensdefaults. Wenn das
+Onboarding-Modell nicht erreichbar ist, wird ein neuer Treffer lediglich als
+`needsReview`-Eintrag mit neutraler Metadatenbeschreibung angelegt. Kategorie,
+Raum und Analyse-Rollen werden nicht aus Namen geraten, sondern durch die KI
+oder den Nutzer gesetzt.
 
 ## Nicht-Ziele
 

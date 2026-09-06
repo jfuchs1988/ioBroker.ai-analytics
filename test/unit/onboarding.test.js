@@ -144,6 +144,33 @@ describe('runOnboarding', () => {
         });
     });
 
+    it('accepts localized common.name objects during default classification', async () => {
+        const discovered = [{
+            id: 'shelly.0.power',
+            historyInstance: 'history.0',
+            common: { name: { en: 'Power', de: 'Leistung' }, unit: 'W' },
+        }];
+        const setCatalogEntry = sinon.stub().resolves();
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{
+                    sourceId: 'shelly.0.power',
+                    description: 'Leistung',
+                    category: 'consumption',
+                    confidence: 'high',
+                }]),
+            }),
+        };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+    });
+
     it('reports onboarding progress through the optional callback', async () => {
         const discovered = [
             { id: 'javascript.0.verbrauch.gesamt', historyInstance: 'influxdb.0', common: { name: 'Gesamtverbrauch' } },
@@ -226,91 +253,6 @@ describe('runOnboarding', () => {
 
         expect(result.needsReview).to.have.lengthOf(1);
         expect(result.needsReview[0].needsReview).to.equal(true);
-    });
-
-    it('defaults PV and heat-pump rooms to Keller but retains review for uncertain semantics', async () => {
-        const discovered = [
-            { id: 'sun2000.0.meter.activePower', historyInstance: 'history.0', common: { name: 'Active power', unit: 'W' } },
-            { id: 'viessmannapi.0.1.0.features.heating.sensors.temperature.value', historyInstance: 'history.0', common: { name: 'Temperature', unit: '°C' } },
-        ];
-        const provider = {
-            chat: sinon.stub().callsFake(({ messages }) => {
-                const sourceId = [...messages[0].content.matchAll(/"sourceId": "([^"]+)"/g)].pop()[1];
-                return Promise.resolve({
-                    content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'consumption', room: '', confidence: 'low' }]),
-                });
-            }),
-        };
-        const setCatalogEntry = sinon.stub().resolves();
-        const { runOnboarding } = loadOnboardingWithStubs({
-            getAllCatalogEntries: sinon.stub().resolves([]),
-            setCatalogEntry,
-        });
-
-        const result = await runOnboarding({}, provider, discovered);
-
-        expect(result.needsReview).to.have.lengthOf(2);
-        expect(setCatalogEntry.callCount).to.equal(2);
-        for (const call of setCatalogEntry.getCalls()) {
-            expect(call.args[1]).to.include({ room: 'Keller', needsReview: true, confidence: 'low', classificationSource: 'llm' });
-        }
-    });
-
-    it('uses neutral defaults for unknown Shelly and Homematic actuators', async () => {
-        const discovered = [
-            { id: 'shelly.0.shellyplus2pm#abc#1.Relay1.Power', historyInstance: 'history.0', common: { name: 'Power', unit: 'W' } },
-            { id: 'hm-rpc.0.000A1D89A5C234.1.LEVEL', historyInstance: 'history.0', common: { name: 'LEVEL' } },
-        ];
-        const provider = {
-            chat: sinon.stub().callsFake(({ messages }) => {
-                const sourceId = [...messages[0].content.matchAll(/"sourceId": "([^"]+)"/g)].pop()[1];
-                return Promise.resolve({
-                    content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'environment', room: '', confidence: 'low' }]),
-                });
-            }),
-        };
-        const setCatalogEntry = sinon.stub().resolves();
-        const { runOnboarding } = loadOnboardingWithStubs({
-            getAllCatalogEntries: sinon.stub().resolves([]),
-            setCatalogEntry,
-        });
-
-        const result = await runOnboarding({}, provider, discovered);
-        const stored = setCatalogEntry.getCalls().map((call) => call.args[1]);
-
-        expect(result.needsReview).to.deep.equal([]);
-        expect(stored[0]).to.include({ description: 'Shelly Relay 1 aktuelle Leistung', category: 'device_usage', needsReview: false, classificationSource: 'default' });
-        expect(stored[1]).to.include({ description: 'Homematic-Aktor 000A1D89A5C234 Stellwert', category: 'device_usage', needsReview: false, classificationSource: 'default' });
-    });
-
-    it('uses a UniFi client hostname from the object tree for presence detection', async () => {
-        const sourceId = 'unifi.0.default.clients.6c:ac:c2:b8:18:f3.is_online';
-        const discovered = [{ id: sourceId, historyInstance: 'history.0', common: { name: 'is_online' } }];
-        const adapter = {
-            getForeignObjectsAsync: sinon.stub().resolves({}),
-            getForeignObjectAsync: sinon.stub().resolves({ common: { name: 'Johannes Handy' }, native: { hostname: 'pixel-johannes' } }),
-        };
-        const provider = {
-            chat: sinon.stub().resolves({
-                content: JSON.stringify([{ sourceId, description: 'Unklar', unit: '', category: 'environment', room: '', confidence: 'low' }]),
-            }),
-        };
-        const setCatalogEntry = sinon.stub().resolves();
-        const { runOnboarding } = loadOnboardingWithStubs({
-            getAllCatalogEntries: sinon.stub().resolves([]),
-            setCatalogEntry,
-        });
-
-        const result = await runOnboarding(adapter, provider, discovered);
-
-        expect(result.needsReview).to.deep.equal([]);
-        expect(adapter.getForeignObjectAsync.calledWith('unifi.0.default.clients.6c:ac:c2:b8:18:f3')).to.equal(true);
-        expect(setCatalogEntry.firstCall.args[1]).to.include({
-            description: 'Anwesenheit pixel-johannes',
-            category: 'device_usage',
-            needsReview: false,
-            classificationSource: 'default',
-        });
     });
 
     it('continues after batch processing fails', async () => {
@@ -840,99 +782,4 @@ describe('runOnboarding', () => {
         expect(adapter.log.warn.called).to.equal(true);
     });
 
-    it('still runs the self-consumption suggestion even with no newly discovered objects', async () => {
-        const setCatalogEntry = sinon.stub().resolves();
-        const { runOnboarding } = loadOnboardingWithStubs({
-            getAllCatalogEntries: sinon.stub().resolves([
-                { sourceId: 'pv.0.total', description: 'PV Erzeugung', category: 'generation_pv', valueKind: 'cumulative_total' },
-                { sourceId: 'grid.0.feedin', description: 'Netzeinspeisung', category: 'consumption', valueKind: 'cumulative_total' },
-            ]),
-            setCatalogEntry,
-        });
-
-        await runOnboarding({ log: {} }, {}, []);
-
-        expect(setCatalogEntry.callCount).to.equal(2);
-        const [, pvUpdate] = setCatalogEntry.getCalls()[0].args;
-        expect(pvUpdate.derivedMetricRole).to.equal('pv_generation');
-        expect(pvUpdate.derivedMetricGroupId).to.be.a('string');
-        const [, feedInUpdate] = setCatalogEntry.getCalls()[1].args;
-        expect(feedInUpdate.derivedMetricRole).to.equal('grid_feed_in');
-        expect(feedInUpdate.derivedMetricGroupId).to.equal(pvUpdate.derivedMetricGroupId);
-    });
-});
-
-describe('suggestSelfConsumptionPair', () => {
-    const { suggestSelfConsumptionPair } = require('../../lib/onboarding');
-
-    function pvCandidate(overrides = {}) {
-        return { sourceId: 'pv.0.total', description: 'PV Erzeugung gesamt', category: 'generation_pv', valueKind: 'cumulative_total', derivedMetricGroupId: undefined, ...overrides };
-    }
-    function feedInCandidate(overrides = {}) {
-        return { sourceId: 'grid.0.feedin', description: 'Netzeinspeisung', category: 'consumption', valueKind: 'cumulative_total', derivedMetricGroupId: undefined, ...overrides };
-    }
-
-    it('suggests a pair when exactly one candidate exists for each role', () => {
-        const result = suggestSelfConsumptionPair([pvCandidate(), feedInCandidate()]);
-        expect(result).to.deep.equal({ pvSourceId: 'pv.0.total', feedInSourceId: 'grid.0.feedin' });
-    });
-
-    it('suggests nothing when a candidate is a gauge instead of a counter kind', () => {
-        const result = suggestSelfConsumptionPair([pvCandidate({ valueKind: 'gauge' }), feedInCandidate()]);
-        expect(result).to.equal(null);
-    });
-
-    it('suggests nothing when multiple pv candidates exist (ambiguous)', () => {
-        const result = suggestSelfConsumptionPair([pvCandidate(), pvCandidate({ sourceId: 'pv.1.total' }), feedInCandidate()]);
-        expect(result).to.equal(null);
-    });
-
-    it('suggests nothing when a candidate already has a derivedMetricGroupId', () => {
-        const result = suggestSelfConsumptionPair([pvCandidate({ derivedMetricGroupId: 'existing' }), feedInCandidate()]);
-        expect(result).to.equal(null);
-    });
-
-    it('suggests nothing when no feed-in candidate exists', () => {
-        const result = suggestSelfConsumptionPair([pvCandidate()]);
-        expect(result).to.equal(null);
-    });
-});
-
-describe('suggestHvacRoles', () => {
-    const { suggestHvacRoles } = require('../../lib/onboarding');
-
-    function windowCandidate(overrides = {}) {
-        return { sourceId: 'contact.0.window', description: 'Fensterkontakt Wohnzimmer', room: 'Wohnzimmer', valueKind: 'boolean_state', hvacRole: undefined, ...overrides };
-    }
-    function heatingCandidate(overrides = {}) {
-        return { sourceId: 'relay.0.heating', description: 'Heizungsventil Wohnzimmer', room: 'Wohnzimmer', valueKind: 'boolean_state', hvacRole: undefined, ...overrides };
-    }
-
-    it('suggests window/heating roles for an unambiguous room', () => {
-        const result = suggestHvacRoles([windowCandidate(), heatingCandidate()]);
-        expect(result).to.deep.equal([
-            { sourceId: 'contact.0.window', hvacRole: 'window' },
-            { sourceId: 'relay.0.heating', hvacRole: 'heating' },
-        ]);
-    });
-
-    it('suggests nothing for a room with two window candidates', () => {
-        const result = suggestHvacRoles([windowCandidate(), windowCandidate({ sourceId: 'contact.0.window2' }), heatingCandidate()]);
-        expect(result).to.deep.equal([]);
-    });
-
-    it('suggests nothing for entries that already have an hvacRole', () => {
-        const result = suggestHvacRoles([windowCandidate({ hvacRole: 'window' }), heatingCandidate()]);
-        expect(result).to.deep.equal([]);
-    });
-
-    it('handles multiple unambiguous rooms independently', () => {
-        const result = suggestHvacRoles([
-            windowCandidate(),
-            heatingCandidate(),
-            windowCandidate({ sourceId: 'contact.1.window', room: 'Kueche' }),
-            heatingCandidate({ sourceId: 'relay.1.heating', room: 'Kueche' }),
-        ]);
-        expect(result).to.have.lengthOf(4);
-    });
 });

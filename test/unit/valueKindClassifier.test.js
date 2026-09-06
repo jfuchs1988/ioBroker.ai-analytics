@@ -31,18 +31,26 @@ describe('classifyFromMetadata', () => {
         });
     });
 
-    it('guesses daily_reset_counter for names/ids hinting at a daily value', () => {
+    it('does not infer a counter kind from names or ids', () => {
         const obj = { id: 'sun2000.0.collected.dailyEnergyYield', common: { type: 'number', name: 'Heutiger Energieertrag' } };
         const result = classifyFromMetadata(obj);
-        expect(result.valueKind).to.equal('daily_reset_counter');
+        expect(result.valueKind).to.equal('gauge');
         expect(result.valueKindConfidence).to.equal('low');
         expect(result.valueKindSource).to.equal('metadata');
     });
 
-    it('guesses cumulative_total for names/roles hinting at a lifetime total', () => {
+    it('accepts localized metadata names and roles without using them as a rule', () => {
+        const obj = {
+            id: 'sun2000.0.meter.totalYield',
+            common: { type: 'number', name: { en: 'Total yield', de: 'Gesamtertrag' }, role: { en: 'value' } },
+        };
+        expect(classifyFromMetadata(obj).valueKind).to.equal('gauge');
+    });
+
+    it('does not infer a cumulative kind from names or roles', () => {
         const obj = { id: 'sun2000.0.inverter.totalYield', common: { type: 'number', name: 'Gesamtertrag', role: 'value.power.consumption' } };
         const result = classifyFromMetadata(obj);
-        expect(result.valueKind).to.equal('cumulative_total');
+        expect(result.valueKind).to.equal('gauge');
         expect(result.valueKindConfidence).to.equal('low');
     });
 
@@ -164,7 +172,7 @@ describe('classifyValueKind', () => {
 
         const result = await classifyValueKind({}, obj, 'influxdb.0');
 
-        expect(result).to.deep.equal({ valueKind: 'daily_reset_counter', valueKindConfidence: 'low', valueKindSource: 'metadata' });
+        expect(result).to.deep.equal({ valueKind: 'gauge', valueKindConfidence: 'low', valueKindSource: 'metadata' });
         expect(getHistory.callCount).to.equal(4);
     });
 

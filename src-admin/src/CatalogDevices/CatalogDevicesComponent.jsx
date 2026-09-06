@@ -3,15 +3,33 @@ import { ConfigGeneric } from '@iobroker/json-config';
 import DeviceRow from './DeviceRow.jsx';
 import BulkEditToolbar from './BulkEditToolbar.jsx';
 import { filterEntries, sortEntries, nextSortState } from './catalogTableUtils.js';
+import { CATALOG_COLUMNS, DEFAULT_VISIBLE_COLUMNS } from './catalogColumns.js';
 import { csvEscape, parseCsv, normalizeHeader, validateFile, validateCatalogImportValue, MAX_SOURCE_ID_LENGTH } from '../csvHelpers.js';
 
 const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'hvacRole'];
 const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'hvacRole'];
+const COLUMN_STORAGE_VERSION = 1;
+
+function readVisibleColumns(key) {
+    try {
+        const stored = window.localStorage.getItem(key);
+        if (!stored) return DEFAULT_VISIBLE_COLUMNS;
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed) || !parsed.length) return DEFAULT_VISIBLE_COLUMNS;
+        const valid = new Set(CATALOG_COLUMNS.map(column => column.key));
+        const columns = parsed.filter(column => valid.has(column));
+        return columns.length ? columns : DEFAULT_VISIBLE_COLUMNS;
+    } catch (_error) {
+        return DEFAULT_VISIBLE_COLUMNS;
+    }
+}
 
 export default class CatalogDevicesComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
-        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null };
+        const instance = props.oContext && props.oContext.instance !== undefined ? props.oContext.instance : 'default';
+        this.columnStorageKey = `ai-analytics.catalogDevices.columns.${instance}.v${COLUMN_STORAGE_VERSION}`;
+        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null, visibleColumns: readVisibleColumns(this.columnStorageKey) };
         this.fileInputRef = React.createRef();
         this.progressTimer = null;
         this.loadGeneration = 0;
@@ -159,6 +177,27 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             else expandedRows.add(sourceId);
             return { expandedRows };
         });
+    }
+
+    setVisibleColumns(visibleColumns) {
+        if (!visibleColumns.length) return;
+        this.setState({ visibleColumns });
+        try {
+            window.localStorage.setItem(this.columnStorageKey, JSON.stringify(visibleColumns));
+        } catch (_error) {
+            // A restricted browser storage must not disable the device table.
+        }
+    }
+
+    toggleColumn(columnKey) {
+        const visible = new Set(this.state.visibleColumns);
+        if (visible.has(columnKey)) visible.delete(columnKey);
+        else visible.add(columnKey);
+        this.setVisibleColumns(CATALOG_COLUMNS.map(column => column.key).filter(key => visible.has(key)));
+    }
+
+    resetVisibleColumns() {
+        this.setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
     }
 
     getExistingGroups() {
@@ -318,6 +357,29 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         );
     }
 
+    renderColumnSelector() {
+        const visible = new Set(this.state.visibleColumns);
+        return (
+            <details style={{ marginBottom: 8 }}>
+                <summary>Spalten anzeigen/ausblenden</summary>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', padding: 8 }}>
+                    {CATALOG_COLUMNS.map(column => (
+                        <label key={column.key}>
+                            <input
+                                type="checkbox"
+                                checked={visible.has(column.key)}
+                                disabled={visible.has(column.key) && visible.size === 1}
+                                onChange={() => this.toggleColumn(column.key)}
+                            />{' '}
+                            {column.label}
+                        </label>
+                    ))}
+                    <button type="button" onClick={() => this.resetVisibleColumns()}>Alle anzeigen</button>
+                </div>
+            </details>
+        );
+    }
+
     renderItem() {
         const filtered = filterEntries(this.state.entries, this.state.filter);
         const entries = sortEntries(filtered, this.state.sort);
@@ -349,6 +411,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <span>{this.state.progress.total ? Math.round((this.state.progress.processed / this.state.progress.total) * 100) : 0}%</span>
                 </div> : null}
                 <div style={{ marginBottom: 8, fontSize: 12 }}>Verhalten: <b>Gauge</b> = kontinuierlicher Messwert, z. B. Temperatur. Update-Frequenz, Vollständigkeit sowie Energie-/HVAC-Rolle stehen im aufklappbaren Detail-Panel jeder Zeile (▸). Räume sind freie Eingaben.</div>
+                {this.renderColumnSelector()}
                 {this.state.selected.length > 0 ? (
                     <BulkEditToolbar
                         count={this.state.selected.length}
@@ -364,15 +427,9 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                         <thead>
                             <tr>
                                 <th>Auswahl</th>
-                                {this.renderSortHeader('sourceId', 'Objekt-ID')}
-                                {this.renderSortHeader('description', 'Beschreibung')}
-                                {this.renderSortHeader('category', 'Kategorie')}
-                                {this.renderSortHeader('valueKind', 'Verhalten')}
-                                <th>Einheit</th>
-                                <th>Schreibbar</th>
-                                {this.renderSortHeader('room', 'Raum')}
-                                {this.renderSortHeader('status', 'Status')}
-                                <th>Aktionen</th>
+                                {CATALOG_COLUMNS.filter(column => this.state.visibleColumns.includes(column.key)).map(column => column.sortable
+                                    ? this.renderSortHeader(column.key, column.label)
+                                    : <th key={column.key}>{column.label}</th>)}
                             </tr>
                         </thead>
                         <tbody>{entries.map(entry => (
@@ -382,6 +439,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                                 selected={this.state.selected.includes(entry.sourceId)}
                                 expanded={this.state.expandedRows.has(entry.sourceId)}
                                 existingGroups={existingGroups}
+                                visibleColumns={this.state.visibleColumns}
                                 onToggleSelected={() => this.toggleSelected(entry.sourceId)}
                                 onToggleExpanded={() => this.toggleExpanded(entry.sourceId)}
                                 onFieldChange={fields => this.handleRowFieldChange(entry.sourceId, fields)}
