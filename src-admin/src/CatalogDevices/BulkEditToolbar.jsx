@@ -21,24 +21,25 @@ const FIELD_OPTIONS = [
 export default class BulkEditToolbar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { field: 'category', value: '', groupId: '', status: '' };
+        this.state = { field: 'category', value: '', groupId: '' };
     }
 
     async apply() {
         const { field, value, groupId } = this.state;
         const fields = field === 'derivedMetricRole' ? { derivedMetricRole: value, derivedMetricGroupId: groupId } : { [field]: value };
-        const result = await this.props.onApplyField(fields);
-        this.setState({ status: `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.` });
-    }
-
-    async runAction(action, label) {
-        const result = await action();
-        this.setState({ status: `${label}: ${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.` });
+        await this.props.onApplyField(fields);
     }
 
     async handleDelete() {
         if (!window.confirm(`${this.props.count} ausgewählte Geräte wirklich entfernen?`)) return;
-        await this.runAction(() => this.props.onDelete(), 'Löschen');
+        await this.props.onDelete();
+    }
+
+    get canApply() {
+        const { field, value, groupId } = this.state;
+        if (field === 'derivedMetricRole') return value === '' || Boolean(groupId);
+        if (field === 'room' || field === 'hvacRole') return true;
+        return value !== '';
     }
 
     renderValueInput() {
@@ -88,7 +89,6 @@ export default class BulkEditToolbar extends React.Component {
 
     render() {
         const { count } = this.props;
-        const canApply = this.state.field !== 'derivedMetricRole' || this.state.value === '' || Boolean(this.state.groupId);
         return (
             <div role="region" aria-label="Bulk-Aktionen">
                 <span>{count} ausgewählt</span>
@@ -96,11 +96,10 @@ export default class BulkEditToolbar extends React.Component {
                     {FIELD_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
                 {this.renderValueInput()}
-                <button disabled={!canApply} onClick={() => this.apply()}>Auf {count} ausgewählte Geräte anwenden</button>
-                <button onClick={() => this.runAction(() => this.props.onIgnore(), 'Ignorieren')}>Ignorieren</button>
-                <button onClick={() => this.runAction(() => this.props.onActivate(), 'Aktivieren')}>Aktivieren</button>
+                <button disabled={!this.canApply} onClick={() => this.apply()}>Auf {count} ausgewählte Geräte anwenden</button>
+                <button onClick={() => this.props.onIgnore()}>Ignorieren</button>
+                <button onClick={() => this.props.onActivate()}>Aktivieren</button>
                 <button onClick={() => this.handleDelete()}>Löschen</button>
-                {this.state.status ? <div role="status" aria-live="polite">{this.state.status}</div> : null}
             </div>
         );
     }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BulkEditToolbar from '../../src-admin/src/CatalogDevices/BulkEditToolbar.jsx';
 
@@ -26,7 +26,6 @@ describe('BulkEditToolbar', () => {
         await user.click(screen.getByRole('button', { name: /Auf 3 ausgewählte Geräte anwenden/ }));
 
         expect(props.onApplyField).toHaveBeenCalledWith({ category: 'device_usage' });
-        await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('3 gespeichert, 0 fehlgeschlagen.'));
     });
 
     it('requires both a role and a group before enabling apply for derivedMetricRole', async () => {
@@ -100,6 +99,6 @@ describe('BulkEditToolbar', () => {
 
         await user.click(screen.getByRole('button', { name: 'Ignorieren' }));
 
-        await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('2 gespeichert, 1 fehlgeschlagen.'));
+        expect(screen.queryByRole('status')).toBeNull();
     });
 });

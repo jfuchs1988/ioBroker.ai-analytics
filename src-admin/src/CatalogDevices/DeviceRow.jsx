@@ -9,6 +9,7 @@ const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
 const MAX_DESCRIPTION_LENGTH = 2000;
 const MAX_ROOM_LENGTH = 200;
+const FIELD_OK_TIMEOUT_MS = 3000;
 
 function statusLabelOf(entry) {
     if (entry.ignored) return 'ignoriert';
@@ -24,8 +25,10 @@ export default class DeviceRow extends React.Component {
             description: props.entry.description || '',
             room: props.entry.room || '',
             fieldErrors: {},
+            fieldOk: {},
             pendingRole: undefined,
         };
+        this.fieldOkTimers = {};
     }
 
     componentDidUpdate(prevProps) {
@@ -38,17 +41,61 @@ export default class DeviceRow extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        this.unmounted = true;
+        Object.keys(this.fieldOkTimers).forEach(key => clearTimeout(this.fieldOkTimers[key]));
+        this.fieldOkTimers = {};
+    }
+
+    clearFieldOkTimer(key) {
+        if (this.fieldOkTimers[key]) {
+            clearTimeout(this.fieldOkTimers[key]);
+            delete this.fieldOkTimers[key];
+        }
+    }
+
+    scheduleFieldOkClear(key) {
+        this.clearFieldOkTimer(key);
+        this.fieldOkTimers[key] = setTimeout(() => {
+            delete this.fieldOkTimers[key];
+            if (this.unmounted) return;
+            this.setState(state => {
+                const fieldOk = { ...state.fieldOk };
+                delete fieldOk[key];
+                return { fieldOk };
+            });
+        }, FIELD_OK_TIMEOUT_MS);
+    }
+
     async save(fields) {
-        const result = await this.props.onFieldChange(fields);
         const changedKeys = Object.keys(fields);
+        // Clear any pending success indicator/timer for these fields immediately so a fast
+        // successive edit doesn't leave a stale "saved" flag or double-fire a clear.
+        changedKeys.forEach(key => this.clearFieldOkTimer(key));
+        this.setState(state => {
+            const fieldOk = { ...state.fieldOk };
+            changedKeys.forEach(key => delete fieldOk[key]);
+            return { fieldOk };
+        });
+
+        const result = await this.props.onFieldChange(fields);
+        if (this.unmounted) return;
+        const hasError = Boolean(result && result.error);
         this.setState(state => {
             const fieldErrors = { ...state.fieldErrors };
+            const fieldOk = { ...state.fieldOk };
             changedKeys.forEach(key => {
-                if (result && result.error) fieldErrors[key] = result.error;
-                else delete fieldErrors[key];
+                if (hasError) {
+                    fieldErrors[key] = result.error;
+                    delete fieldOk[key];
+                } else {
+                    delete fieldErrors[key];
+                    fieldOk[key] = true;
+                }
             });
-            return { fieldErrors };
+            return { fieldErrors, fieldOk };
         });
+        if (!hasError) changedKeys.forEach(key => this.scheduleFieldOkClear(key));
     }
 
     handleTextBlur(field, maxLength) {
@@ -70,8 +117,12 @@ export default class DeviceRow extends React.Component {
     }
 
     handleGroupChange(nextGroup) {
-        const role = this.state.pendingRole || this.props.entry.derivedMetricRole;
         this.setState({ pendingRole: undefined });
+        if (!nextGroup) {
+            this.save({ derivedMetricRole: '' });
+            return;
+        }
+        const role = this.state.pendingRole || this.props.entry.derivedMetricRole;
         this.save({ derivedMetricRole: role, derivedMetricGroupId: nextGroup });
     }
 

@@ -50,4 +50,17 @@ describe('GroupIdPicker', () => {
 
         expect(onChange).toHaveBeenCalledWith('sofort');
     });
+
+    it('shows validation errors for an overly long new group ID', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        render(<GroupIdPicker ariaLabel="Gruppe" value="" existingGroups={[]} onChange={onChange} />);
+
+        await user.selectOptions(screen.getByLabelText('Gruppe'), '__new__');
+        await user.type(screen.getByLabelText('Gruppe'), 'a'.repeat(129));
+        await user.tab();
+
+        expect(screen.getByRole('alert')).toHaveTextContent('maximal 128');
+        expect(onChange).not.toHaveBeenCalled();
+    });
 });

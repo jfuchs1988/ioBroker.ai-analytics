@@ -62,7 +62,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
 
     async loadEntries() {
         const generation = ++this.loadGeneration;
-        this.setState({ loading: true });
+        if (this.state.entries.length === 0) this.setState({ loading: true });
         try {
             const response = await this.callAdapter('listCatalogEntries');
             if (response && response.error) throw new Error(response.error);
@@ -124,6 +124,13 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         this.setState({ selected: failedIds });
         await this.loadEntries();
         return { succeeded, failed: failedIds.length };
+    }
+
+    async runBulkAction(action, label) {
+        const result = await action();
+        const summary = `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.`;
+        this.setState({ status: label ? `${label}: ${summary}` : summary });
+        return result;
     }
 
     async removeEntry(entry) {
@@ -346,10 +353,10 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <BulkEditToolbar
                         count={this.state.selected.length}
                         existingGroups={existingGroups}
-                        onApplyField={fields => this.applyToSelected(fields)}
-                        onIgnore={() => this.applyToSelected({ ignored: true })}
-                        onActivate={() => this.applyToSelected({ ignored: false })}
-                        onDelete={() => this.deleteSelected()}
+                        onApplyField={fields => this.runBulkAction(() => this.applyToSelected(fields))}
+                        onIgnore={() => this.runBulkAction(() => this.applyToSelected({ ignored: true }), 'Ignorieren')}
+                        onActivate={() => this.runBulkAction(() => this.applyToSelected({ ignored: false }), 'Aktivieren')}
+                        onDelete={() => this.runBulkAction(() => this.deleteSelected(), 'Löschen')}
                     />
                 ) : null}
                 {this.state.loading ? <div>Geräte werden geladen ...</div> : <div style={{ overflowX: 'auto', maxHeight: 600 }}>
