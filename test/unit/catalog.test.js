@@ -128,6 +128,53 @@ describe('catalog', () => {
         expect(adapter.log.warn.callCount).to.equal(3);
     });
 
+    it('getCatalogEntry repairs a pre-existing derivedMetricRole/valueKind mismatch instead of dropping the entry', async () => {
+        const adapter = makeAdapter();
+        adapter.log = { warn: sinon.stub() };
+        const stored = {
+            sourceId: 'javascript.0.x',
+            category: 'consumption',
+            derivedMetricRole: 'grid_import',
+            derivedMetricGroupId: 'energy-1',
+        };
+        adapter.getStateAsync.resolves({ val: JSON.stringify(stored) });
+
+        const entry = await getCatalogEntry(adapter, 'javascript.0.x');
+
+        expect(entry).to.not.equal(null);
+        expect(entry).to.not.have.property('derivedMetricRole');
+        expect(entry).to.not.have.property('derivedMetricGroupId');
+        expect(entry.needsReview).to.equal(true);
+        expect(adapter.log.warn.calledOnce).to.equal(true);
+    });
+
+    it('getAllCatalogEntries repairs a pre-existing role/valueKind mismatch but still skips unrelated corruption', async () => {
+        const adapter = makeAdapter();
+        adapter.log = { warn: sinon.stub() };
+        adapter.getStatesAsync.resolves({
+            'ai-analytics.0.catalog.repairable': {
+                val: JSON.stringify({
+                    sourceId: 'repairable',
+                    category: 'consumption',
+                    derivedMetricRole: 'grid_import',
+                    derivedMetricGroupId: 'energy-1',
+                }),
+            },
+            'ai-analytics.0.catalog.corrupt': {
+                val: JSON.stringify({ sourceId: 'corrupt', category: 'not-a-category' }),
+            },
+        });
+
+        const entries = await getAllCatalogEntries(adapter);
+
+        expect(entries).to.have.lengthOf(1);
+        expect(entries[0].sourceId).to.equal('repairable');
+        expect(entries[0]).to.not.have.property('derivedMetricRole');
+        expect(entries[0]).to.not.have.property('derivedMetricGroupId');
+        expect(entries[0].needsReview).to.equal(true);
+        expect(adapter.log.warn.callCount).to.equal(2);
+    });
+
     it('markInactive sets active=false on an existing entry', async () => {
         const adapter = makeAdapter();
         const existing = {

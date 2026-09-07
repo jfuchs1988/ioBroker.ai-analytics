@@ -110,5 +110,5 @@ export function validateCatalogImportValue(field, value) {
     if (field === 'hvacRole' && !HVAC_ROLES.includes(value)) throw new Error(`Ungültige hvacRole: ${value}`);
     if (field === 'updateFrequency' && !UPDATE_FREQUENCIES.includes(value)) throw new Error(`Ungültige updateFrequency: ${value}`);
     if (field === 'dataCompleteness' && !DATA_COMPLETENESS.includes(value)) throw new Error(`Ungültige dataCompleteness: ${value}`);
-    return field === 'ignored' ? parseBoolean(value, field) : value;
+    return (field === 'ignored' || field === 'derivedMetricInverted') ? parseBoolean(value, field) : value;
 }

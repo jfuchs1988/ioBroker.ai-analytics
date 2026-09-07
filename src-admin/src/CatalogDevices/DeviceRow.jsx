@@ -179,6 +179,7 @@ export default class DeviceRow extends React.Component {
                 {effectiveRole ? <GroupIdPicker ariaLabel={`Energiebilanz-Gruppe für ${entry.sourceId}`} value={entry.derivedMetricGroupId} existingGroups={this.props.existingGroups} onChange={group => this.handleGroupChange(group)} /> : null}
                 {this.feedback('derivedMetricGroupId')}
             </td>;
+            case 'derivedMetricInverted': return <td key={column}>{entry.derivedMetricInverted ? 'Ja' : ''}</td>;
             case 'hvacRole': return <td key={column}>
                 <select aria-label={`HVAC-Rolle für ${entry.sourceId}`} value={entry.hvacRole || ''} disabled={hvacDisabled} title={hvacDisabled ? 'Nur für Verhalten boolean_state verfügbar' : undefined} onChange={event => this.save({ hvacRole: event.target.value })}>
                     <option value="">keine</option>{HVAC_ROLES.map(value => <option key={value} value={value}>{value}</option>)}

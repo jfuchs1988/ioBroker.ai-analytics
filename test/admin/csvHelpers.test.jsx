@@ -43,6 +43,8 @@ describe('admin CSV helpers', () => {
         expect(validateCatalogImportValue('derivedMetricRole', 'battery_power')).toBe('battery_power');
         expect(validateCatalogImportValue('hvacRole', 'window')).toBe('window');
         expect(() => validateCatalogImportValue('hvacRole', 'unknown')).toThrow('hvacRole');
+        expect(validateCatalogImportValue('derivedMetricInverted', 'true')).toBe(true);
+        expect(validateCatalogImportValue('derivedMetricInverted', 'false')).toBe(false);
     });
 
     it('strictly validates settings numbers, booleans, and providers', () => {
