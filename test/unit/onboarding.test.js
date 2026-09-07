@@ -817,4 +817,241 @@ describe('runOnboarding', () => {
         expect(adapter.log.warn.called).to.equal(true);
     });
 
+    it('stores a compatible derivedMetricRole proposal and forces needsReview even at high confidence', async () => {
+        const discovered = [
+            { id: 'sun2000.0.battery.totalCharge', historyInstance: 'influxdb.0', common: { name: 'Batterie Ladeleistung gesamt' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{
+                    sourceId: 'sun2000.0.battery.totalCharge', description: 'Batterie Ladeleistung gesamt',
+                    unit: 'kWh', category: 'consumption', room: '', confidence: 'high',
+                    derivedMetricRole: 'battery_charge',
+                }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.deep.include({
+            derivedMetricRole: 'battery_charge',
+            derivedMetricGroupId: 'sun2000.0',
+            needsReview: true,
+        });
+    });
+
+    it('drops an incompatible derivedMetricRole proposal but still stores the rest of the entry', async () => {
+        const discovered = [
+            { id: 'sun2000.0.grid.power', historyInstance: 'influxdb.0', common: { name: 'Netzleistung' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{
+                    sourceId: 'sun2000.0.grid.power', description: 'Netzleistung', unit: 'W',
+                    category: 'consumption', room: '', confidence: 'high',
+                    derivedMetricRole: 'grid_import',
+                }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'gauge', valueKindConfidence: 'high', valueKindSource: 'metadata' });
+        const adapter = { log: { warn: sinon.stub() } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding(adapter, provider, discovered);
+
+        expect(setCatalogEntry.calledOnce).to.equal(true);
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.not.have.property('derivedMetricRole');
+        expect(entry).to.not.have.property('derivedMetricGroupId');
+        expect(entry.needsReview).to.equal(true);
+        expect(entry.description).to.equal('Netzleistung');
+    });
+
+    it('drops both roles when the LLM proposes the same role twice within one adapter instance', async () => {
+        const discovered = [
+            { id: 'sun2000.0.battery.a', historyInstance: 'influxdb.0', common: { name: 'a' } },
+            { id: 'sun2000.0.battery.b', historyInstance: 'influxdb.0', common: { name: 'b' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([
+                    { sourceId: 'sun2000.0.battery.a', description: 'a', unit: 'kWh', category: 'consumption', room: '', confidence: 'high', derivedMetricRole: 'battery_charge' },
+                    { sourceId: 'sun2000.0.battery.b', description: 'b', unit: 'kWh', category: 'consumption', room: '', confidence: 'high', derivedMetricRole: 'battery_charge' },
+                ]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(setCatalogEntry.calledTwice).to.equal(true);
+        for (const call of setCatalogEntry.getCalls()) {
+            const [, entry] = call.args;
+            expect(entry).to.not.have.property('derivedMetricRole');
+            expect(entry.needsReview).to.equal(true);
+        }
+    });
+
+    it('does not propose a role that is already claimed by an existing catalog entry in the same group', async () => {
+        const discovered = [
+            { id: 'sun2000.0.battery.new', historyInstance: 'influxdb.0', common: { name: 'neu' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{
+                    sourceId: 'sun2000.0.battery.new', description: 'neu', unit: 'kWh',
+                    category: 'consumption', room: '', confidence: 'high', derivedMetricRole: 'battery_charge',
+                }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([
+                { sourceId: 'sun2000.0.battery.old', derivedMetricRole: 'battery_charge', derivedMetricGroupId: 'sun2000.0' },
+            ]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.not.have.property('derivedMetricRole');
+        expect(entry.needsReview).to.equal(true);
+    });
+
+    it('stores a compatible hvacRole proposal and forces needsReview', async () => {
+        const discovered = [
+            { id: 'javascript.0.fenster.kueche', historyInstance: 'influxdb.0', common: { name: 'Fenster Kueche' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{
+                    sourceId: 'javascript.0.fenster.kueche', description: 'Fenster Kueche', unit: '',
+                    category: 'environment', room: 'Kueche', confidence: 'high', hvacRole: 'window',
+                }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'boolean_state', valueKindConfidence: 'high', valueKindSource: 'metadata' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.deep.include({ hvacRole: 'window', needsReview: true });
+    });
+
+    it('derives the same derivedMetricGroupId for two objects of the same adapter instance', async () => {
+        const discovered = [
+            { id: 'sun2000.0.grid.import', historyInstance: 'influxdb.0', common: { name: 'Netzbezug' } },
+            { id: 'sun2000.0.grid.feedin', historyInstance: 'influxdb.0', common: { name: 'Netzeinspeisung' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([
+                    { sourceId: 'sun2000.0.grid.import', description: 'Netzbezug', unit: 'kWh', category: 'consumption', room: '', confidence: 'high', derivedMetricRole: 'grid_import' },
+                    { sourceId: 'sun2000.0.grid.feedin', description: 'Netzeinspeisung', unit: 'kWh', category: 'generation_pv', room: '', confidence: 'high', derivedMetricRole: 'grid_feed_in' },
+                ]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(setCatalogEntry.getCall(0).args[1].derivedMetricGroupId).to.equal('sun2000.0');
+        expect(setCatalogEntry.getCall(1).args[1].derivedMetricGroupId).to.equal('sun2000.0');
+    });
+
+    it('catches a duplicate role proposed in a later batch of the same instance (instance larger than BATCH_SIZE)', async () => {
+        // 21 objects of the same adapter instance -> buildBatches (size 20) splits it into two
+        // batches. Only obj0 (batch 1) and obj20 (batch 2, alone) propose a role, both the same
+        // one -> obj20's batch-local roleKeyCounts is 1 (no in-batch duplicate), so this only
+        // gets caught if assignedRoleKeys persists across the batch loop from batch 1 to batch 2.
+        const discovered = Array.from({ length: 21 }, (unused, i) => ({
+            id: `sun2000.0.obj${i}`,
+            historyInstance: 'influxdb.0',
+            common: { name: `obj${i}` },
+        }));
+        const provider = {
+            chat: sinon.stub().callsFake(({ messages }) => {
+                const requested = JSON.parse(messages[0].content.split('Objekte:\n')[1]);
+                const content = requested.map((obj) => ({
+                    sourceId: obj.sourceId, description: obj.sourceId, unit: 'kWh',
+                    category: 'consumption', room: '', confidence: 'high',
+                    derivedMetricRole: (obj.sourceId === 'sun2000.0.obj0' || obj.sourceId === 'sun2000.0.obj20') ? 'battery_charge' : null,
+                }));
+                return Promise.resolve({ content: JSON.stringify(content) });
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'cumulative_total', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+            classifyValueKind,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        expect(provider.chat.callCount).to.equal(2); // 21 objects / BATCH_SIZE 20 -> two batches
+        const obj0Call = setCatalogEntry.getCalls().find((call) => call.args[1].sourceId === 'sun2000.0.obj0');
+        const obj20Call = setCatalogEntry.getCalls().find((call) => call.args[1].sourceId === 'sun2000.0.obj20');
+        expect(obj0Call.args[1].derivedMetricRole).to.equal('battery_charge'); // first claim (batch 1) succeeds
+        expect(obj20Call.args[1]).to.not.have.property('derivedMetricRole'); // second claim (batch 2) blocked by assignedRoleKeys
+        expect(obj20Call.args[1].needsReview).to.equal(true);
+    });
+
+    it('leaves entries untouched when the LLM proposes no role, unchanged from prior behaviour', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{ sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        await runOnboarding({}, provider, discovered);
+
+        const [, entry] = setCatalogEntry.firstCall.args;
+        expect(entry).to.not.have.property('derivedMetricRole');
+        expect(entry.needsReview).to.equal(false);
+    });
+
 });
