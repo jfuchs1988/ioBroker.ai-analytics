@@ -3,6 +3,35 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.52] - 2026-09-08
+
+### Hinzugefügt
+
+- Zwei neue Analyse-Rollen `grid_power`/`battery_power` für signierte
+  Momentanleistungswerte (z. B. Netz-/Batterieleistung), nutzbar für
+  Spitzenlast-Auswertung über die bestehenden `getPeriodTotal`/
+  `compareTimeframes`-Werkzeuge; neues Feld `derivedMetricInverted` für die
+  Vorzeichen-Konvention.
+- KI-Onboarding schlägt jetzt zusätzlich zur Kategorie auch
+  `derivedMetricRole`/`hvacRole` vor (Batching läuft jetzt pro
+  Adapter-Instanz statt Adapter-Typ); jeder Vorschlag markiert den Eintrag
+  zur manuellen Prüfung, unabhängig vom Kategorie-Konfidenzwert.
+
+### Geändert
+
+- Die sechs Energiebilanz-Rollen (`pv_generation`, `grid_import`,
+  `grid_feed_in`, `consumption`, `battery_charge`, `battery_discharge`)
+  erfordern jetzt einen zählerartigen `valueKind`
+  (`daily_reset_counter`/`cumulative_total`) — verhindert ein stilles `NaN`
+  im Energiebilanz-Residuum bei versehentlicher Zuordnung an einen
+  Momentanwert.
+
+### Behoben
+
+- Katalogeinträge, die durch die neue Validierungsregel rückwirkend
+  ungültig würden, werden beim Lesen repariert (Rollenfeld entfernt,
+  `needsReview` gesetzt) statt stillschweigend übersprungen zu werden.
+
 ## [0.0.1-beta.51] - 2026-09-06
 
 ### Hinzugefügt
