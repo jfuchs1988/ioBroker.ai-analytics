@@ -52,7 +52,7 @@ describe('buildBatches', () => {
         expect(batches[1].map((o) => o.id)).to.deep.equal(['shelly.0.c', 'shelly.0.d']);
     });
 
-    it('groups by adapter type regardless of instance number', () => {
+    it('splits by adapter instance, keeping different instances of the same adapter type in separate batches', () => {
         const objects = [
             { id: 'hm-rpc.0.a' },
             { id: 'hm-rpc.1.b' },
@@ -61,9 +61,24 @@ describe('buildBatches', () => {
 
         const batches = buildBatches(objects, 10);
 
+        expect(batches).to.have.lengthOf(3);
+        expect(batches[0].map((o) => o.id)).to.deep.equal(['hm-rpc.0.a']);
+        expect(batches[1].map((o) => o.id)).to.deep.equal(['hm-rpc.1.b']);
+        expect(batches[2].map((o) => o.id)).to.deep.equal(['shelly.0.c']);
+    });
+
+    it('keeps two objects of the same adapter instance in the same batch', () => {
+        const objects = [
+            { id: 'sun2000.0.grid.power' },
+            { id: 'sun2000.1.grid.power' },
+            { id: 'sun2000.0.battery.totalCharge' },
+        ];
+
+        const batches = buildBatches(objects, 10);
+
         expect(batches).to.have.lengthOf(2);
-        expect(batches[0].map((o) => o.id)).to.deep.equal(['hm-rpc.0.a', 'hm-rpc.1.b']);
-        expect(batches[1].map((o) => o.id)).to.deep.equal(['shelly.0.c']);
+        expect(batches[0].map((o) => o.id)).to.deep.equal(['sun2000.0.grid.power', 'sun2000.0.battery.totalCharge']);
+        expect(batches[1].map((o) => o.id)).to.deep.equal(['sun2000.1.grid.power']);
     });
 
     it('splits a single adapter type into multiple batches once it exceeds the batch size', () => {
