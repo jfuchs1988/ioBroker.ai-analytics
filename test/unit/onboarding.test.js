@@ -36,6 +36,26 @@ function makeDiscovered(count) {
     }));
 }
 
+describe('buildClassificationPrompt', () => {
+    const { buildClassificationPrompt } = require('../../lib/onboarding');
+
+    it('lists all eight derivedMetricRole values and both hvacRole values', () => {
+        const prompt = buildClassificationPrompt([{ id: 'sun2000.0.x', common: { name: 'x' } }]);
+
+        for (const role of ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption', 'grid_power', 'battery_power']) {
+            expect(prompt).to.include(role);
+        }
+        expect(prompt).to.include('window');
+        expect(prompt).to.include('heating');
+    });
+
+    it('instructs the model to answer null when the role is not evident from the name', () => {
+        const prompt = buildClassificationPrompt([{ id: 'sun2000.0.x', common: { name: 'x' } }]);
+
+        expect(prompt.toLowerCase()).to.include('null');
+    });
+});
+
 describe('buildBatches', () => {
     it('never mixes two adapter types in the same batch, even if that means a smaller batch', () => {
         const objects = [
