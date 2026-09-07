@@ -244,6 +244,17 @@ export default class DeviceRow extends React.Component {
                                     />
                                 ) : null}
                                 {fieldErrors.derivedMetricRole ? <span role="alert">{fieldErrors.derivedMetricRole}</span> : null}
+                                {(effectiveRole === 'grid_power' || effectiveRole === 'battery_power') ? (
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            aria-label={`Vorzeichen invertiert für ${entry.sourceId}`}
+                                            checked={Boolean(entry.derivedMetricInverted)}
+                                            onChange={event => this.save({ derivedMetricInverted: event.target.checked })}
+                                        />
+                                        {' '}Vorzeichen invertiert
+                                    </label>
+                                ) : null}
                                 <label>
                                     HVAC-Rolle{' '}
                                     <select
