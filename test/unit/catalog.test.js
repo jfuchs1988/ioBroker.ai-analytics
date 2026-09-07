@@ -183,7 +183,7 @@ describe('catalog', () => {
 
     it('accepts a valid derivedMetricRole/derivedMetricGroupId pair', () => {
         const entry = validateCatalogEntry({
-            sourceId: 'x', category: 'generation_pv',
+            sourceId: 'x', category: 'generation_pv', valueKind: 'daily_reset_counter',
             derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1',
         });
         expect(entry.derivedMetricRole).to.equal('pv_generation');
@@ -207,16 +207,80 @@ describe('catalog', () => {
 
     it('rejects an oversized derivedMetricGroupId', () => {
         expect(() => validateCatalogEntry({
-            sourceId: 'x', category: 'generation_pv',
+            sourceId: 'x', category: 'generation_pv', valueKind: 'daily_reset_counter',
             derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'x'.repeat(129),
         })).to.throw('derivedMetricGroupId');
     });
 
     it('accepts the new energy balance roles', () => {
         for (const role of ['grid_import', 'battery_charge', 'battery_discharge', 'consumption']) {
-            const entry = validateCatalogEntry({ sourceId: 'x', category: 'consumption', derivedMetricRole: role, derivedMetricGroupId: 'energy-1' });
+            const entry = validateCatalogEntry({ sourceId: 'x', category: 'consumption', valueKind: 'daily_reset_counter', derivedMetricRole: role, derivedMetricGroupId: 'energy-1' });
             expect(entry.derivedMetricRole).to.equal(role);
         }
+    });
+
+    it('rejects a balance role on a gauge-kind entry', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'gauge',
+            derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1',
+        })).to.throw('grid_import');
+    });
+
+    it('rejects a balance role when valueKind is not yet classified', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption',
+            derivedMetricRole: 'battery_charge', derivedMetricGroupId: 'energy-1',
+        })).to.throw('battery_charge');
+    });
+
+    it('accepts a balance role on a cumulative_total entry', () => {
+        const entry = validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'cumulative_total',
+            derivedMetricRole: 'grid_feed_in', derivedMetricGroupId: 'energy-1',
+        });
+        expect(entry.derivedMetricRole).to.equal('grid_feed_in');
+    });
+
+    it('accepts grid_power/battery_power only on a gauge entry', () => {
+        for (const role of ['grid_power', 'battery_power']) {
+            const entry = validateCatalogEntry({ sourceId: 'x', category: 'consumption', valueKind: 'gauge', derivedMetricRole: role, derivedMetricGroupId: 'energy-1' });
+            expect(entry.derivedMetricRole).to.equal(role);
+        }
+    });
+
+    it('rejects grid_power/battery_power on a counter entry', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'daily_reset_counter',
+            derivedMetricRole: 'grid_power', derivedMetricGroupId: 'energy-1',
+        })).to.throw('grid_power');
+    });
+
+    it('accepts derivedMetricInverted only alongside grid_power/battery_power', () => {
+        const entry = validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'gauge',
+            derivedMetricRole: 'battery_power', derivedMetricGroupId: 'energy-1', derivedMetricInverted: true,
+        });
+        expect(entry.derivedMetricInverted).to.equal(true);
+    });
+
+    it('rejects derivedMetricInverted on a non-power role', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'daily_reset_counter',
+            derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1', derivedMetricInverted: true,
+        })).to.throw('derivedMetricInverted');
+    });
+
+    it('rejects derivedMetricInverted without any derivedMetricRole', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', derivedMetricInverted: false,
+        })).to.throw('derivedMetricInverted');
+    });
+
+    it('rejects a non-boolean derivedMetricInverted', () => {
+        expect(() => validateCatalogEntry({
+            sourceId: 'x', category: 'consumption', valueKind: 'gauge',
+            derivedMetricRole: 'grid_power', derivedMetricGroupId: 'energy-1', derivedMetricInverted: 'yes',
+        })).to.throw('derivedMetricInverted');
     });
 
     it('accepts a valid hvacRole on a boolean_state entry', () => {
