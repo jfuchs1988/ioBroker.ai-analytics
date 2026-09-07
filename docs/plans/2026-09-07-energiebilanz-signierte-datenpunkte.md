@@ -786,8 +786,10 @@ Expected: FAIL — `grid_power` etc. nicht im Prompt-Text enthalten.
 Ersetze den Import (Zeile 4):
 
 ```js
-const { getAllCatalogEntries, setCatalogEntry, CATEGORIES, DERIVED_METRIC_ROLES, HVAC_ROLES, isDerivedMetricRoleValueKindValid, isHvacRoleValueKindValid } = require('./catalog');
+const { getAllCatalogEntries, setCatalogEntry, CATEGORIES, DERIVED_METRIC_ROLES, HVAC_ROLES } = require('./catalog');
 ```
+
+(Nur `DERIVED_METRIC_ROLES, HVAC_ROLES` werden zu den bestehenden `getAllCatalogEntries, setCatalogEntry, CATEGORIES` ergänzt — sie werden unten in `buildClassificationPrompt` verwendet. `isDerivedMetricRoleValueKindValid`/`isHvacRoleValueKindValid` werden bewusst NICHT hier importiert, da sie in diesem Task noch nirgends verwendet werden — ein ungenutzter Import würde ESLint stören. Task 7 erweitert diese Import-Zeile um die zwei Prädikat-Funktionen, sobald sie gebraucht werden.)
 
 Ersetze `buildClassificationPrompt` (Zeile 63-81):
 
@@ -815,8 +817,6 @@ function buildClassificationPrompt(objects) {
     ].join('\n');
 }
 ```
-
-(`isDerivedMetricRoleValueKindValid`/`isHvacRoleValueKindValid` werden hier importiert, aber erst in Task 7 verwendet — ein ungenutzter Import würde ESLint stören, daher Import und Verwendung in Task 7 gemeinsam einfügen: **korrigiere diesen Step** — importiere in Task 6 nur `DERIVED_METRIC_ROLES, HVAC_ROLES` zusätzlich zu den bestehenden `getAllCatalogEntries, setCatalogEntry, CATEGORIES`, und ergänze `isDerivedMetricRoleValueKindValid, isHvacRoleValueKindValid` erst in Task 7 Step 3.)
 
 - [ ] **Step 4: Tests ausführen, erwarteter Zustand: alle PASS**
 
