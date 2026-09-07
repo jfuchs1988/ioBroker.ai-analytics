@@ -43,6 +43,18 @@ describe('BulkEditToolbar', () => {
         expect(props.onApplyField).toHaveBeenCalledWith({ derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' });
     });
 
+    it('offers grid_power and battery_power in the bulk energy-role dropdown', async () => {
+        const user = userEvent.setup();
+        renderToolbar();
+
+        await user.selectOptions(screen.getByLabelText('Bulk-Feld'), 'derivedMetricRole');
+
+        const select = screen.getByLabelText('Wert für Bulk-Energie-Rolle');
+        const optionValues = Array.from(select.options).map(option => option.value);
+        expect(optionValues).toContain('grid_power');
+        expect(optionValues).toContain('battery_power');
+    });
+
     it('keeps apply enabled for derivedMetricRole when the role is left at keine', async () => {
         const user = userEvent.setup();
         renderToolbar();

@@ -649,6 +649,10 @@ class AiAnalytics extends utils.Adapter {
                     'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
                      'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
                      'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
+                     'Bei einem Objekt mit derivedMetricRole "grid_power" oder "battery_power" (Momentanleistung, kein Zaehler) ' +
+                     'liefert getPeriodTotal/comparePeriods min/max als Spitzenlast in beide Richtungen; ohne derivedMetricInverted (Standard) ' +
+                     'ist bei grid_power positiv = Netzbezug/negativ = Einspeisung, bei battery_power positiv = Laden/negativ = Entladen — ' +
+                     'ist derivedMetricInverted gesetzt, gilt die jeweils umgekehrte Zuordnung. ' +
                      `Die statistische Voranalyse hat nur diese Kandidaten gefunden: ${JSON.stringify(anomalyCandidates)}. Erklaere die Auffaelligkeiten anhand dieser Belege und erfinde keine weiteren statistischen Kandidaten. ` +
                      'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
                 userMessage: 'Fuehre die periodische Pruefung durch.',
@@ -725,6 +729,10 @@ class AiAnalytics extends utils.Adapter {
                 'da diese automatisch die passende Rechenoperation fuer Momentanwerte, Zaehler und Schalter anwenden. ' +
                  'Nutze in deiner Antwort IMMER die "description" aus den Werkzeug-Ergebnissen (getHistory/compareTimeframes) statt der rohen sourceId, damit die Ausgabe fuer den Nutzer lesbar ist. ' +
                  'Falls getPeriodTotal/comparePeriods ein Objekt mit dataCompleteness "gaps" oder "stale" liefern, benenne diese Unsicherheit in deiner Antwort statt sie zu verschweigen. ' +
+                 'Bei einem Objekt mit derivedMetricRole "grid_power" oder "battery_power" (Momentanleistung, kein Zaehler) ' +
+                 'liefert getPeriodTotal/comparePeriods min/max als Spitzenlast in beide Richtungen; ohne derivedMetricInverted (Standard) ' +
+                 'ist bei grid_power positiv = Netzbezug/negativ = Einspeisung, bei battery_power positiv = Laden/negativ = Entladen — ' +
+                 'ist derivedMetricInverted gesetzt, gilt die jeweils umgekehrte Zuordnung. ' +
                  'Falls der Nutzer nach seinem Standort oder der aktuellen Uhrzeit/Zeitzone fragt, nutze die oben genannten Angaben. ' +
                  'Falls der Nutzer eine offene Rueckfrage zu einem unsicheren Objekt beantwortet (du kannst offene Rueckfragen mit ' +
                  'listCatalog({needsReviewOnly: true}) einsehen), aktualisiere den Eintrag mit updateCatalogEntry. ' +

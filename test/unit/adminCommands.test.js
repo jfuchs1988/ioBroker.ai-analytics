@@ -258,7 +258,7 @@ describe('adminCommands', () => {
         });
 
         it('accepts and stores a valid derivedMetricRole/derivedMetricGroupId pair', async () => {
-            const existing = { sourceId: 'javascript.0.x', category: 'generation_pv' };
+            const existing = { sourceId: 'javascript.0.x', category: 'generation_pv', valueKind: 'daily_reset_counter' };
             const setCatalogEntry = sinon.stub().resolves();
             const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
                 getAllCatalogEntries: sinon.stub().resolves([existing]),
@@ -274,13 +274,126 @@ describe('adminCommands', () => {
         it('accepts the new energy balance roles', async () => {
             const setCatalogEntry = sinon.stub().resolves();
             const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
-                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption' }]),
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'daily_reset_counter' }]),
                 setCatalogEntry,
             });
 
             const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' });
 
             expect(result.entry).to.deep.include({ derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' });
+        });
+
+        it('rejects a balance role when the resulting valueKind is not counter-like', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'gauge' }]),
+                setCatalogEntry: sinon.stub().resolves(),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' });
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error.message).to.include('grid_import');
+        });
+
+        it('accepts grid_power on a gauge entry and stores derivedMetricInverted', async () => {
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'gauge' }]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000-0', derivedMetricInverted: true });
+
+            expect(result.entry).to.deep.include({ derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000-0', derivedMetricInverted: true });
+        });
+
+        it('rejects grid_power on a non-gauge entry', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'daily_reset_counter' }]),
+                setCatalogEntry: sinon.stub().resolves(),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000-0' });
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error.message).to.include('grid_power');
+        });
+
+        it('rejects derivedMetricInverted alongside a non-power role', async () => {
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([{ sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'daily_reset_counter' }]),
+                setCatalogEntry: sinon.stub().resolves(),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1', derivedMetricInverted: true });
+            } catch (err) {
+                error = err;
+            }
+
+            expect(error.message).to.include('derivedMetricInverted');
+        });
+
+        it('stores an explicit derivedMetricInverted: false', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'gauge', derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000-0', derivedMetricInverted: true };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricInverted: false });
+
+            expect(result.entry).to.deep.include({ derivedMetricInverted: false });
+        });
+
+        it('clears derivedMetricInverted along with derivedMetricRole via the empty-string sentinel', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'gauge', derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000-0', derivedMetricInverted: true };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            let error;
+            let result;
+            try {
+                result = await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', derivedMetricRole: '' });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error).to.equal(undefined);
+            expect(result.entry).to.not.have.property('derivedMetricRole');
+            expect(result.entry).to.not.have.property('derivedMetricGroupId');
+            expect(result.entry).to.not.have.property('derivedMetricInverted');
+        });
+
+        it('re-checks derivedMetricRole compatibility when only valueKind changes', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'consumption', valueKind: 'daily_reset_counter', derivedMetricRole: 'grid_import', derivedMetricGroupId: 'energy-1' };
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry: sinon.stub().resolves(),
+            });
+
+            let error;
+            try {
+                await updateCatalogEntryAdmin({}, { sourceId: 'javascript.0.x', valueKind: 'gauge' });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error).to.be.instanceOf(Error);
+            expect(error.message).to.include('grid_import');
         });
 
         it('rejects hvacRole when the existing entry is not boolean_state', async () => {

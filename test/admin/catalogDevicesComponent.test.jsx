@@ -45,6 +45,19 @@ describe('CatalogDevicesComponent', () => {
         expect(rowsAfter[0]).toContain('javascript.0.a');
     });
 
+    it('renders one body cell per header cell for every default-visible column', async () => {
+        const socket = makeFakeSocket({ listCatalogEntries: () => ({ entries: ENTRIES }) });
+        render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
+
+        await waitFor(() => expect(screen.getByText('javascript.0.b')).toBeTruthy());
+        const rows = screen.getAllByRole('row');
+        const headerCellCount = rows[0].querySelectorAll('th').length;
+        expect(headerCellCount).toBeGreaterThan(1);
+        for (const row of rows.slice(1)) {
+            expect(row.querySelectorAll('td').length).toBe(headerCellCount);
+        }
+    });
+
     it('shows all catalog columns and persists hidden columns per instance', async () => {
         const user = userEvent.setup();
         window.localStorage.removeItem('ai-analytics.catalogDevices.columns.0.v1');

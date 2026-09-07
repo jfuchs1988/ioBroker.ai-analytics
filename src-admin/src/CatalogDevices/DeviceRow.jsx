@@ -3,7 +3,7 @@ import GroupIdPicker from './GroupIdPicker.jsx';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
-const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption'];
+const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption', 'grid_power', 'battery_power'];
 const HVAC_ROLES = ['window', 'heating'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
@@ -179,6 +179,7 @@ export default class DeviceRow extends React.Component {
                 {effectiveRole ? <GroupIdPicker ariaLabel={`Energiebilanz-Gruppe für ${entry.sourceId}`} value={entry.derivedMetricGroupId} existingGroups={this.props.existingGroups} onChange={group => this.handleGroupChange(group)} /> : null}
                 {this.feedback('derivedMetricGroupId')}
             </td>;
+            case 'derivedMetricInverted': return <td key={column}>{entry.derivedMetricInverted ? 'Ja' : ''}</td>;
             case 'hvacRole': return <td key={column}>
                 <select aria-label={`HVAC-Rolle für ${entry.sourceId}`} value={entry.hvacRole || ''} disabled={hvacDisabled} title={hvacDisabled ? 'Nur für Verhalten boolean_state verfügbar' : undefined} onChange={event => this.save({ hvacRole: event.target.value })}>
                     <option value="">keine</option>{HVAC_ROLES.map(value => <option key={value} value={value}>{value}</option>)}
@@ -244,6 +245,17 @@ export default class DeviceRow extends React.Component {
                                     />
                                 ) : null}
                                 {fieldErrors.derivedMetricRole ? <span role="alert">{fieldErrors.derivedMetricRole}</span> : null}
+                                {(effectiveRole === 'grid_power' || effectiveRole === 'battery_power') ? (
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            aria-label={`Vorzeichen invertiert für ${entry.sourceId}`}
+                                            checked={Boolean(entry.derivedMetricInverted)}
+                                            onChange={event => this.save({ derivedMetricInverted: event.target.checked })}
+                                        />
+                                        {' '}Vorzeichen invertiert
+                                    </label>
+                                ) : null}
                                 <label>
                                     HVAC-Rolle{' '}
                                     <select

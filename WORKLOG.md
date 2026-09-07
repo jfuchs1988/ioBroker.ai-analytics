@@ -6,10 +6,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`.
-- Status: Geräteliste-UI-Redesign, Discovery-Fix und Spaltenansicht gemergt und
-  als `0.0.1-beta.51` veröffentlicht; automatisierte Verifikation und E2E-Test
-  sind grün.
+- Branch: `feature/energiebilanz-signierte-datenpunkte` (aus `master`), bereit
+  zum Merge.
+- Status: alle neun Tasks der Spec umgesetzt, `npm test`/`npm run lint`/
+  `npm run build:admin` grün.
 
 ## TODO
 
@@ -29,6 +29,23 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## DONE
 
+- Energiebilanz-Rollen gegen `valueKind` abgesichert und um Spitzenlast-Rollen
+  erweitert (2026-09-07): `derivedMetricRole` fuer die sechs Bilanz-Rollen
+  verlangt jetzt `daily_reset_counter`/`cumulative_total` (verhindert stilles
+  `NaN` im Residuum bei versehentlicher Zuweisung an einen `gauge`-Datenpunkt);
+  zwei neue Rollen `grid_power`/`battery_power` (nur `gauge`) plus
+  `derivedMetricInverted` fuer Spitzenlast-Auswertung ueber die bestehenden
+  `getPeriodTotal`/`compareTimeframes`-Werkzeuge, ausserhalb der
+  Bilanz-Pflichtrollen. KI-Onboarding schlaegt jetzt zusaetzlich zu `category`
+  auch `derivedMetricRole`/`hvacRole` vor (Batching jetzt pro
+  Adapter-**Instanz** statt Adapter-Typ), mit Vorpruefung gegen die neue Regel
+  (inkompatible/doppelte Vorschlaege werden verworfen statt den ganzen
+  Katalogeintrag abzulehnen) und erzwungenem `needsReview` bei jedem
+  Rollenvorschlag. Bewusst NICHT gebaut: eine Leistungs-Integration fuer
+  Tagesenergie aus einem signierten Momentanleistungswert (Genauigkeitsrisiko
+  bei lueckenhaftem Logging), siehe
+  `docs/architecture/11-risiken-und-schulden.md`. Siehe
+  [Spec](docs/specs/2026-09-07-energiebilanz-signierte-datenpunkte.md).
 - Merge und Release `0.0.1-beta.50` (2026-09-06): `master` enthält das
   Geräteliste-Redesign; E2E-Test gegen echten js-controller und Paketbau waren
   erfolgreich. GitHub-Tag und Release folgen nach dem Push.

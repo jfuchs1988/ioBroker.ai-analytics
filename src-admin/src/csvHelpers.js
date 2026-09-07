@@ -2,7 +2,7 @@
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
 const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
-const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption'];
+const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption', 'grid_power', 'battery_power'];
 const HVAC_ROLES = ['window', 'heating'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
@@ -110,5 +110,5 @@ export function validateCatalogImportValue(field, value) {
     if (field === 'hvacRole' && !HVAC_ROLES.includes(value)) throw new Error(`Ungültige hvacRole: ${value}`);
     if (field === 'updateFrequency' && !UPDATE_FREQUENCIES.includes(value)) throw new Error(`Ungültige updateFrequency: ${value}`);
     if (field === 'dataCompleteness' && !DATA_COMPLETENESS.includes(value)) throw new Error(`Ungültige dataCompleteness: ${value}`);
-    return field === 'ignored' ? parseBoolean(value, field) : value;
+    return (field === 'ignored' || field === 'derivedMetricInverted') ? parseBoolean(value, field) : value;
 }

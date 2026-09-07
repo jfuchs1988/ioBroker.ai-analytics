@@ -118,6 +118,35 @@ describe('DeviceRow', () => {
         expect(props.onFieldChange).toHaveBeenCalledWith({ derivedMetricRole: '' });
     });
 
+    it('shows the invert-sign checkbox only for grid_power/battery_power roles and saves changes', async () => {
+        const user = userEvent.setup();
+        const { props } = renderRow({ expanded: true, entry: { derivedMetricRole: 'grid_power', derivedMetricGroupId: 'sun2000.0' } });
+
+        const checkbox = screen.getByLabelText('Vorzeichen invertiert für javascript.0.x');
+        expect(checkbox).not.toBeChecked();
+        await user.click(checkbox);
+
+        expect(props.onFieldChange).toHaveBeenCalledWith({ derivedMetricInverted: true });
+    });
+
+    it('reflects an already-inverted entry as checked', () => {
+        renderRow({ expanded: true, entry: { derivedMetricRole: 'battery_power', derivedMetricGroupId: 'sun2000.0', derivedMetricInverted: true } });
+
+        expect(screen.getByLabelText('Vorzeichen invertiert für javascript.0.x')).toBeChecked();
+    });
+
+    it('hides the invert-sign checkbox for non-power energy roles', () => {
+        renderRow({ expanded: true, entry: { derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'pv-1' } });
+
+        expect(screen.queryByLabelText('Vorzeichen invertiert für javascript.0.x')).not.toBeInTheDocument();
+    });
+
+    it('hides the invert-sign checkbox when no energy role is set', () => {
+        renderRow({ expanded: true });
+
+        expect(screen.queryByLabelText('Vorzeichen invertiert für javascript.0.x')).not.toBeInTheDocument();
+    });
+
     it('calls onRemove when the Entfernen button is clicked', async () => {
         const user = userEvent.setup();
         const { props } = renderRow();
