@@ -14,6 +14,7 @@ export const CATALOG_COLUMNS = [
     { key: 'dataCompleteness', label: 'Vollständigkeit', sortable: true },
     { key: 'derivedMetricRole', label: 'Energie-Rolle', sortable: true },
     { key: 'derivedMetricGroupId', label: 'Energiebilanz-Gruppe', sortable: true },
+    { key: 'derivedMetricInverted', label: 'Vorzeichen invertiert', sortable: true },
     { key: 'hvacRole', label: 'HVAC-Rolle', sortable: true },
     { key: 'status', label: 'Status', sortable: true, readOnly: true },
     { key: 'actions', label: 'Aktionen', sortable: false, readOnly: true },
