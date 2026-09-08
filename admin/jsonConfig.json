@@ -427,7 +427,7 @@
         },
         "catalogHint": {
           "type": "staticText",
-          "text": "Datenpunkte auswählen, Änderungen vornehmen und anschließend einmal speichern. Räume sind freie Eingaben, zum Beispiel Keller, Heizraum, Technikraum oder Garage.",
+          "text": "Änderungen an den Datenpunkten werden sofort gespeichert. Räume sind freie Eingaben, zum Beispiel Keller, Heizraum, Technikraum oder Garage.",
           "newLine": true
         },
         "catalogDevices": {

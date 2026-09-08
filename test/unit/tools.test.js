@@ -83,7 +83,7 @@ describe('buildTools', () => {
         const result = await execute('getHistory', { sourceId: 'javascript.0.x', start: 1, end: 2, aggregate: 'average' });
 
         expect(getHistoryStub.calledOnceWith(adapter, 'influxdb.0', 'javascript.0.x', 1, 2, 'average')).to.equal(true);
-        expect(result).to.deep.equal({ description: undefined, room: undefined, unit: undefined, history: [{ ts: 1, val: 5 }] });
+        expect(result).to.deep.equal({ description: undefined, room: undefined, unit: undefined, truncated: false, history: [{ ts: 1, val: 5 }] });
     });
 
     it('getHistory throws for objects not in the catalog', async () => {
@@ -143,6 +143,7 @@ describe('buildTools', () => {
             description: 'Wohnzimmer Lampe',
             room: 'Wohnzimmer',
             unit: 'kWh',
+            truncated: false,
             history: [{ ts: 1, val: 5 }],
         });
     });
@@ -471,7 +472,7 @@ describe('buildTools', () => {
         });
         const result = await buildTools({}).execute('getPeriodTotal', { sourceId: 'switch.0.x', periods: [{ start: 0, end: 1000 }] });
         expect(result.periods[0]).to.deep.equal({ start: 0, end: 1000, onDurationMs: 600, switchCount: 3 });
-        expect(getHistory.calledOnceWith({}, 'history.0', 'switch.0.x', 0, 1000, 'onchange')).to.equal(true);
+        expect(getHistory.calledOnceWith({}, 'history.0', 'switch.0.x', -86400000, 1000, 'onchange')).to.equal(true);
     });
 
     it('resolves dayOffset using local calendar boundaries', async () => {

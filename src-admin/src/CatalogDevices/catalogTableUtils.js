@@ -12,7 +12,10 @@ export function filterEntries(entries, query, { includeIgnored = true } = {}) {
     const visibleEntries = includeIgnored ? entries : entries.filter(entry => !entry.ignored);
     if (!q) return visibleEntries;
     return visibleEntries.filter(entry =>
-        [entry.sourceId, entry.description, entry.category, entry.room, entry.valueKind]
+        [entry.sourceId, entry.description, entry.category, entry.room, entry.valueKind, entry.unit, entry.writePattern,
+            entry.updateFrequency, entry.dataCompleteness, entry.derivedMetricRole, entry.derivedMetricGroupId,
+            entry.hvacRole, entry.ignored ? 'ignoriert ja' : 'ignoriert nein', entry.needsReview ? 'prüfung nötig ja' : 'prüfung nötig nein',
+            statusLabel(entry)]
             .filter(Boolean)
             .join(' ')
             .toLowerCase()

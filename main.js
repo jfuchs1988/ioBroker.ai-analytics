@@ -75,6 +75,7 @@ class AiAnalytics extends utils.Adapter {
         this.chatRunPromise = null;
         this.proactiveCheckPromise = null;
         this.catalogSyncPromise = null;
+        this.bridgeStateChangePromise = Promise.resolve();
         this.licenseState = { status: 'beta', fullAccess: true };
         this.runtimeLimits = getLimits(this.config || {});
     }
@@ -198,7 +199,9 @@ class AiAnalytics extends utils.Adapter {
             : chatProviderConfig;
         this.onboardingProvider = this.config.onboardingProviderType
             ? this.buildProviderSafely(onboardingProviderConfig, 'Onboarding-Modell')
-            : this.chatProvider;
+            : onboardingTokenLimits.maxOutputTokens === chatTokenLimits.maxOutputTokens
+                ? this.chatProvider
+                : this.buildProviderSafely({ ...chatProviderConfig, maxTokens: onboardingTokenLimits.maxOutputTokens }, 'Onboarding-Modell');
 
         this.runtimeLimits = { ...getLimits(this.config), ...chatTokenLimits };
         this.tools = buildTools(this, { limits: this.runtimeLimits });
@@ -560,6 +563,7 @@ class AiAnalytics extends utils.Adapter {
         let anomalyCandidates = [];
         let totalFailedCount = 0;
         let preAnalysisError = null;
+        let analysisIncomplete;
         try {
             const catalogEntries = await getAllCatalogEntries(this);
             const eligibleCount = catalogEntries.filter(isEligibleCatalogEntry).length;
@@ -600,6 +604,7 @@ class AiAnalytics extends utils.Adapter {
             preAnalysisError = error;
             this.log.warn(`Statistische Anomalievoranalyse fehlgeschlagen: ${error.message}`);
         }
+        analysisIncomplete = Boolean(preAnalysisError || totalFailedCount > 0);
 
         if (anomalyCandidates.length === 0 && (preAnalysisError || totalFailedCount > 0)) {
             await this.appendHistoryFailureReports();
@@ -658,7 +663,8 @@ class AiAnalytics extends utils.Adapter {
                      'liefert getPeriodTotal/comparePeriods min/max als Spitzenlast in beide Richtungen; ohne derivedMetricInverted (Standard) ' +
                      'ist bei grid_power positiv = Netzbezug/negativ = Einspeisung, bei battery_power positiv = Laden/negativ = Entladen — ' +
                      'ist derivedMetricInverted gesetzt, gilt die jeweils umgekehrte Zuordnung. ' +
-                     `Die statistische Voranalyse hat nur diese Kandidaten gefunden: ${JSON.stringify(anomalyCandidates)}. Erklaere die Auffaelligkeiten anhand dieser Belege und erfinde keine weiteren statistischen Kandidaten. ` +
+                      `Die statistische Voranalyse hat nur diese Kandidaten gefunden: ${JSON.stringify(anomalyCandidates)}. Erklaere die Auffaelligkeiten anhand dieser Belege und erfinde keine weiteren statistischen Kandidaten. ` +
+                      (analysisIncomplete ? `Die Voranalyse war unvollständig: ${totalFailedCount || 1} Datenreihe(n) konnten nicht gelesen werden. Weise ausdrücklich auf diese Unsicherheit hin. ` : '') +
                      'Wenn nichts auffaellig ist, antworte kurz mit "Keine Auffaelligkeiten."',
                 userMessage: 'Fuehre die periodische Pruefung durch.',
                 onProgress: progress => this.updateCatalogSyncState({ phase: 'check', processed: progress.processed, total: progress.total, message: `Prüfung läuft ... ${Math.round((progress.processed / progress.total) * 100)}%` }),
@@ -675,7 +681,7 @@ class AiAnalytics extends utils.Adapter {
 
         if (isNothingFound && silentIfNothingFound) {
             await this.appendHistoryFailureReports();
-            await this.updateCatalogSyncState({ running: false, phase: 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
+            await this.updateCatalogSyncState({ running: false, phase: analysisIncomplete ? 'error' : 'done', processed: MAX_ITERATIONS, total: MAX_ITERATIONS, message: analysisIncomplete ? 'Prüfung abgeschlossen, aber unvollständig.' : 'Prüfung abgeschlossen.', finishedAt: new Date().toISOString() });
             return { skipped: false };
         }
 
@@ -871,19 +877,40 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async onBridgeStateChange(id, state) {
-        try {
-            await adminBridge.handleBridgeStateChange(this, id, state, (command, message) =>
-                this.dispatchAdapterCommand(command, message)
-            );
-        } catch (error) {
-            this.log.error(`Admin-Bridge: Verarbeitung fehlgeschlagen: ${error && error.message ? error.message : String(error)}`);
-        }
+        const previous = this.bridgeStateChangePromise || Promise.resolve();
+        const run = previous.then(async () => {
+            try {
+                await adminBridge.handleBridgeStateChange(this, id, state, (command, message) =>
+                    this.dispatchAdapterCommand(command, message)
+                );
+            } catch (error) {
+                this.log.error(`Admin-Bridge: Verarbeitung fehlgeschlagen: ${error && error.message ? error.message : String(error)}`);
+            }
+        });
+        this.bridgeStateChangePromise = run.catch(() => {});
+        await run;
     }
 
     onUnload(callback) {
         try {
             if (this.stopScheduler) this.stopScheduler();
-            callback();
+            const pending = [this.chatRunPromise, this.proactiveCheckPromise, this.catalogSyncPromise, this.bridgeStateChangePromise]
+                .filter(promise => promise && typeof promise.then === 'function');
+            if (!pending.length) {
+                callback();
+                return;
+            }
+            let settled = false;
+            const finish = () => {
+                if (settled) return;
+                settled = true;
+                callback();
+            };
+            const timeout = setTimeout(finish, 5000);
+            Promise.allSettled(pending).finally(() => {
+                clearTimeout(timeout);
+                finish();
+            });
         } catch (e) {
             callback();
         }

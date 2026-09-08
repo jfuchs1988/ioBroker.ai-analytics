@@ -57,7 +57,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         const instance = props.oContext && props.oContext.instance !== undefined ? props.oContext.instance : 'default';
         this.columnStorageKey = `ai-analytics.catalogDevices.columns.${instance}.v${COLUMN_STORAGE_VERSION}`;
         this.visibilityStorageKey = `ai-analytics.catalogDevices.showIgnored.${instance}.v${VISIBILITY_STORAGE_VERSION}`;
-        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null, visibleColumns: readVisibleColumns(this.columnStorageKey), showIgnored: readStoredBoolean(this.visibilityStorageKey, false) };
+        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null, visibleColumns: readVisibleColumns(this.columnStorageKey), showIgnored: readStoredBoolean(this.visibilityStorageKey, false), bulkBusy: false };
         this.fileInputRef = React.createRef();
         this.progressTimer = null;
         this.loadGeneration = 0;
@@ -95,7 +95,13 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             if (this.unmounted) throw new Error('Komponente wurde geschlossen.');
             const state = await socket.getState(`${instance}.admin.bridge`);
             if (state && state.ack === true && typeof state.val === 'string') {
-                const response = JSON.parse(state.val);
+                let response;
+                try {
+                    response = JSON.parse(state.val);
+                } catch (_error) {
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                    continue;
+                }
                 if (response.id === requestId) {
                     if (!response.ok) throw new Error(response.error || 'Unbekannter Fehler');
                     return response.result;
@@ -173,10 +179,16 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
     }
 
     async runBulkAction(action, label) {
-        const result = await action();
-        const summary = `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.`;
-        this.setState({ status: label ? `${label}: ${summary}` : summary });
-        return result;
+        if (this.state.bulkBusy) return { succeeded: 0, failed: 0 };
+        this.setState({ bulkBusy: true });
+        try {
+            const result = await action();
+            const summary = `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.`;
+            this.setState({ status: label ? `${label}: ${summary}` : summary });
+            return result;
+        } finally {
+            this.setState({ bulkBusy: false });
+        }
     }
 
     async removeEntry(entry) {
@@ -243,6 +255,11 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         }
     }
 
+    setFilter(filter) {
+        const visibleIds = new Set(filterEntries(this.state.entries, filter, { includeIgnored: this.state.showIgnored }).map(entry => entry.sourceId));
+        this.setState(state => ({ filter, selected: state.selected.filter(sourceId => visibleIds.has(sourceId)) }));
+    }
+
     getExistingGroups() {
         return Array.from(new Set(this.state.entries.map(entry => entry.derivedMetricGroupId).filter(Boolean))).sort();
     }
@@ -288,7 +305,12 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                 const state = await this.props.oContext.socket.getState(`ai-analytics.${this.props.oContext.instance}.catalogSync`);
                 if (this.unmounted) return;
                 if (!state || !state.val) return;
-                const progress = typeof state.val === 'string' ? JSON.parse(state.val) : state.val;
+                let progress;
+                try {
+                    progress = typeof state.val === 'string' ? JSON.parse(state.val) : state.val;
+                } catch (_error) {
+                    return;
+                }
                 this.setState({ progress });
                 if (progress.running === true) observedRunning = true;
                 if (observedRunning && progress.running === false && this.progressTimer) {
@@ -392,7 +414,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         const active = sort && sort.key === key;
         const indicator = active ? (sort.direction === 'asc' ? ' ▲' : ' ▼') : '';
         return (
-            <th key={key}>
+            <th scope="col" key={key}>
                 <button aria-label={`Nach ${label} sortieren`} onClick={() => this.setState({ sort: nextSortState(sort, key) })}>
                     {label}{indicator}
                 </button>
@@ -451,7 +473,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <button onClick={() => this.runCommand('runDiscoveryNow', 'Re-Scan läuft ...', 'Re-Scan abgeschlossen.')}>Geräte neu einlesen</button>
                     <button onClick={() => this.runCommand('runDiscoveryOnly', 'Sync läuft ...', 'Sync abgeschlossen.')}>Nur Updates einlesen</button>
                     <button onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
-                    <button onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle auswählen</button>
+                    <button onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle sichtbaren auswählen</button>
                     <button onClick={() => this.setState({ selected: [] })}>Auswahl aufheben</button>
                     <button type="button" aria-pressed={this.state.showIgnored} onClick={() => this.setShowIgnored(!this.state.showIgnored)}>
                         {this.state.showIgnored ? 'Ignorierte ausblenden' : 'Ignorierte anzeigen'}
@@ -465,7 +487,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                         style={{ display: 'none' }}
                         onChange={event => this.handleCsvFileSelected(event)}
                     />
-                    <input aria-label="Katalog filtern" placeholder="Filtern ..." value={this.state.filter} onChange={event => this.setState({ filter: event.target.value })} />
+                    <input aria-label="Katalog filtern" placeholder="Filtern ..." value={this.state.filter} onChange={event => this.setFilter(event.target.value)} />
                 </div>
                 {this.state.status ? <div role="status" aria-live="polite" style={{ marginBottom: 8 }}>{this.state.status}</div> : null}
                 {this.state.progress && this.state.progress.running ? <div style={{ marginBottom: 8 }}>
@@ -479,6 +501,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                 {this.state.selected.length > 0 ? (
                     <BulkEditToolbar
                         count={this.state.selected.length}
+                        busy={this.state.bulkBusy}
                         existingGroups={existingGroups}
                         onApplyField={fields => this.runBulkAction(() => this.applyToSelected(fields))}
                         onIgnore={() => this.runBulkAction(() => this.applyToSelected({ ignored: true }), 'Ignorieren')}
@@ -492,10 +515,10 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                             <tr>
-                                <th>Auswahl</th>
-                                {CATALOG_COLUMNS.filter(column => this.state.visibleColumns.includes(column.key)).map(column => column.sortable
-                                    ? this.renderSortHeader(column.key, column.label)
-                                    : <th key={column.key}>{column.label}</th>)}
+                                 <th scope="col">Auswahl</th>
+                                 {CATALOG_COLUMNS.filter(column => this.state.visibleColumns.includes(column.key)).map(column => column.sortable
+                                     ? this.renderSortHeader(column.key, column.label)
+                                     : <th scope="col" key={column.key}>{column.label}</th>)}
                             </tr>
                         </thead>
                         <tbody>{entries.map(entry => (

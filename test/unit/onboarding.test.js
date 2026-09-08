@@ -622,7 +622,7 @@ describe('runOnboarding', () => {
         expect(provider.chat.callCount).to.be.below(3);
         expect(adapter.log.warn.calledOnce).to.equal(true);
         expect(adapter.log.warn.firstCall.args[0]).to.include('Tagesbudget');
-        expect(adapter.log.error.called).to.equal(false);
+        expect(adapter.log.error.called).to.equal(true);
         expect(result.needsReview).to.deep.equal([]);
     });
 

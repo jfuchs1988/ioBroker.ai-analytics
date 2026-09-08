@@ -98,9 +98,11 @@ describe('CatalogDevicesComponent', () => {
         const view = render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
 
         await waitFor(() => expect(screen.getByRole('columnheader', { name: 'Schreibbar' })).toBeTruthy());
-        expect(screen.getByRole('columnheader', { name: 'Update-Frequenz' })).toBeTruthy();
+        expect(screen.queryByRole('columnheader', { name: 'Update-Frequenz' })).toBeNull();
 
         await user.click(screen.getByText('Spalten anzeigen/ausblenden'));
+        await user.click(screen.getByRole('checkbox', { name: 'Update-Frequenz' }));
+        expect(screen.getByRole('columnheader', { name: 'Update-Frequenz' })).toBeTruthy();
         await user.click(screen.getByRole('checkbox', { name: 'Kategorie' }));
         expect(screen.queryByRole('columnheader', { name: 'Kategorie' })).toBeNull();
 

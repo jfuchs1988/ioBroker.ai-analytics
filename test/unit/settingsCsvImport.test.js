@@ -122,7 +122,7 @@ describe('SettingsCsvComponent settings import', () => {
             maxAgentIterations: 7,
             maxToolCalls: 31,
         });
-        expect(component.state.status).to.equal('4 Settings importiert. Bitte mit Speichern übernehmen.');
+        expect(component.state.status).to.equal('4 Settings importiert und sofort übernommen.');
     });
 
     it('imports the new chat/onboarding token-limit columns as numbers', async () => {

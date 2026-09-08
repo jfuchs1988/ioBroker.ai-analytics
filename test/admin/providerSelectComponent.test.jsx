@@ -16,7 +16,10 @@ function baseOContext() {
 describe('ProviderSelectComponent', () => {
     it('renders the current provider and reports a change', async () => {
         const user = userEvent.setup();
-        const onChange = vi.fn().mockResolvedValue(undefined);
+        const onChange = vi.fn((_attr, _value, done) => {
+            if (done) done();
+            return Promise.resolve();
+        });
 
         render(
             <ProviderSelectComponent
@@ -41,7 +44,10 @@ describe('ProviderSelectComponent', () => {
 
     it('sets the OpenCode Zen base URL when opencode is selected via the urlField', async () => {
         const user = userEvent.setup();
-        const onChange = vi.fn().mockResolvedValue(undefined);
+        const onChange = vi.fn((_attr, _value, done) => {
+            if (done) done();
+            return Promise.resolve();
+        });
 
         render(
             <ProviderSelectComponent
@@ -58,10 +64,7 @@ describe('ProviderSelectComponent', () => {
         await user.selectOptions(select, 'opencode');
 
         await waitFor(() => {
-            expect(onChange).toHaveBeenCalledWith({ providerType: 'opencode' }, undefined, expect.any(Function));
-        });
-        await waitFor(() => {
-            expect(onChange).toHaveBeenCalledWith({ providerType: 'anthropic', baseUrl: 'https://opencode.ai/zen/v1' }, undefined, expect.any(Function));
+            expect(onChange).toHaveBeenCalledWith({ providerType: 'opencode', baseUrl: 'https://opencode.ai/zen/v1' }, undefined, expect.any(Function));
         });
     });
 });

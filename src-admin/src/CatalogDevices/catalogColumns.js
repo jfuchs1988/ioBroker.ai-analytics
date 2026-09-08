@@ -20,4 +20,7 @@ export const CATALOG_COLUMNS = [
     { key: 'actions', label: 'Aktionen', sortable: false, readOnly: true },
 ];
 
-export const DEFAULT_VISIBLE_COLUMNS = CATALOG_COLUMNS.map(column => column.key);
+export const DEFAULT_VISIBLE_COLUMNS = [
+    'sourceId', 'description', 'category', 'valueKind', 'unit', 'writable',
+    'room', 'ignored', 'active', 'needsReview', 'status', 'actions',
+];

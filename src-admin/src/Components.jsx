@@ -33,6 +33,16 @@ const SETTINGS_SECRET_COLUMNS = new Set(['apiKey', 'onboardingApiKey']);
 const PROVIDER_TYPES = new Set(['anthropic', 'openai', 'openrouter', 'opencode', 'local']);
 const OPENCODE_ZEN_BASE_URL = 'https://opencode.ai/zen/v1';
 const OPENCODE_ZEN_MODELS = ['mimo-v2.5-free', 'ling-3.0-flash-fin-free', 'nemotron-3-ultra-free', 'nemotron-3.5-lightning-free', 'muse-spark-1.3-contributor-free', 'muse-spark-1.2-contributor-free'];
+const SETTINGS_BOUNDS = {
+    chatMaxInputTokens: [1000, 1000000],
+    chatMaxOutputTokens: [256, 128000],
+    onboardingMaxInputTokens: [1000, 1000000],
+    onboardingMaxOutputTokens: [256, 128000],
+    maxAgentIterations: [1, 32],
+    maxToolCalls: [1, 128],
+    maxPeriodsPerRequest: [1, 1024],
+    maxPeriodsPerToolCall: [1, 120],
+};
 const MAX_CSV_FIELD_LENGTH = 4096;
 
 export function validateSettingImportValue(key, rawValue) {
@@ -40,7 +50,8 @@ export function validateSettingImportValue(key, rawValue) {
     let value = rawValue;
     if (SETTINGS_NUMBER_COLUMNS.has(key)) {
         value = value === '' ? 0 : Number(value);
-        if (!Number.isFinite(value) || value < 0 || (key === 'checkIntervalHours' && value < 1)) {
+        const bounds = SETTINGS_BOUNDS[key];
+        if (!Number.isFinite(value) || value < 0 || (key === 'checkIntervalHours' && value < 1) || (bounds && (value < bounds[0] || value > bounds[1]))) {
             throw new Error(`${key} enthält keine gültige nicht-negative Zahl.`);
         }
     }
@@ -53,12 +64,17 @@ export function validateSettingImportValue(key, rawValue) {
 export class ProviderSelectComponent extends ConfigGeneric {
     renderItem() {
         const value = (this.props.data && this.props.data[this.props.attr]) || '';
-        const urlField = this.props.attr === 'providerType' ? 'baseUrl' : this.props.attr === 'onboardingProviderType' ? 'onboardingBaseUrl' : null;
+        const attrName = Array.isArray(this.props.attr) ? this.props.attr[0] : this.props.attr;
+        const urlField = this.props.schema.urlField || (attrName === 'providerType' ? 'baseUrl' : attrName === 'onboardingProviderType' ? 'onboardingBaseUrl' : null);
         const options = [ ...(this.props.schema.includeEmpty ? [['', 'Wie oben (Chat/Pruefung)']] : []), ['anthropic', 'Anthropic'], ['openai', 'OpenAI'], ['openrouter', 'OpenRouter'], ['opencode', 'OpenCode Zen'], ['local', 'Lokal (OpenAI-kompatibel)'] ];
         return <select value={value} aria-label={this.props.schema.label || 'LLM-Provider'} onChange={async event => {
             const next = event.target.value;
-            await this.onChange(this.props.attr, next);
-            if (next === 'opencode' && urlField) await this.onChange(urlField, OPENCODE_ZEN_BASE_URL);
+            const data = { ...(this.props.data || {}), [attrName]: next };
+            if (next === 'opencode' && urlField) data[urlField] = OPENCODE_ZEN_BASE_URL;
+            await new Promise(resolve => {
+                const result = this.props.onChange(data, undefined, resolve);
+                if (result instanceof Promise) result.then(resolve).catch(resolve);
+            });
         }}>{options.map(([optionValue, label]) => <option key={optionValue} value={optionValue}>{label}</option>)}</select>;
     }
 }
@@ -90,7 +106,13 @@ export class UsageResetComponent extends ConfigGeneric {
         while (Date.now() < deadline) {
             const state = await socket.getState(`${instance}.admin.bridge`);
             if (state && state.ack === true && typeof state.val === 'string') {
-                const response = JSON.parse(state.val);
+                let response;
+                try {
+                    response = JSON.parse(state.val);
+                } catch (_error) {
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                    continue;
+                }
                 if (response.id === requestId) {
                     if (!response.ok) throw new Error(response.error || 'Zurücksetzen fehlgeschlagen.');
                     this.setState({ status: 'Tokenzähler und Kostenhistorie wurden zurückgesetzt.' });
@@ -158,7 +180,7 @@ export class SettingsCsvComponent extends ConfigGeneric {
             for (const [key, value] of importedValues) {
                 await this.onChangeAsync(key, value);
             }
-            this.setState({ status: `${imported} Settings importiert. Bitte mit Speichern übernehmen.` });
+            this.setState({ status: `${imported} Settings importiert und sofort übernommen.` });
         } catch (error) {
             this.setState({ status: `Fehler: ${error.message || error}` });
         }

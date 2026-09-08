@@ -204,12 +204,13 @@ export default class DeviceRow extends React.Component {
         const effectiveRole = pendingRole !== undefined ? pendingRole : (entry.derivedMetricRole || '');
         const hvacDisabled = entry.valueKind !== 'boolean_state';
         const visibleColumns = this.props.visibleColumns || ['sourceId', 'description', 'category', 'valueKind', 'unit', 'writable', 'room', 'status', 'actions'];
+        const detailId = `catalog-details-${encodeURIComponent(entry.sourceId)}`;
 
         return (
             <>
                 <tr>
                     <td>
-                        <button aria-label={`${entry.sourceId} Details ${expanded ? 'schließen' : 'öffnen'}`} onClick={() => this.props.onToggleExpanded()}>
+                        <button aria-label={`${entry.sourceId} Details ${expanded ? 'schließen' : 'öffnen'}`} aria-expanded={expanded} aria-controls={detailId} onClick={() => this.props.onToggleExpanded()}>
                             {expanded ? '▾' : '▸'}
                         </button>
                         <input type="checkbox" aria-label={`${entry.sourceId} auswählen`} checked={selected} onChange={() => this.props.onToggleSelected()} />
@@ -219,7 +220,7 @@ export default class DeviceRow extends React.Component {
                 {expanded ? (
                     <tr>
                         <td colSpan={visibleColumns.length + 1}>
-                            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', padding: 8 }}>
+                            <div id={detailId} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', padding: 8 }}>
                                 <label>
                                     Update-Frequenz{' '}
                                     <select aria-label={`Update-Frequenz für ${entry.sourceId}`} value={entry.updateFrequency || ''} onChange={event => this.save({ updateFrequency: event.target.value })}>

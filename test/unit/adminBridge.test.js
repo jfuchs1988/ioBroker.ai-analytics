@@ -49,6 +49,13 @@ describe('adminBridge', () => {
             expect(parseRequest(adapter, 'ai-analytics.0.other.state', state)).to.equal(null);
         });
 
+        it('rejects bridge requests written by another adapter', () => {
+            const adapter = makeAdapter();
+            const state = { val: JSON.stringify({ id: 'tab-1', command: 'listCatalogEntries' }), ack: false, from: 'system.adapter.javascript.0' };
+            expect(parseRequest(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state)).to.equal(null);
+            expect(adapter.log.warn.calledOnce).to.equal(true);
+        });
+
         it('ignores its own responses (ack=true)', () => {
             const adapter = makeAdapter();
             const state = { val: JSON.stringify({ id: 'tab-1', ok: true, result: {} }), ack: true };

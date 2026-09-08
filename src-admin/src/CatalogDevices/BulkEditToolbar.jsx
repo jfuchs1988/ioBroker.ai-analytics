@@ -88,7 +88,7 @@ export default class BulkEditToolbar extends React.Component {
     }
 
     render() {
-        const { count } = this.props;
+        const { count, busy } = this.props;
         return (
             <div role="region" aria-label="Bulk-Aktionen">
                 <span>{count} ausgewählt</span>
@@ -96,12 +96,12 @@ export default class BulkEditToolbar extends React.Component {
                     {FIELD_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
                 {this.renderValueInput()}
-                <button disabled={!this.canApply} onClick={() => this.apply()}>Auf {count} ausgewählte Geräte anwenden</button>
-                <button onClick={() => this.props.onIgnore()}>Ignorieren</button>
-                <button onClick={() => this.props.onActivate()}>Aktivieren</button>
-                <button onClick={() => this.props.onReviewComplete()}>Prüfung erledigen</button>
-                <button onClick={() => this.props.onReviewRequired()}>Prüfung wieder öffnen</button>
-                <button onClick={() => this.handleDelete()}>Löschen</button>
+                <button disabled={busy || !this.canApply} onClick={() => this.apply()}>Auf {count} ausgewählte Geräte anwenden</button>
+                <button disabled={busy} onClick={() => this.props.onIgnore()}>Ignorieren</button>
+                <button disabled={busy} onClick={() => this.props.onActivate()}>Aktivieren</button>
+                <button disabled={busy} onClick={() => this.props.onReviewComplete()}>Prüfung erledigen</button>
+                <button disabled={busy} onClick={() => this.props.onReviewRequired()}>Prüfung wieder öffnen</button>
+                <button disabled={busy} onClick={() => this.handleDelete()}>Löschen</button>
             </div>
         );
     }
