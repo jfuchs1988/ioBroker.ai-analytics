@@ -6,6 +6,7 @@ const {
     createOpenAiCompatibleProvider,
     listOpenAiCompatibleModels,
     resolveOpenAiBaseUrl,
+    toResponsesInput,
 } = require('../../lib/providers/openaiCompatible');
 const { createProvider, listModels } = require('../../lib/providers');
 
@@ -285,6 +286,20 @@ describe('openai-compatible provider', () => {
         expect(body.tools[0].name).to.equal('listCatalog');
         expect(result).to.deep.include({ content: 'Hallo', toolCalls: [{ id: 'call_1', name: 'listCatalog', input: {} }] });
         expect(result.usage).to.deep.equal({ inputTokens: 3, outputTokens: 2 });
+    });
+
+    it('keeps assistant text and tool calls when serializing Responses history', () => {
+        const input = toResponsesInput('system', [{
+            role: 'assistant',
+            content: 'Ich prüfe das jetzt.',
+            toolCalls: [{ id: 'call_1', name: 'listCatalog', input: {} }],
+        }]);
+
+        expect(input).to.deep.equal([
+            { role: 'system', content: [{ type: 'input_text', text: 'system' }] },
+            { role: 'assistant', content: [{ type: 'output_text', text: 'Ich prüfe das jetzt.' }] },
+            { type: 'function_call', call_id: 'call_1', name: 'listCatalog', arguments: '{}' },
+        ]);
     });
 
     it('normalizes custom base URLs and requires one for local providers', () => {
