@@ -9,6 +9,7 @@ const { checkProviderReachable, ensureReachabilityStates, CHAT_STATE, ONBOARDING
 const { buildTools } = require('./lib/tools');
 const { runAgent, MAX_ITERATIONS } = require('./lib/agent');
 const { getLimits } = require('./lib/limits');
+const { getTokenLimits } = require('./lib/tokenLimits');
 const { runOnboarding } = require('./lib/onboarding');
 const { ensureChatHistoryState, appendChatMessage, getRecentChatHistory } = require('./lib/chatLog');
 const { startProactiveScheduler } = require('./lib/scheduler');
@@ -175,27 +176,31 @@ class AiAnalytics extends utils.Adapter {
         await adminBridge.ensureBridgeState(this);
         await this.subscribeStatesAsync(adminBridge.BRIDGE_STATE);
 
+        const chatTokenLimits = getTokenLimits(this.config, 'chat');
         const chatProviderConfig = {
             type: this.config.providerType,
             apiKey: this.config.apiKey,
             model: this.config.model,
             baseUrl: this.config.baseUrl,
+            maxTokens: chatTokenLimits.maxOutputTokens,
         };
         this.chatProvider = this.buildProviderSafely(chatProviderConfig, 'Chat/Pruefungs-Modell');
 
+        const onboardingTokenLimits = getTokenLimits(this.config, 'onboarding');
         const onboardingProviderConfig = this.config.onboardingProviderType
             ? {
                   type: this.config.onboardingProviderType,
                   apiKey: this.config.onboardingApiKey,
                   model: this.config.onboardingModel,
                   baseUrl: this.config.onboardingBaseUrl,
+                  maxTokens: onboardingTokenLimits.maxOutputTokens,
               }
             : chatProviderConfig;
         this.onboardingProvider = this.config.onboardingProviderType
             ? this.buildProviderSafely(onboardingProviderConfig, 'Onboarding-Modell')
             : this.chatProvider;
 
-        this.runtimeLimits = getLimits(this.config);
+        this.runtimeLimits = { ...getLimits(this.config), ...chatTokenLimits };
         this.tools = buildTools(this, { limits: this.runtimeLimits });
         this.readOnlyTools = buildTools(this, { readOnly: true, limits: this.runtimeLimits });
 

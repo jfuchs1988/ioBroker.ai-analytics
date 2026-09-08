@@ -15,13 +15,17 @@ export { csvEscape, parseCsv, normalizeHeader, validateFile, parseBoolean, valid
 const SETTINGS_COLUMNS = [
     'providerType', 'baseUrl', 'model', 'apiKey',
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
+    'chatMaxInputTokens', 'chatMaxOutputTokens',
     'onboardingProviderType', 'onboardingBaseUrl', 'onboardingModel', 'onboardingApiKey',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
+    'onboardingMaxInputTokens', 'onboardingMaxOutputTokens',
     'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
 ];
 const SETTINGS_NUMBER_COLUMNS = new Set([
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
+    'chatMaxInputTokens', 'chatMaxOutputTokens',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
+    'onboardingMaxInputTokens', 'onboardingMaxOutputTokens',
     'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall',
 ]);
 const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);

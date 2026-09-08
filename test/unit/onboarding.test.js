@@ -1054,4 +1054,46 @@ describe('runOnboarding', () => {
         expect(entry.needsReview).to.equal(false);
     });
 
+    it('skips a batch whose prompt exceeds the configured onboarding input-token limit, without aborting the run', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x'.repeat(5000) } },
+        ];
+        const provider = { chat: sinon.stub() };
+        const setCatalogEntry = sinon.stub().resolves();
+        const adapter = { log: { warn: sinon.stub(), error: sinon.stub(), silly: sinon.stub() }, config: { onboardingMaxInputTokens: 100 } };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(provider.chat.called).to.equal(false);
+        expect(setCatalogEntry.called).to.equal(false);
+        expect(result.classifiedCount).to.equal(0);
+        expect(adapter.log.error.called).to.equal(true);
+    });
+
+    it('classifies normally when the prompt fits the default onboarding input-token limit', async () => {
+        const discovered = [
+            { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
+        ];
+        const provider = {
+            chat: sinon.stub().resolves({
+                content: JSON.stringify([{ sourceId: 'javascript.0.x', description: 'x', unit: '', category: 'consumption', room: '', confidence: 'high' }]),
+            }),
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const adapter = { log: { warn: sinon.stub(), error: sinon.stub(), silly: sinon.stub() }, config: {} };
+        const { runOnboarding } = loadOnboardingWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([]),
+            setCatalogEntry,
+        });
+
+        const result = await runOnboarding(adapter, provider, discovered);
+
+        expect(provider.chat.calledOnce).to.equal(true);
+        expect(result.classifiedCount).to.equal(1);
+    });
+
 });
