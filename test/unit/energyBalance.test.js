@@ -116,6 +116,17 @@ describe('findEnergyBalanceCandidates', () => {
         expect(computePeriodValue.called).to.equal(false);
     });
 
+    it('skips a group with gauge PV because it cannot provide an energy total', async () => {
+        const entries = makeGroup({ pv_generation: { valueKind: 'gauge' } });
+        const computePeriodValue = sinon.stub().resolves({ total: 0 });
+        const { findEnergyBalanceCandidates } = loadEnergyBalanceWithStubs({ computePeriodValue });
+
+        const result = await findEnergyBalanceCandidates({}, entries, 30 * 24 * 3600 * 1000);
+
+        expect(result.candidates).to.deep.equal([]);
+        expect(computePeriodValue.called).to.equal(false);
+    });
+
     it('skips a group with a duplicated required role', async () => {
         const entries = makeGroup().concat([{ sourceId: 'pv.1.total', historyInstance: 'history.0', valueKind: 'cumulative_total', derivedMetricGroupId: 'energy-1', derivedMetricRole: 'pv_generation', active: true, dataCompleteness: 'complete', description: 'Zweite PV' }]);
         const computePeriodValue = sinon.stub().resolves({ total: 0 });

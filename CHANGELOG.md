@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.56] - 2026-09-08
+
+### Geändert
+
+- `pv_generation` akzeptiert jetzt auch `gauge` für historisierte PV-Leistung.
+  Diese Werte bleiben für Tages-Min/Max/Avg verfügbar, werden aber nicht als
+  Energiezähler in Energiebilanz oder Eigenverbrauchsquote verwendet.
+
 ## [0.0.1-beta.55] - 2026-09-08
 
 ### Behoben

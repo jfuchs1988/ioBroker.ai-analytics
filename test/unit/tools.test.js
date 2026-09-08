@@ -577,4 +577,20 @@ describe('getSelfConsumption', () => {
         }
         expect(threw.message).to.include('grid_feed_in');
     });
+
+    it('rejects gauge PV values because self-consumption requires energy totals', async () => {
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([pvEntry({ valueKind: 'gauge' }), feedInEntry()]),
+        });
+        const { execute } = buildTools({});
+
+        let threw;
+        try {
+            await execute('getSelfConsumption', { periods: [{ dayOffset: -1 }] });
+        } catch (error) {
+            threw = error;
+        }
+        expect(threw).to.exist;
+        expect(threw.message).to.include('Energiezähler');
+    });
 });

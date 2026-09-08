@@ -295,6 +295,14 @@ describe('catalog', () => {
         }
     });
 
+    it('accepts pv_generation on a gauge entry for power statistics', () => {
+        const entry = validateCatalogEntry({
+            sourceId: 'x', category: 'generation_pv', valueKind: 'gauge',
+            derivedMetricRole: 'pv_generation', derivedMetricGroupId: 'energy-1',
+        });
+        expect(entry.derivedMetricRole).to.equal('pv_generation');
+    });
+
     it('rejects grid_power/battery_power on a counter entry', () => {
         expect(() => validateCatalogEntry({
             sourceId: 'x', category: 'consumption', valueKind: 'daily_reset_counter',
