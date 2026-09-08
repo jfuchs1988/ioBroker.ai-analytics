@@ -7,11 +7,12 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## WIP
 
 - Branch: `release/beta.53` (aus `origin/master` / beta.52).
-- Status: Discovery-Bridge-Timeout-Fix integriert; Release-Verifikation läuft.
+- Status: Discovery-Bridge-Timeout-Fix integriert; beta.53 ist lokal gebaut und
+  zur Veröffentlichung vorbereitet.
 
 ## TODO
 
-- `npm run test:e2e`, Paketbau, Tag und GitHub-Release für beta.53 ausführen.
+- Nach Veröffentlichung den lokalen Release-Branch aufräumen.
 - Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
   zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
 - Review-Fixwelle nach dem Claude-Session-Limit abgeschlossen: Bulk-Status wird
@@ -27,6 +28,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Release `0.0.1-beta.53` (2026-09-08): Discovery-Befehle der Admin-Geräteliste
+  erhalten bis zu 10 Minuten für die State-Bridge-Antwort; `npm test`, Lint,
+  Admin-Build, echter E2E-Test und Paketbau waren erfolgreich.
 
 - Energiebilanz-Rollen gegen `valueKind` abgesichert und um Spitzenlast-Rollen
   erweitert (2026-09-07): `derivedMetricRole` fuer die sechs Bilanz-Rollen
