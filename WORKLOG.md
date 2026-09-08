@@ -13,8 +13,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
   veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
   Responses-Unterstützung ist als beta.59 veröffentlicht; Output-Limit-
-  Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist für
-  beta.61 vorbereitet.
+  Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist als
+  beta.61 veröffentlicht.
 
 ## TODO
 
@@ -36,7 +36,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Foundry-Toolcall-Fix für beta.61 vorbereitet: Assistant-Text und
   Function-Calls werden gemeinsam in Responses-History serialisiert; 478 Unit-
-  und 60 Admin-Tests sowie Lint grün.
+  und 60 Admin-Tests, E2E und Lint grün.
 
 - Output-Token-Limit für beta.60 vorbereitet: Chat und Onboarding erlauben bis
   zu `128000`; Tests, E2E, Lint, Admin-Build und Paketbau erfolgreich.
