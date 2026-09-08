@@ -190,6 +190,48 @@ describe('openai-compatible provider', () => {
         expect(fetchStub.firstCall.args[0]).to.equal('http://localhost:1234/v1/chat/completions');
     });
 
+    it('sends max_tokens when config.maxTokens is provided (chat/completions)', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const provider = createOpenAiCompatibleProvider({ apiKey: 'key', model: 'gpt-4o-mini', maxTokens: 2048 });
+        await provider.chat({ system: 's', messages: [], tools: [] });
+
+        const body = JSON.parse(fetchStub.firstCall.args[1].body);
+        expect(body.max_tokens).to.equal(2048);
+    });
+
+    it('omits max_tokens when config.maxTokens is not provided (chat/completions)', async () => {
+        const fetchStub = sinon.stub().resolves({
+            ok: true,
+            json: async () => ({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }),
+        });
+        sinon.stub(global, 'fetch').callsFake(fetchStub);
+
+        const provider = createOpenAiCompatibleProvider({ apiKey: 'key', model: 'gpt-4o-mini' });
+        await provider.chat({ system: 's', messages: [], tools: [] });
+
+        const body = JSON.parse(fetchStub.firstCall.args[1].body);
+        expect(body).not.to.have.property('max_tokens');
+    });
+
+    it('sends max_output_tokens when config.maxTokens is provided (Responses API)', async () => {
+        const fetchStub = sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            body: null,
+            text: async () => JSON.stringify({ output: [{ type: 'message', content: [{ type: 'output_text', text: 'ok' }] }], usage: {} }),
+        });
+
+        const provider = createOpenAiCompatibleProvider({ type: 'opencode', apiKey: 'key', model: 'muse-spark-1.3-contributor-free', maxTokens: 1500 });
+        await provider.chat({ system: 's', messages: [], tools: [] });
+
+        const body = JSON.parse(fetchStub.firstCall.args[1].body);
+        expect(body.max_output_tokens).to.equal(1500);
+    });
+
     it('uses the OpenRouter API by default for the openrouter provider', async () => {
         const fetchStub = sinon.stub().resolves({
             ok: true,
