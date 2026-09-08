@@ -6,10 +6,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/energiebilanz-signierte-datenpunkte` (aus `master`), bereit
-  zum Merge.
-- Status: alle neun Tasks der Spec umgesetzt, `npm test`/`npm run lint`/
-  `npm run build:admin` grün.
+- Branch: `feature/llm-token-limits` (aus `master`), bereit zum Merge.
+- Status: alle sieben Tasks der Spec umgesetzt, `npm test`/`npm run lint` grün.
 
 ## TODO
 
@@ -29,6 +27,26 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## DONE
 
+- LLM-Token-Limits (2026-09-08): neues fokussiertes Modul `lib/tokenLimits.js`
+  (`getTokenLimits`, `estimateTokens`/`estimateRequestTokens`, zeichenbasierte
+  Heuristik ohne Tokenizer-Abhaengigkeit) loest zwei Luecken: OpenAI-kompatible
+  Provider sendeten bisher gar kein Ausgabe-Limit, Anthropic nutzte einen
+  unsichtbaren, nicht einstellbaren Fallback (2048). Vier neue Einstellungen
+  (`chatMaxInputTokens`/`chatMaxOutputTokens`/`onboardingMaxInputTokens`/
+  `onboardingMaxOutputTokens`) je Chat-/Onboarding-Modell. `runAgent`
+  (`lib/agent.js`) schaetzt vor jeder Anfrage die Eingabegroesse; bei
+  Ueberschreitung mit mindestens zwei abgeschlossenen Chat-Runden in der
+  Historie wird genau ein Kompressionsversuch unternommen (aelteste Haelfte
+  der Runden wird zusammengefasst und der verbleibenden ersten Nutzer-Nachricht
+  vorangestellt — nie als eigene Nachricht, um die user/assistant-Alternierung
+  nicht zu brechen); reicht das nicht oder gibt es keine kompaktierbare
+  Historie, ein klar definierter Fehler statt der kryptischen Provider-Meldung.
+  Bewusst keine Kompression der laufenden Werkzeug-Aufruf-Sequenz einer
+  einzelnen Frage (Risiko fuer `tool_use`/`tool_result`-Paarung). Onboarding
+  bekommt denselben Eingabe-Check ohne Kompression (kein Gespraechsverlauf
+  zum Zusammenfassen) — ueberschreitet ein Batch das Limit, wird er wie jeder
+  andere Batch-Fehler geloggt und uebersprungen. Siehe
+  [Spec](docs/specs/2026-09-08-llm-token-limits.md).
 - Energiebilanz-Rollen gegen `valueKind` abgesichert und um Spitzenlast-Rollen
   erweitert (2026-09-07): `derivedMetricRole` fuer die sechs Bilanz-Rollen
   verlangt jetzt `daily_reset_counter`/`cumulative_total` (verhindert stilles
