@@ -5,24 +5,11 @@ const proxyquire = require('proxyquire');
 const { buildBatches } = require('../../lib/onboarding');
 
 function loadOnboardingWithStubs({ getAllCatalogEntries, setCatalogEntry, recordUsage, isBudgetExceeded, classifyValueKind, classifyDataQuality }) {
-    const COUNTER_DERIVED_METRIC_ROLES = new Set(['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption']);
-    const GAUGE_DERIVED_METRIC_ROLES = new Set(['grid_power', 'battery_power']);
-    const DERIVED_METRIC_ROLES = new Set([...COUNTER_DERIVED_METRIC_ROLES, ...GAUGE_DERIVED_METRIC_ROLES]);
-    const COUNTER_VALUE_KINDS = new Set(['daily_reset_counter', 'cumulative_total']);
-
     return proxyquire('../../lib/onboarding', {
         './catalog': {
             getAllCatalogEntries,
             setCatalogEntry,
             CATEGORIES: ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'],
-            DERIVED_METRIC_ROLES,
-            HVAC_ROLES: new Set(['window', 'heating']),
-            isDerivedMetricRoleValueKindValid: (role, valueKind) => {
-                if (COUNTER_DERIVED_METRIC_ROLES.has(role)) return COUNTER_VALUE_KINDS.has(valueKind);
-                if (GAUGE_DERIVED_METRIC_ROLES.has(role)) return valueKind === 'gauge';
-                return true;
-            },
-            isHvacRoleValueKindValid: (valueKind) => valueKind === 'boolean_state',
         },
         './usage': {
             recordUsage: recordUsage || sinon.stub().resolves(),
