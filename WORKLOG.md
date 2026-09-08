@@ -10,8 +10,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 - Status: Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
-  als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind für beta.57
-  vorbereitet.
+  als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
+  veröffentlicht.
 
 ## TODO
 
@@ -33,7 +33,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Gerätefilter und Energierollen-Legende für beta.57 vorbereitet: ignorierte
   Einträge sind standardmäßig verborgen, der Schalter wird je Instanz
-  gespeichert; 474 Unit- und 59 Admin-Tests, Lint und Admin-Build grün.
+  gespeichert; 474 Unit- und 59 Admin-Tests, E2E, Lint, Admin-Build und
+  Paketbau waren erfolgreich.
 
 - Gauge-PV-Unterstützung für beta.56 vorbereitet: `pv_generation` akzeptiert
   Gauge-Werte für Leistungsstatistiken; Energiebilanz und Eigenverbrauch
