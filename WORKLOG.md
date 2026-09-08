@@ -10,7 +10,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 - Status: Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
-  für beta.56 vorbereitet.
+  als beta.56 veröffentlicht.
 
 ## TODO
 
@@ -32,7 +32,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Gauge-PV-Unterstützung für beta.56 vorbereitet: `pv_generation` akzeptiert
   Gauge-Werte für Leistungsstatistiken; Energiebilanz und Eigenverbrauch
-  ignorieren diese Werte als Nicht-Zähler.
+  ignorieren diese Werte als Nicht-Zähler; Tests, E2E, Lint, Build und Paketbau
+  waren erfolgreich.
 
 - Admin-JSON-Schema-Fix für beta.55 vorbereitet: nicht unterstützte
   `urlField`-Attribute entfernt, OpenCode-Zen-Autofill in der Komponente
