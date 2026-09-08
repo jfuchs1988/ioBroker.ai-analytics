@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.55] - 2026-09-08
+
+### Behoben
+
+- Admin-Konfiguration gegen die ioBroker-JSON-Schema-Validierung korrigiert;
+  Provider-Autofill bleibt erhalten, ohne nicht unterstützte `urlField`-Attribute
+  zu verwenden.
+
 ## [0.0.1-beta.54] - 2026-09-08
 
 ### Hinzugefügt

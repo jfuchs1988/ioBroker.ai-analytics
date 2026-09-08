@@ -53,11 +53,12 @@ export function validateSettingImportValue(key, rawValue) {
 export class ProviderSelectComponent extends ConfigGeneric {
     renderItem() {
         const value = (this.props.data && this.props.data[this.props.attr]) || '';
+        const urlField = this.props.attr === 'providerType' ? 'baseUrl' : this.props.attr === 'onboardingProviderType' ? 'onboardingBaseUrl' : null;
         const options = [ ...(this.props.schema.includeEmpty ? [['', 'Wie oben (Chat/Pruefung)']] : []), ['anthropic', 'Anthropic'], ['openai', 'OpenAI'], ['openrouter', 'OpenRouter'], ['opencode', 'OpenCode Zen'], ['local', 'Lokal (OpenAI-kompatibel)'] ];
         return <select value={value} aria-label={this.props.schema.label || 'LLM-Provider'} onChange={async event => {
             const next = event.target.value;
             await this.onChange(this.props.attr, next);
-            if (next === 'opencode' && this.props.schema.urlField) await this.onChange(this.props.schema.urlField, OPENCODE_ZEN_BASE_URL);
+            if (next === 'opencode' && urlField) await this.onChange(urlField, OPENCODE_ZEN_BASE_URL);
         }}>{options.map(([optionValue, label]) => <option key={optionValue} value={optionValue}>{label}</option>)}</select>;
     }
 }

@@ -8,7 +8,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Branch: `master`.
 - Status: Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
-  konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht.
+  konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
+  JSON-Schema-Fix ist für beta.55 vorbereitet.
 
 ## TODO
 
@@ -27,6 +28,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Admin-JSON-Schema-Fix für beta.55 vorbereitet: nicht unterstützte
+  `urlField`-Attribute entfernt, OpenCode-Zen-Autofill in der Komponente
+  erhalten; Tests, Lint und JSON-Prüfung grün.
 
 - LLM-Token-Limits für beta.54 integriert: vier neue Admin-Felder für Chat und
   Onboarding sowie Eingabe-/Ausgabe-Begrenzung in der Laufzeit; Tests, E2E,

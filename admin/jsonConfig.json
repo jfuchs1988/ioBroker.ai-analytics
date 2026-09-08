@@ -77,7 +77,6 @@
         },
         "providerType": {
           "type": "custom",
-          "urlField": "baseUrl",
           "url": "custom/customComponents.js",
           "name": "AiAnalyticsConfig/Components/ProviderSelectComponent",
           "guiApi": 2,
@@ -182,7 +181,6 @@
         "onboardingProviderType": {
           "type": "custom",
           "includeEmpty": true,
-          "urlField": "onboardingBaseUrl",
           "url": "custom/customComponents.js",
           "name": "AiAnalyticsConfig/Components/ProviderSelectComponent",
           "guiApi": 2,
