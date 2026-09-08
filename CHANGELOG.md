@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.53] - 2026-09-08
+
+### Behoben
+
+- Manuelle Discovery-Befehle der Admin-Geräteliste laufen nicht mehr nach 60
+  Sekunden ab; die State-Bridge wartet bis zu 10 Minuten auf ihre Antwort.
+
 ## [0.0.1-beta.52] - 2026-09-08
 
 ### Hinzugefügt

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CatalogDevicesComponent from '../../src-admin/src/CatalogDevices/CatalogDevicesComponent.jsx';
+import CatalogDevicesComponent, { bridgeTimeoutForCommand } from '../../src-admin/src/CatalogDevices/CatalogDevicesComponent.jsx';
 
 function makeFakeSocket(responders) {
     let lastRequest = null;
@@ -29,6 +29,12 @@ const ENTRIES = [
 describe('CatalogDevicesComponent', () => {
     beforeEach(() => {
         window.localStorage.removeItem('ai-analytics.catalogDevices.columns.0.v1');
+    });
+
+    it('waits longer for discovery commands than for normal bridge commands', () => {
+        expect(bridgeTimeoutForCommand('listCatalogEntries')).toBe(60000);
+        expect(bridgeTimeoutForCommand('runDiscoveryNow')).toBe(600000);
+        expect(bridgeTimeoutForCommand('runDiscoveryOnly')).toBe(600000);
     });
 
     it('loads and renders entries sorted by load order, then re-sorts on header click', async () => {

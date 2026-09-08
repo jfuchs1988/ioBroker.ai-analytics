@@ -9,6 +9,13 @@ import { csvEscape, parseCsv, normalizeHeader, validateFile, validateCatalogImpo
 const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'];
 const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'];
 const COLUMN_STORAGE_VERSION = 1;
+const BRIDGE_TIMEOUT_MS = 60000;
+const LONG_RUNNING_COMMAND_TIMEOUT_MS = 10 * 60 * 1000;
+const LONG_RUNNING_COMMANDS = new Set(['runDiscoveryNow', 'runDiscoveryOnly']);
+
+export function bridgeTimeoutForCommand(command) {
+    return LONG_RUNNING_COMMANDS.has(command) ? LONG_RUNNING_COMMAND_TIMEOUT_MS : BRIDGE_TIMEOUT_MS;
+}
 
 function readVisibleColumns(key) {
     try {
@@ -62,7 +69,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             val: JSON.stringify({ id: requestId, command, message }),
             ack: false,
         });
-        const deadline = Date.now() + 60000;
+        const deadline = Date.now() + bridgeTimeoutForCommand(command);
         while (Date.now() < deadline) {
             if (this.unmounted) throw new Error('Komponente wurde geschlossen.');
             const state = await socket.getState(`${instance}.admin.bridge`);

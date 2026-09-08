@@ -6,13 +6,12 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/energiebilanz-signierte-datenpunkte` (aus `master`), bereit
-  zum Merge.
-- Status: alle neun Tasks der Spec umgesetzt, `npm test`/`npm run lint`/
-  `npm run build:admin` grün.
+- Branch: `release/beta.53` (aus `origin/master` / beta.52).
+- Status: Discovery-Bridge-Timeout-Fix integriert; Release-Verifikation läuft.
 
 ## TODO
 
+- `npm run test:e2e`, Paketbau, Tag und GitHub-Release für beta.53 ausführen.
 - Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
   zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
 - Review-Fixwelle nach dem Claude-Session-Limit abgeschlossen: Bulk-Status wird
