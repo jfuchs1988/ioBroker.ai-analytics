@@ -124,4 +124,28 @@ describe('SettingsCsvComponent settings import', () => {
         });
         expect(component.state.status).to.equal('4 Settings importiert. Bitte mit Speichern übernehmen.');
     });
+
+    it('imports the new chat/onboarding token-limit columns as numbers', async () => {
+        const adapter = makeAdapter({
+            chatMaxInputTokens: 100000,
+            chatMaxOutputTokens: 4096,
+            onboardingMaxInputTokens: 100000,
+            onboardingMaxOutputTokens: 4096,
+        });
+        const component = makeComponent(adapter);
+        const file = {
+            text: async () =>
+                'chatMaxInputTokens,chatMaxOutputTokens,onboardingMaxInputTokens,onboardingMaxOutputTokens\n50000,2048,60000,3000\n',
+        };
+
+        await component.handleFileSelected({ target: { files: [file] } });
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        expect(adapter.data).to.deep.equal({
+            chatMaxInputTokens: 50000,
+            chatMaxOutputTokens: 2048,
+            onboardingMaxInputTokens: 60000,
+            onboardingMaxOutputTokens: 3000,
+        });
+    });
 });
