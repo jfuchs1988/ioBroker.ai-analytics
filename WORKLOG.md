@@ -6,13 +6,12 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `release/beta.53` (aus `origin/master` / beta.52).
-- Status: Discovery-Bridge-Timeout-Fix integriert; beta.53 ist lokal gebaut und
-  zur Veröffentlichung vorbereitet.
+- Branch: `master`.
+- Status: Discovery-Bridge-Timeout-Fix integriert und als `0.0.1-beta.53` auf
+  GitHub veröffentlicht; Verifikation und Paketbau waren erfolgreich.
 
 ## TODO
 
-- Nach Veröffentlichung den lokalen Release-Branch aufräumen.
 - Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
   zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
 - Review-Fixwelle nach dem Claude-Session-Limit abgeschlossen: Bulk-Status wird
