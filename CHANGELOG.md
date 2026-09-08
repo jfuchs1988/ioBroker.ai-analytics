@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.59] - 2026-09-08
+
+### Behoben
+
+- Microsoft-Foundry-Endpoints verwenden automatisch die aktuelle Responses
+  API unter `/openai/v1/responses` mit `max_output_tokens`.
+
 ## [0.0.1-beta.58] - 2026-09-08
 
 ### Hinzugefügt

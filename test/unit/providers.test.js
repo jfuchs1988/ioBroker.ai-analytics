@@ -294,6 +294,20 @@ describe('openai-compatible provider', () => {
         expect(() => resolveOpenAiBaseUrl('local', '')).to.throw('Basis-URL');
     });
 
+    it('uses the Foundry v1 Responses endpoint for current Azure model deployments', async () => {
+        const fetchStub = sinon.stub(global, 'fetch').resolves({
+            ok: true,
+            body: null,
+            text: async () => JSON.stringify({ output: [{ type: 'message', content: [{ type: 'output_text', text: 'ok' }] }] }),
+        });
+        const provider = createOpenAiCompatibleProvider({ type: 'local', apiKey: 'key', model: 'gpt-5.6-sol', baseUrl: 'https://resource.openai.azure.com' });
+
+        await provider.chat({ system: 's', messages: [], tools: [] });
+
+        expect(fetchStub.firstCall.args[0]).to.equal('https://resource.openai.azure.com/openai/v1/responses');
+        expect(JSON.parse(fetchStub.firstCall.args[1].body).model).to.equal('gpt-5.6-sol');
+    });
+
     it('lists only free OpenRouter models that support tools', async () => {
         const fetchStub = sinon.stub().resolves({
             ok: true,

@@ -11,7 +11,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
-  veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht.
+  veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
+  Responses-Unterstützung ist für beta.59 vorbereitet.
 
 ## TODO
 
@@ -30,6 +31,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Microsoft-Foundry-Unterstützung für beta.59 vorbereitet: Azure-Foundry-
+  Basen werden auf `/openai/v1` normalisiert und über die Responses API
+  angesprochen; 476 Unit- und 60 Admin-Tests, Lint und Admin-Build grün.
 
 - Statusaktionen für beta.58 vorbereitet: `needsReview` kann pro Zeile und
   über die Mehrfachauswahl gesetzt oder erledigt werden; Backend, Tests, Lint
