@@ -12,7 +12,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
   veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
-  Responses-Unterstützung ist für beta.59 vorbereitet.
+  Responses-Unterstützung ist als beta.59 veröffentlicht.
 
 ## TODO
 
@@ -34,7 +34,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Microsoft-Foundry-Unterstützung für beta.59 vorbereitet: Azure-Foundry-
   Basen werden auf `/openai/v1` normalisiert und über die Responses API
-  angesprochen; 476 Unit- und 60 Admin-Tests, Lint und Admin-Build grün.
+  angesprochen; 476 Unit- und 60 Admin-Tests, E2E, Lint, Admin-Build und
+  Paketbau erfolgreich.
 
 - Statusaktionen für beta.58 vorbereitet: `needsReview` kann pro Zeile und
   über die Mehrfachauswahl gesetzt oder erledigt werden; Backend, Tests, Lint
