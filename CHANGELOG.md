@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.57] - 2026-09-08
+
+### Hinzugefügt
+
+- Geräteansicht blendet ignorierte Geräte standardmäßig aus und bietet einen
+  instanzbezogen gespeicherten Schalter zum Ein-/Ausblenden.
+- Eine Legende erklärt Energiezähler- und Gauge-Leistungsrollen direkt in der
+  Geräteliste.
+
 ## [0.0.1-beta.56] - 2026-09-08
 
 ### Geändert

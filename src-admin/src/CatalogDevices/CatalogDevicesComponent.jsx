@@ -12,6 +12,17 @@ const COLUMN_STORAGE_VERSION = 1;
 const BRIDGE_TIMEOUT_MS = 60000;
 const LONG_RUNNING_COMMAND_TIMEOUT_MS = 10 * 60 * 1000;
 const LONG_RUNNING_COMMANDS = new Set(['runDiscoveryNow', 'runDiscoveryOnly']);
+const VISIBILITY_STORAGE_VERSION = 1;
+const ENERGY_ROLE_LEGEND = [
+    ['pv_generation', 'PV-Erzeugung: Energiezähler für erzeugte Energie oder Gauge-Leistung für Tages-Min/Max/Avg; Gauge-PV wird nicht als Energie summiert.'],
+    ['grid_import', 'Netzbezug: Energie, die aus dem öffentlichen Netz bezogen wurde, als Energiezähler.'],
+    ['grid_feed_in', 'Netzeinspeisung: Energie, die ins öffentliche Netz eingespeist wurde, als Energiezähler.'],
+    ['consumption', 'Verbrauch: im Haushalt oder System verbrauchte Energie, als Energiezähler.'],
+    ['battery_charge', 'Batterieladung: in die Batterie geladene Energie, als Energiezähler.'],
+    ['battery_discharge', 'Batterieentladung: aus der Batterie entnommene Energie, als Energiezähler.'],
+    ['grid_power', 'Netzleistung: aktuelle Leistung am Netzanschlusspunkt, als Gauge in W/kW.'],
+    ['battery_power', 'Batterieleistung: aktuelle Lade-/Entladeleistung, als Gauge in W/kW.'],
+];
 
 export function bridgeTimeoutForCommand(command) {
     return LONG_RUNNING_COMMANDS.has(command) ? LONG_RUNNING_COMMAND_TIMEOUT_MS : BRIDGE_TIMEOUT_MS;
@@ -31,12 +42,22 @@ function readVisibleColumns(key) {
     }
 }
 
+function readStoredBoolean(key, fallback) {
+    try {
+        const stored = window.localStorage.getItem(key);
+        return stored === null ? fallback : stored === 'true';
+    } catch (_error) {
+        return fallback;
+    }
+}
+
 export default class CatalogDevicesComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
         const instance = props.oContext && props.oContext.instance !== undefined ? props.oContext.instance : 'default';
         this.columnStorageKey = `ai-analytics.catalogDevices.columns.${instance}.v${COLUMN_STORAGE_VERSION}`;
-        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null, visibleColumns: readVisibleColumns(this.columnStorageKey) };
+        this.visibilityStorageKey = `ai-analytics.catalogDevices.showIgnored.${instance}.v${VISIBILITY_STORAGE_VERSION}`;
+        this.state = { ...this.state, entries: [], filter: '', loading: true, status: '', progress: null, selected: [], expandedRows: new Set(), sort: null, visibleColumns: readVisibleColumns(this.columnStorageKey), showIgnored: readStoredBoolean(this.visibilityStorageKey, false) };
         this.fileInputRef = React.createRef();
         this.progressTimer = null;
         this.loadGeneration = 0;
@@ -205,6 +226,21 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
 
     resetVisibleColumns() {
         this.setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
+    }
+
+    setShowIgnored(showIgnored) {
+        this.setState(state => ({
+            showIgnored,
+            selected: showIgnored ? state.selected : state.selected.filter(sourceId => {
+                const entry = state.entries.find(candidate => candidate.sourceId === sourceId);
+                return entry && !entry.ignored;
+            }),
+        }));
+        try {
+            window.localStorage.setItem(this.visibilityStorageKey, String(showIgnored));
+        } catch (_error) {
+            // A restricted browser storage must not disable the device table.
+        }
     }
 
     getExistingGroups() {
@@ -387,8 +423,25 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         );
     }
 
+    renderEnergyRoleLegend() {
+        return (
+            <details open style={{ marginBottom: 12 }}>
+                <summary>Legende: Energie- und Leistungsrollen</summary>
+                <dl style={{ margin: '8px 0', display: 'grid', gridTemplateColumns: 'minmax(130px, 1fr) 3fr', gap: '4px 12px' }}>
+                    {ENERGY_ROLE_LEGEND.map(([role, description]) => <React.Fragment key={role}>
+                        <dt><b>{role}</b></dt>
+                        <dd style={{ margin: 0 }}>{description}</dd>
+                    </React.Fragment>)}
+                </dl>
+                <div style={{ fontSize: 12 }}>
+                    Energiezähler werden für Energiebilanz und Eigenverbrauch verwendet. Gauge-Werte beschreiben Leistung zu einem Zeitpunkt und liefern Tages-Min/Max/Avg, aber keine Energie-Summe.
+                </div>
+            </details>
+        );
+    }
+
     renderItem() {
-        const filtered = filterEntries(this.state.entries, this.state.filter);
+        const filtered = filterEntries(this.state.entries, this.state.filter, { includeIgnored: this.state.showIgnored });
         const entries = sortEntries(filtered, this.state.sort);
         const existingGroups = this.getExistingGroups();
 
@@ -400,6 +453,9 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <button onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
                     <button onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle auswählen</button>
                     <button onClick={() => this.setState({ selected: [] })}>Auswahl aufheben</button>
+                    <button type="button" aria-pressed={this.state.showIgnored} onClick={() => this.setShowIgnored(!this.state.showIgnored)}>
+                        {this.state.showIgnored ? 'Ignorierte ausblenden' : 'Ignorierte anzeigen'}
+                    </button>
                     <button onClick={() => this.exportCsv()}>Als CSV exportieren</button>
                     <button onClick={() => this.triggerCsvImport()}>CSV importieren</button>
                     <input
@@ -418,6 +474,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     <span>{this.state.progress.total ? Math.round((this.state.progress.processed / this.state.progress.total) * 100) : 0}%</span>
                 </div> : null}
                 <div style={{ marginBottom: 8, fontSize: 12 }}>Verhalten: <b>Gauge</b> = kontinuierlicher Messwert, z. B. Temperatur. Update-Frequenz, Vollständigkeit sowie Energie-/HVAC-Rolle stehen im aufklappbaren Detail-Panel jeder Zeile (▸). Räume sind freie Eingaben.</div>
+                {this.renderEnergyRoleLegend()}
                 {this.renderColumnSelector()}
                 {this.state.selected.length > 0 ? (
                     <BulkEditToolbar

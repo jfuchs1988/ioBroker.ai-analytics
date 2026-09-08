@@ -7,10 +7,11 @@ export function statusLabel(entry) {
     return 'aktiv';
 }
 
-export function filterEntries(entries, query) {
+export function filterEntries(entries, query, { includeIgnored = true } = {}) {
     const q = (query || '').trim().toLowerCase();
-    if (!q) return entries;
-    return entries.filter(entry =>
+    const visibleEntries = includeIgnored ? entries : entries.filter(entry => !entry.ignored);
+    if (!q) return visibleEntries;
+    return visibleEntries.filter(entry =>
         [entry.sourceId, entry.description, entry.category, entry.room, entry.valueKind]
             .filter(Boolean)
             .join(' ')

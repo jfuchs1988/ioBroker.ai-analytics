@@ -25,10 +25,12 @@ const ENTRIES = [
     { sourceId: 'javascript.0.b', description: 'Bravo', category: 'lighting', valueKind: 'boolean_state', room: 'Keller' },
     { sourceId: 'javascript.0.a', description: 'Alpha', category: 'consumption', valueKind: 'gauge', room: 'Wohnzimmer' },
 ];
+const IGNORED_ENTRY = { sourceId: 'javascript.0.ignored', description: 'Ignored', category: 'lighting', valueKind: 'gauge', ignored: true };
 
 describe('CatalogDevicesComponent', () => {
     beforeEach(() => {
         window.localStorage.removeItem('ai-analytics.catalogDevices.columns.0.v1');
+        window.localStorage.removeItem('ai-analytics.catalogDevices.showIgnored.0.v1');
     });
 
     it('waits longer for discovery commands than for normal bridge commands', () => {
@@ -49,6 +51,31 @@ describe('CatalogDevicesComponent', () => {
         await user.click(screen.getByLabelText('Nach Objekt-ID sortieren'));
         const rowsAfter = screen.getAllByRole('row').slice(1).map(row => row.textContent);
         expect(rowsAfter[0]).toContain('javascript.0.a');
+    });
+
+    it('hides ignored entries by default and toggles their visibility with persistence', async () => {
+        const user = userEvent.setup();
+        const socket = makeFakeSocket({ listCatalogEntries: () => ({ entries: [...ENTRIES, IGNORED_ENTRY] }) });
+        const view = render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
+
+        await waitFor(() => expect(screen.getByText('javascript.0.b')).toBeTruthy());
+        expect(screen.queryByText('javascript.0.ignored')).toBeNull();
+        await user.click(screen.getByRole('button', { name: 'Ignorierte anzeigen' }));
+        expect(screen.getByText('javascript.0.ignored')).toBeTruthy();
+        view.unmount();
+        render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
+        await waitFor(() => expect(screen.getByText('javascript.0.ignored')).toBeTruthy());
+        await user.click(screen.getByRole('button', { name: 'Ignorierte ausblenden' }));
+        expect(screen.queryByText('javascript.0.ignored')).toBeNull();
+    });
+
+    it('shows the energy role legend with counter and gauge explanations', async () => {
+        const socket = makeFakeSocket({ listCatalogEntries: () => ({ entries: ENTRIES }) });
+        render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
+
+        await waitFor(() => expect(screen.getByText('Legende: Energie- und Leistungsrollen')).toBeTruthy());
+        expect(screen.getByText(/PV-Erzeugung: Energiezähler/)).toBeTruthy();
+        expect(screen.getByText(/Gauge-Werte beschreiben Leistung/)).toBeTruthy();
     });
 
     it('renders one body cell per header cell for every default-visible column', async () => {
