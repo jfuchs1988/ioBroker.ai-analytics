@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.54] - 2026-09-08
+
+### Hinzugefügt
+
+- Konfigurierbare maximale Input- und Output-Tokens für Chat- und
+  Onboarding-Modell, inklusive Eingabegrößenprüfung und sicherer Begrenzung
+  der Provider-Anfragen.
+
 ## [0.0.1-beta.53] - 2026-09-08
 
 ### Behoben
