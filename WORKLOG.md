@@ -12,7 +12,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
   veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
-  Responses-Unterstützung ist als beta.59 veröffentlicht.
+  Responses-Unterstützung ist als beta.59 veröffentlicht; Output-Limit-
+  Erweiterung ist für beta.60 vorbereitet.
 
 ## TODO
 
@@ -31,6 +32,9 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Output-Token-Limit für beta.60 vorbereitet: Chat und Onboarding erlauben bis
+  zu `128000`; Tests, Lint und Admin-Build grün.
 
 - Microsoft-Foundry-Unterstützung für beta.59 vorbereitet: Azure-Foundry-
   Basen werden auf `/openai/v1` normalisiert und über die Responses API

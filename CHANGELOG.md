@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.60] - 2026-09-08
+
+### Geändert
+
+- Maximales Output-Token-Limit für Chat und Onboarding von `32768` auf
+  `128000` erhöht, passend zu aktuellen Microsoft-Foundry-Deployments.
+
 ## [0.0.1-beta.59] - 2026-09-08
 
 ### Behoben

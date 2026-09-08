@@ -30,6 +30,11 @@ describe('tokenLimits', () => {
             expect(getTokenLimits({ chatMaxOutputTokens: 99999999 }, 'chat').maxOutputTokens).to.equal(TOKEN_LIMIT_BOUNDS.maxOutputTokens.max);
         });
 
+        it('allows the 128000-token output limit supported by current Foundry deployments', () => {
+            expect(TOKEN_LIMIT_BOUNDS.maxOutputTokens.max).to.equal(128000);
+            expect(getTokenLimits({ chatMaxOutputTokens: 128000 }, 'chat').maxOutputTokens).to.equal(128000);
+        });
+
         it('falls back to the default for a non-numeric or missing value', () => {
             expect(getTokenLimits({ chatMaxInputTokens: 'not-a-number' }, 'chat').maxInputTokens).to.equal(TOKEN_LIMIT_DEFAULTS.maxInputTokens);
             expect(getTokenLimits({}, 'chat').maxOutputTokens).to.equal(TOKEN_LIMIT_DEFAULTS.maxOutputTokens);
