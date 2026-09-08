@@ -823,6 +823,7 @@ class AiAnalytics extends utils.Adapter {
         const adminCommandHandlers = {
             listProviderModels: () => adminCommands.listProviderModels(this, message),
             listCatalogEntries: () => adminCommands.listCatalogEntries(this),
+            resetUsage: () => adminCommands.resetUsage(this),
             updateCatalogEntryAdmin: () => adminCommands.updateCatalogEntryAdmin(this, message),
             removeCatalogEntry: () => adminCommands.removeCatalogEntry(this, message),
             runDiscoveryNow: () => adminCommands.runDiscoveryNow(this),

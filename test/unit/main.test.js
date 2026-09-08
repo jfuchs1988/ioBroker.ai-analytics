@@ -99,6 +99,7 @@ describe('AiAnalytics command dispatch', () => {
         const commands = [
             ['listProviderModels', 'listProviderModels', { providerType: 'openrouter' }],
             ['listCatalogEntries', 'listCatalogEntries', undefined],
+            ['resetUsage', 'resetUsage', undefined],
             ['updateCatalogEntryAdmin', 'updateCatalogEntryAdmin', { sourceId: 'x' }],
             ['removeCatalogEntry', 'removeCatalogEntry', { sourceId: 'x' }],
             ['runDiscoveryNow', 'runDiscoveryNow', undefined],

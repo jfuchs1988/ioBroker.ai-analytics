@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.62] - 2026-09-08
+
+### Behoben
+
+- `resetUsage` ist jetzt im zentralen Admin-Dispatcher verdrahtet und
+  funktioniert auch über die State-Bridge.
+
 ## [0.0.1-beta.61] - 2026-09-08
 
 ### Behoben
