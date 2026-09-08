@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.58] - 2026-09-08
+
+### Hinzugefügt
+
+- Statusaktionen in der Geräteliste: Einzelne Geräte können als geprüft
+  markiert oder wieder prüfpflichtig gesetzt werden; beide Aktionen sind auch
+  über die Mehrfachauswahl verfügbar.
+
 ## [0.0.1-beta.57] - 2026-09-08
 
 ### Hinzugefügt

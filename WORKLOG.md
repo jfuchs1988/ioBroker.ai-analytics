@@ -11,7 +11,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
-  veröffentlicht.
+  veröffentlicht; Statusaktionen sind für beta.58 vorbereitet.
 
 ## TODO
 
@@ -30,6 +30,10 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Statusaktionen für beta.58 vorbereitet: `needsReview` kann pro Zeile und
+  über die Mehrfachauswahl gesetzt oder erledigt werden; Backend, Tests, Lint
+  und Admin-Build grün.
 
 - Gerätefilter und Energierollen-Legende für beta.57 vorbereitet: ignorierte
   Einträge sind standardmäßig verborgen, der Schalter wird je Instanz

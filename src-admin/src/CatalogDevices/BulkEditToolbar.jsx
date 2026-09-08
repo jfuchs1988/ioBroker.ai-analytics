@@ -99,6 +99,8 @@ export default class BulkEditToolbar extends React.Component {
                 <button disabled={!this.canApply} onClick={() => this.apply()}>Auf {count} ausgewählte Geräte anwenden</button>
                 <button onClick={() => this.props.onIgnore()}>Ignorieren</button>
                 <button onClick={() => this.props.onActivate()}>Aktivieren</button>
+                <button onClick={() => this.props.onReviewComplete()}>Prüfung erledigen</button>
+                <button onClick={() => this.props.onReviewRequired()}>Prüfung wieder öffnen</button>
                 <button onClick={() => this.handleDelete()}>Löschen</button>
             </div>
         );

@@ -92,6 +92,20 @@ describe('adminCommands', () => {
             expect(sillyStub.firstCall.args[0]).to.include('javascript.0.x');
         });
 
+        it('updates needsReview directly from the admin UI', async () => {
+            const existing = { sourceId: 'javascript.0.x', category: 'lighting', needsReview: true, ignored: false, active: true };
+            const setCatalogEntry = sinon.stub().resolves();
+            const { updateCatalogEntryAdmin } = loadAdminCommandsWithStubs({
+                getAllCatalogEntries: sinon.stub().resolves([existing]),
+                setCatalogEntry,
+            });
+
+            const result = await updateCatalogEntryAdmin({}, { sourceId: existing.sourceId, needsReview: false });
+
+            expect(result.entry.needsReview).to.equal(false);
+            expect(setCatalogEntry.firstCall.args[1].needsReview).to.equal(false);
+        });
+
         it('allows a partial update (only ignored, no category/room change)', async () => {
             const existing = { sourceId: 'javascript.0.x', category: 'lighting', room: 'Keller', needsReview: false, ignored: false, active: true };
             const setCatalogEntry = sinon.stub().resolves();

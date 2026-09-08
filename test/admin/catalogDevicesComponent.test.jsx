@@ -144,4 +144,17 @@ describe('CatalogDevicesComponent', () => {
 
         await waitFor(() => expect(updateSpy).toHaveBeenCalledWith({ sourceId: 'javascript.0.a', category: 'lighting' }));
     });
+
+    it('sends a needsReview update from the bulk toolbar', async () => {
+        const user = userEvent.setup();
+        const updateSpy = vi.fn(() => ({ entry: {} }));
+        const socket = makeFakeSocket({ listCatalogEntries: () => ({ entries: ENTRIES }), updateCatalogEntryAdmin: updateSpy });
+        render(<CatalogDevicesComponent schema={{}} data={{}} attr="catalogDevices" onChange={() => {}} onError={() => {}} oContext={baseOContext(socket)} />);
+
+        await waitFor(() => expect(screen.getByText('javascript.0.a')).toBeTruthy());
+        await user.click(screen.getByLabelText('javascript.0.a auswählen'));
+        await user.click(screen.getByRole('button', { name: 'Prüfung erledigen' }));
+
+        await waitFor(() => expect(updateSpy).toHaveBeenCalledWith({ sourceId: 'javascript.0.a', needsReview: false }));
+    });
 });

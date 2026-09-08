@@ -158,7 +158,12 @@ export default class DeviceRow extends React.Component {
                 {entry.ignored ? 'Ja' : 'Nein'} <button onClick={() => this.save({ ignored: !entry.ignored })}>{entry.ignored ? 'Aktivieren' : 'Ignorieren'}</button>{this.feedback('ignored')}
             </td>;
             case 'active': return <td key={column}>{entry.active === false ? 'Nein' : 'Ja'}</td>;
-            case 'needsReview': return <td key={column}>{entry.needsReview ? 'Ja' : 'Nein'}</td>;
+            case 'needsReview': return <td key={column}>
+                {entry.needsReview ? 'Ja' : 'Nein'}{' '}
+                <button onClick={() => this.save({ needsReview: !entry.needsReview })}>
+                    {entry.needsReview ? 'Als geprüft markieren' : 'Prüfung wieder öffnen'}
+                </button>{this.feedback('needsReview')}
+            </td>;
             case 'writePattern': return <td key={column}>{entry.writePattern || ''}</td>;
             case 'updateFrequency': return <td key={column}>
                 <select aria-label={`Update-Frequenz für ${entry.sourceId}`} value={entry.updateFrequency || ''} onChange={event => this.save({ updateFrequency: event.target.value })}>

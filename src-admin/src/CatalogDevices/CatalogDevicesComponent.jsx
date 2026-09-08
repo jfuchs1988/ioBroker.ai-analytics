@@ -483,6 +483,8 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                         onApplyField={fields => this.runBulkAction(() => this.applyToSelected(fields))}
                         onIgnore={() => this.runBulkAction(() => this.applyToSelected({ ignored: true }), 'Ignorieren')}
                         onActivate={() => this.runBulkAction(() => this.applyToSelected({ ignored: false }), 'Aktivieren')}
+                        onReviewComplete={() => this.runBulkAction(() => this.applyToSelected({ needsReview: false }), 'Prüfung erledigt')}
+                        onReviewRequired={() => this.runBulkAction(() => this.applyToSelected({ needsReview: true }), 'Prüfung wieder geöffnet')}
                         onDelete={() => this.runBulkAction(() => this.deleteSelected(), 'Löschen')}
                     />
                 ) : null}
