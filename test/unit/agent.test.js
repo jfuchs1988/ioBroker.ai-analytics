@@ -238,4 +238,177 @@ describe('runAgent', () => {
             expect(error).to.be.an('error');
         }
     });
+
+    describe('input token limit', () => {
+        function tinyLimits() {
+            return { maxInputTokens: 50 }; // ~200 chars total budget — trivially exceeded by the fixtures below
+        }
+
+        it('throws without calling the provider when there is no compactable history', async () => {
+            const provider = { chat: sinon.stub() };
+            const tools = { definitions: [], execute: sinon.stub() };
+
+            let error;
+            try {
+                await runAgent({
+                    provider,
+                    tools,
+                    systemPrompt: 'x'.repeat(300),
+                    userMessage: 'Frage',
+                    limits: tinyLimits(),
+                });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error.message).to.include('Eingabe-Token-Limit');
+            expect(provider.chat.called).to.equal(false);
+        });
+
+        it('throws without calling the provider when priorMessages has fewer than 2 complete rounds', async () => {
+            const provider = { chat: sinon.stub() };
+            const tools = { definitions: [], execute: sinon.stub() };
+
+            let error;
+            try {
+                await runAgent({
+                    provider,
+                    tools,
+                    systemPrompt: 's',
+                    userMessage: 'Frage',
+                    priorMessages: [
+                        { role: 'user', content: 'x'.repeat(300) },
+                        { role: 'assistant', content: 'x'.repeat(300) },
+                    ],
+                    limits: tinyLimits(),
+                });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error.message).to.include('Eingabe-Token-Limit');
+            expect(provider.chat.called).to.equal(false);
+        });
+
+        it('compacts the oldest half of complete rounds once, prepends the summary, and proceeds', async () => {
+            const priorMessages = [
+                { role: 'user', content: 'alte Frage 1 ' + 'x'.repeat(80) },
+                { role: 'assistant', content: 'alte Antwort 1 ' + 'x'.repeat(80) },
+                { role: 'user', content: 'alte Frage 2 ' + 'x'.repeat(80) },
+                { role: 'assistant', content: 'alte Antwort 2 ' + 'x'.repeat(80) },
+            ];
+            const chat = sinon.stub();
+            chat.onCall(0).callsFake(async ({ system, messages, tools }) => {
+                expect(system).to.include('Fasse');
+                expect(messages).to.deep.equal(priorMessages.slice(0, 2));
+                expect(tools).to.deep.equal([]);
+                return { role: 'assistant', content: 'Kurze Zusammenfassung.', toolCalls: [], usage: { inputTokens: 5, outputTokens: 3 } };
+            });
+            chat.onCall(1).callsFake(async ({ messages }) => {
+                expect(messages[0].content).to.include('[Zusammenfassung des bisherigen Verlaufs]: Kurze Zusammenfassung.');
+                expect(messages[0].content).to.include('alte Frage 2');
+                expect(messages[1]).to.deep.equal(priorMessages[3]);
+                expect(messages[2]).to.deep.equal({ role: 'user', content: 'neue Frage' });
+                return { role: 'assistant', content: 'Antwort.', toolCalls: [], usage: { inputTokens: 7, outputTokens: 4 } };
+            });
+            const tools = { definitions: [], execute: sinon.stub() };
+
+            const result = await runAgent({
+                provider: { chat },
+                tools,
+                systemPrompt: 's',
+                userMessage: 'neue Frage',
+                priorMessages,
+                limits: { maxInputTokens: 100 },
+            });
+
+            expect(result.finalText).to.equal('Antwort.');
+            expect(chat.callCount).to.equal(2);
+            expect(result.usage).to.deep.equal({ inputTokens: 12, outputTokens: 7 });
+        });
+
+        it('throws if the estimate still exceeds the limit after compaction', async () => {
+            const priorMessages = [
+                { role: 'user', content: 'x'.repeat(80) },
+                { role: 'assistant', content: 'x'.repeat(80) },
+                { role: 'user', content: 'x'.repeat(80) },
+                { role: 'assistant', content: 'y'.repeat(2000) }, // kept round stays huge even after compaction
+            ];
+            const chat = sinon.stub();
+            chat.onCall(0).resolves({ role: 'assistant', content: 'Zusammenfassung.', toolCalls: [], usage: { inputTokens: 1, outputTokens: 1 } });
+            const tools = { definitions: [], execute: sinon.stub() };
+
+            let error;
+            try {
+                await runAgent({
+                    provider: { chat },
+                    tools,
+                    systemPrompt: 's',
+                    userMessage: 'Frage',
+                    priorMessages,
+                    limits: tinyLimits(),
+                });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error.message).to.include('Eingabe-Token-Limit');
+            expect(chat.callCount).to.equal(1); // only the compaction attempt, never the real request
+        });
+
+        it('throws if the compaction call itself fails, without a second attempt', async () => {
+            const priorMessages = [
+                { role: 'user', content: 'x'.repeat(300) },
+                { role: 'assistant', content: 'x'.repeat(300) },
+                { role: 'user', content: 'x'.repeat(300) },
+                { role: 'assistant', content: 'x'.repeat(300) },
+            ];
+            const chat = sinon.stub().rejects(new Error('Provider nicht erreichbar.'));
+            const tools = { definitions: [], execute: sinon.stub() };
+
+            let error;
+            try {
+                await runAgent({
+                    provider: { chat },
+                    tools,
+                    systemPrompt: 's',
+                    userMessage: 'Frage',
+                    priorMessages,
+                    limits: tinyLimits(),
+                });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error.message).to.include('Eingabe-Token-Limit');
+            expect(chat.callCount).to.equal(1);
+        });
+
+        it('throws mid-loop when the growing tool-call sequence alone exceeds the limit, without attempting compaction', async () => {
+            const bigToolResult = { data: 'x'.repeat(500) };
+            const chat = sinon.stub();
+            chat.onCall(0).resolves({
+                role: 'assistant', content: '',
+                toolCalls: [{ id: 'call_1', name: 'getHistory', input: {} }],
+                usage: { inputTokens: 1, outputTokens: 1 },
+            });
+            const tools = { definitions: [{ name: 'getHistory' }], execute: sinon.stub().resolves(bigToolResult) };
+
+            let error;
+            try {
+                await runAgent({
+                    provider: { chat },
+                    tools,
+                    systemPrompt: 's',
+                    userMessage: 'Frage',
+                    limits: tinyLimits(),
+                });
+            } catch (caught) {
+                error = caught;
+            }
+
+            expect(error.message).to.include('Eingabe-Token-Limit');
+            expect(chat.callCount).to.equal(1); // the first call succeeded; the second (mid-loop) never happens
+        });
+    });
 });
