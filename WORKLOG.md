@@ -16,7 +16,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist als
   beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert; die erste
   Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
-  für beta.64 vorbereitet.
+  als beta.64 veröffentlicht.
 
 ## TODO
 
@@ -38,7 +38,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - Zweite Review-Fixwelle für beta.64 vorbereitet: lokale Tagesgrenzen,
   deterministische Discovery, Gauge-Vergleiche, strikte Onboarding-Antworten,
-  Katalog-Synchronisierung und Bulk-Fehlerdetails korrigiert.
+  Katalog-Synchronisierung und Bulk-Fehlerdetails korrigiert; Tests, E2E,
+  Lint, Admin-Build und Paketbau erfolgreich.
 
 - Whole-Review-Fixwelle für beta.63 vorbereitet: 481 Unit- und 60 Admin-Tests,
   Lint und Admin-Build grün; korrigiert wurden History-/Zähler-/Boolean-
