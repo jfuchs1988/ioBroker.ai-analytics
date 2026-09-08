@@ -13,7 +13,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
   veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
   Responses-Unterstützung ist als beta.59 veröffentlicht; Output-Limit-
-  Erweiterung ist für beta.60 vorbereitet.
+  Erweiterung ist als beta.60 veröffentlicht.
 
 ## TODO
 
@@ -34,7 +34,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 ## DONE
 
 - Output-Token-Limit für beta.60 vorbereitet: Chat und Onboarding erlauben bis
-  zu `128000`; Tests, Lint und Admin-Build grün.
+  zu `128000`; Tests, E2E, Lint, Admin-Build und Paketbau erfolgreich.
 
 - Microsoft-Foundry-Unterstützung für beta.59 vorbereitet: Azure-Foundry-
   Basen werden auf `/openai/v1` normalisiert und über die Responses API
