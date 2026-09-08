@@ -241,7 +241,7 @@ class AiAnalytics extends utils.Adapter {
     async syncCatalog(options = {}) {
         if (this.catalogSyncPromise) throw new Error('Eine Katalog-Synchronisierung läuft bereits.');
         if (this.chatRunPromise || this.proactiveCheckPromise) throw new Error('Eine KI-Anfrage läuft bereits.');
-        const run = this.executeCatalogSync(options);
+        const run = adminCommands.withCatalogMutation(this, () => this.executeCatalogSync(options));
         this.catalogSyncPromise = run;
         try {
             return await run;

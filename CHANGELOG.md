@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.64] - 2026-09-08
+
+### Behoben
+
+- Weitere Review-Korrekturen für Tagesgrenzen, Discovery-Auswahl,
+  Gauge-Vergleiche, Onboarding-Antworten, Katalog-Synchronisierung und
+  Bulk-Fehlerdetails.
+
 ## [0.0.1-beta.63] - 2026-09-08
 
 ### Behoben

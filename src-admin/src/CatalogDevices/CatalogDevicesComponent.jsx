@@ -146,36 +146,40 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         const selected = this.state.selected;
         let succeeded = 0;
         const failedIds = [];
+        const errors = [];
         for (const sourceId of selected) {
             try {
                 const response = await this.callAdapter('updateCatalogEntryAdmin', { sourceId, ...fields });
                 if (response && response.error) throw new Error(response.error);
                 succeeded += 1;
-            } catch (_error) {
+            } catch (error) {
                 failedIds.push(sourceId);
+                errors.push(`${sourceId}: ${error.message || String(error)}`);
             }
         }
         this.setState({ selected: failedIds });
         await this.loadEntries();
-        return { succeeded, failed: failedIds.length };
+        return { succeeded, failed: failedIds.length, errors };
     }
 
     async deleteSelected() {
         const selected = this.state.selected;
         let succeeded = 0;
         const failedIds = [];
+        const errors = [];
         for (const sourceId of selected) {
             try {
                 const response = await this.callAdapter('removeCatalogEntry', { sourceId });
                 if (response && response.error) throw new Error(response.error);
                 succeeded += 1;
-            } catch (_error) {
+            } catch (error) {
                 failedIds.push(sourceId);
+                errors.push(`${sourceId}: ${error.message || String(error)}`);
             }
         }
         this.setState({ selected: failedIds });
         await this.loadEntries();
-        return { succeeded, failed: failedIds.length };
+        return { succeeded, failed: failedIds.length, errors };
     }
 
     async runBulkAction(action, label) {
@@ -183,7 +187,8 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         this.setState({ bulkBusy: true });
         try {
             const result = await action();
-            const summary = `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.`;
+            const details = result.errors && result.errors.length ? ` ${result.errors.slice(0, 3).join(' | ')}` : '';
+            const summary = `${result.succeeded} gespeichert, ${result.failed} fehlgeschlagen.${details}`;
             this.setState({ status: label ? `${label}: ${summary}` : summary });
             return result;
         } finally {
