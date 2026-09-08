@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.63] - 2026-09-08
+
+### Behoben
+
+- Review-Fixes für History-Truncation, Counter-Resets, Boolean-/HVAC-Zustände,
+  Provider-Health, Onboarding-Teilantworten, Bridge-Verarbeitung,
+  Bulk-Aktionen, CSV-Validierung und Admin-Accessibility.
+
 ## [0.0.1-beta.62] - 2026-09-08
 
 ### Behoben

@@ -14,7 +14,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
   Responses-Unterstützung ist als beta.59 veröffentlicht; Output-Limit-
   Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist als
-  beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert.
+  beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert; die erste
+  Whole-Review-Fixwelle ist für beta.63 vorbereitet.
 
 ## TODO
 
@@ -33,6 +34,11 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Whole-Review-Fixwelle für beta.63 vorbereitet: 481 Unit- und 60 Admin-Tests,
+  Lint und Admin-Build grün; korrigiert wurden History-/Zähler-/Boolean-
+  Semantik, Provider-/Onboarding-Grenzen, Bridge-/Lifecycle-Robustheit,
+  Bulk-/CSV-Verhalten und Accessibility-Grundlagen.
 
 - `resetUsage` für beta.62 im zentralen Admin-Dispatcher verdrahtet und mit
   Routing-/Usage-Tests abgesichert; E2E und Paketbau erfolgreich.

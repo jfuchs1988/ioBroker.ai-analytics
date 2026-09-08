@@ -177,6 +177,7 @@ export class SettingsCsvComponent extends ConfigGeneric {
                 importedValues.push([key, value]);
                 imported++;
             });
+            if (!importedValues.length) throw new Error('Settings-CSV enthält keine bekannten Einstellungen.');
             for (const [key, value] of importedValues) {
                 await this.onChangeAsync(key, value);
             }

@@ -369,6 +369,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             const fieldIndexes = CSV_EDITABLE_COLUMNS.map(field => ({ field, index: header.indexOf(field) })).filter(
                 entry => entry.index !== -1
             );
+            if (!fieldIndexes.length) throw new Error('CSV-Header enthält keine bearbeitbare Spalte.');
 
             const dataRows = rows.slice(1);
             let updatedCount = 0;
@@ -386,7 +387,8 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                 try {
                     const values = {};
                     fieldIndexes.forEach(({ field, index }) => {
-                        if (row[index] === undefined || row[index] === '') return;
+                        if (row[index] === undefined) return;
+                        if (row[index] === '' && !['description', 'room'].includes(field)) return;
                         values[field] = validateCatalogImportValue(field, row[index]);
                     });
                     const response = await this.callAdapter('updateCatalogEntryAdmin', { sourceId, ...values });

@@ -116,7 +116,7 @@ describe('buildTools', () => {
         const periodB = { start: 1, end: 2 };
         const result = await execute('compareTimeframes', { sourceId: 'javascript.0.x', periodA, periodB });
 
-        expect(compareStub.calledOnceWith(adapter, 'influxdb.0', 'javascript.0.x', periodA, periodB)).to.equal(true);
+        expect(compareStub.calledOnceWith(adapter, 'influxdb.0', 'javascript.0.x', periodA, periodB, 'average', undefined)).to.equal(true);
         expect(result).to.deep.equal({ description: undefined, room: undefined, unit: undefined, deltaSum: 5 });
     });
 
