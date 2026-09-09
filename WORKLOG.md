@@ -17,7 +17,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert; die erste
   Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
   als beta.64 veröffentlicht; Findings 1 bis 13 sind als beta.65 behoben;
-  Resthärtung 1 bis 6 ist für beta.66 vorbereitet.
+  Resthärtung 1 bis 6 ist als beta.66 veröffentlicht.
 
 ## TODO
 
