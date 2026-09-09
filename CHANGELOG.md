@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.72] - 2026-09-09
+
+### Behoben
+
+- Boolean-Datenqualitäts-Backfill und HVAC/valueKind-Bereinigung vollständig
+  in den versionierten Release-Stand übernommen.
+
+## [0.0.1-beta.71] - 2026-09-09
+
+### Behoben
+
+- Boolean-History wird bei Datenqualitäts-Backfills typgerecht abgefragt;
+  HVAC-/valueKind-Änderungen bereinigen veraltete HVAC-Rollen automatisch.
+
 ## [0.0.1-beta.70] - 2026-09-09
 
 ### Behoben
