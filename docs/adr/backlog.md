@@ -32,7 +32,7 @@ Details: `docs/specs/2026-09-04-teststrategie-main-und-admin-ui.md`.
 
 ## 4. Technische Durchsetzung des Lizenz-/Sponsoring-Modells (Referenzprojekt)
 
-Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, 35 Tage Token, 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements.
+Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, technischer Tokenablauf = `sponsorUntil` (korrigiert 2026-09-10, siehe ADR-0027-Korrektur und Backend-ADR 0004; vormals fälschlich als separates 35-Tage-Fenster dokumentiert), 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements. Die Backend-Gegenseite (Aktivierung, OAuth, Persistenz) ist jetzt in `ioBroker.AiAnalytics.Backend` spezifiziert (Phase 0, 2026-09-10).
 
 ## 5. CI-Aktivierung — gelöst (bewusst gegen CI entschieden)
 

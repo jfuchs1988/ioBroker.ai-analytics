@@ -96,9 +96,10 @@ aktives Logging über History, InfluxDB und SQL:
 Das Repository enthält einen MIT-lizenzierten Kern und separat dokumentierte
 `sponsor-required`-KI-Komponenten. Alle `-beta`-Versionen bleiben kostenlos.
 Die technische Entitlement-Policy startet mit `0.1.0`: Eine separate
-Sponsoring-Webanwendung stellt Ed25519-signierte JWS-Tokens aus. Sie sind
-technisch 35 Tage gültig, stehen für 30 Tage Sponsoring und haben eine
-30-tägige Grace-Period. Danach bleibt eine Chat-Anfrage pro lokalem Tag
+Sponsoring-Webanwendung stellt Ed25519-signierte JWS-Tokens aus. Sie stehen
+für 30 Tage Sponsoring, der technische Tokenablauf entspricht genau diesem
+Zeitraum, und es gibt eine 30-tägige Grace-Period danach. Danach bleibt eine
+Chat-Anfrage pro lokalem Tag
 möglich; proaktive KI-Prüfungen werden deaktiviert. Tokens sind nicht an eine
 Instanz gebunden.
 

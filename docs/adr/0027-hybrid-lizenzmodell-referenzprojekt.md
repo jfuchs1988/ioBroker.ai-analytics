@@ -50,3 +50,13 @@ Integrationen sponsor-pflichtig sind.
 ADR-0018 wird für die Gesamt-Lizenzierung durch diese Entscheidung ersetzt.
 Die dort beschlossene technische Nichtdurchsetzung bleibt bis zur neuen
 Entitlement-Spezifikation als Zwischenstand bestehen.
+
+## Korrektur (2026-09-10)
+
+Die "35 Tage technische Token-Gültigkeit" oben ist durch das Backend-Team
+verworfen worden (Backend-ADR 0004): Der technische Tokenablauf (`exp`)
+entspricht jetzt exakt `sponsorUntil`, ohne separaten Pufferzeitraum. Kein
+Codechange in diesem Repository nötig, da `lib/license.js` Grace bereits aus
+`sponsorUntil` statt `exp` berechnet. Siehe
+[Spec](../specs/2026-09-03-hybrid-license-and-entitlements.md) und
+`docs/agents/licensing.md` für den aktuellen Stand.

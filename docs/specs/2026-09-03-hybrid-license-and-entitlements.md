@@ -18,11 +18,12 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
 - Tokens werden über eine separate Webanwendung ausgestellt.
 - Das Format ist ein signiertes JWS/JWT mit `EdDSA` auf Ed25519-Basis. Der
   Adapter enthält nur den öffentlichen Schlüssel.
-- Die offizielle Sponsoring-Periode beträgt 30 Tage. Das Token hat 35 Tage
-  technische Gültigkeit als Übergangspuffer.
+- Die offizielle Sponsoring-Periode beträgt 30 Tage. Der technische
+  Tokenablauf (`exp`) entspricht exakt `sponsorUntil`; es gibt keinen
+  separaten technischen Pufferzeitraum (Backend-ADR 0004).
 - Die 30-Tage-Grace-Period beginnt mit dem Ende der offiziellen Sponsoring-
-  Periode, nicht erst mit dem technischen Tokenablauf. Die fünf zusätzlichen
-  Token-Tage liegen damit innerhalb der Grace-Period.
+  Periode, also mit `sponsorUntil` und damit auch mit dem technischen
+  Tokenablauf.
 - Nach Ablauf von Token und Grace-Period bleibt eine Chat-Anfrage pro Tag
   möglich. Proaktive KI-Prüfungen werden in diesem eingeschränkten Zustand
   nicht ausgeführt.

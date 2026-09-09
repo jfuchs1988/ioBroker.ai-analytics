@@ -28,8 +28,8 @@ The intended standard channel is GitHub Sponsors:
 https://github.com/sponsors/jfuchs1988
 
 The entitlement contract uses offline-verifiable Ed25519 JWS tokens, 30 days of
-sponsorship, 35 days of technical token validity and a 30-day grace period from
-the end of sponsorship. After grace, one chat request per local day remains
+sponsorship with a technical token expiry equal to that period, and a 30-day
+grace period from the end of sponsorship. After grace, one chat request per local day remains
 available and proactive AI checks are disabled. Tokens are not instance-bound.
 See the [entitlement specification](../docs/specs/2026-09-03-hybrid-license-and-entitlements.md)
 for the complete contract.
