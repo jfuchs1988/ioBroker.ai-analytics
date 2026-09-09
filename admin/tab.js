@@ -719,6 +719,7 @@ function bridgeCall(command, message, timeoutMs) {
                 }
                 throw new Error(parsed.error || 'Unbekannter Fehler (State-Bridge)');
             }
+            if (state && state.ack === true) await bridgeEmitRequest(requestId, command, message);
             await sleep(BRIDGE_POLL_INTERVAL_MS);
         }
         throw new Error(`Keine Antwort auf '${command}' über die State-Bridge nach ${timeoutMs} ms`);

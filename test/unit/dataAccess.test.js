@@ -107,19 +107,19 @@ describe('dataAccess', () => {
         })).to.equal(true);
     });
 
-    it('getHistory passes a fixed safe count (2000) for raw aggregates (none/onchange)', async () => {
+    it('requests one extra raw point to detect truncation safely', async () => {
         const adapter = { sendToAsync: sinon.stub().resolves({ result: [] }) };
 
         await getHistory(adapter, 'influxdb.0', 'shelly.0.x', 0, 1000, 'none');
 
         expect(adapter.sendToAsync.calledOnceWith('influxdb.0', 'getHistory', {
             id: 'shelly.0.x',
-            options: { start: 0, end: 1000, aggregate: 'none', count: 2000 },
+            options: { start: 0, end: 1000, aggregate: 'none', count: 2001 },
         })).to.equal(true);
     });
 
     it('warns when a raw (none/onchange) result hits the count limit, suggesting truncation', async () => {
-        const filledResult = Array.from({ length: 2000 }, (unused, i) => ({ ts: i, val: i }));
+        const filledResult = Array.from({ length: 2001 }, (unused, i) => ({ ts: i, val: i }));
         const warnStub = sinon.stub();
         const adapter = { log: { warn: warnStub }, sendToAsync: sinon.stub().resolves({ result: filledResult }) };
 

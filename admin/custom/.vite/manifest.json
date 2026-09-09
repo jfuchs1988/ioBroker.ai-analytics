@@ -14,15 +14,15 @@
     "name": "remoteEntry",
     "src": "../virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-DAzJQnKA.js"
+      "_chunk-DOktGlV7.js"
     ]
   },
   "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js": {
-    "file": "assets/chunk-Bz3TzXl9.js",
+    "file": "assets/chunk-tcpocV-0.js",
     "name": "virtualExposes",
     "src": "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-B6UoquBB.js"
+      "_chunk-gbvznxnp.js"
     ]
   },
   "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1": {
@@ -51,16 +51,6 @@
       "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1"
     ]
   },
-  "_chunk-B6UoquBB.js": {
-    "file": "assets/chunk-B6UoquBB.js",
-    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
-    "imports": [
-      "_chunk-B7qeedMF.js"
-    ],
-    "dynamicImports": [
-      "src/Components.js"
-    ]
-  },
   "_chunk-B7qeedMF.js": {
     "file": "assets/chunk-B7qeedMF.js",
     "name": "vite-preload-helper"
@@ -69,8 +59,8 @@
     "file": "assets/chunk-C0FnF6B9.js",
     "name": "rolldown-runtime"
   },
-  "_chunk-DAzJQnKA.js": {
-    "file": "assets/chunk-DAzJQnKA.js",
+  "_chunk-DOktGlV7.js": {
+    "file": "assets/chunk-DOktGlV7.js",
     "name": "virtual_mf-REMOTE_ENTRY_ID___mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
       "_chunk-B7qeedMF.js",
@@ -88,6 +78,16 @@
       "_chunk-C0FnF6B9.js"
     ]
   },
+  "_chunk-gbvznxnp.js": {
+    "file": "assets/chunk-gbvznxnp.js",
+    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
+    "imports": [
+      "_chunk-B7qeedMF.js"
+    ],
+    "dynamicImports": [
+      "src/Components.js"
+    ]
+  },
   "_chunk-iA33aMeH.js": {
     "file": "assets/chunk-iA33aMeH.js",
     "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__1__loadShare___mf_0_iobroker_mf_1_json_mf_2_config__loadShare__.js",
@@ -101,7 +101,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-YSFxuziI.js",
+    "file": "assets/index-bfNHv5pQ.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -111,14 +111,14 @@
     ]
   },
   "src/Components.js": {
-    "file": "assets/chunk-S008aiWW.js",
+    "file": "assets/chunk-Wi9Khtnz.js",
     "name": "Components",
     "src": "src/Components.js",
     "isEntry": true,
     "imports": [
-      "_chunk-B6UoquBB.js",
+      "_chunk-gbvznxnp.js",
       "_chunk-iA33aMeH.js",
-      "_chunk-DAzJQnKA.js",
+      "_chunk-DOktGlV7.js",
       "_chunk-DjLodWHf.js"
     ]
   }

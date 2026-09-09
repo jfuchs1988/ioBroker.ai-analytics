@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.69",
+    "version": "0.0.1-beta.70",
     "titleLang": {
       "en": "AI Analytics", "de": "AI Analytics", "ru": "AI Analytics", "pt": "AI Analytics",
       "nl": "AI Analytics", "fr": "AI Analytics", "it": "AI Analytics", "es": "AI Analytics",
@@ -46,6 +46,7 @@
     "globalDependencies": [{ "admin": ">=7.0.0" }],
     "tier": 3,
     "news": {
+      "0.0.1-beta.70": { "en": "History, bridge, counter, Boolean, CSV, and catalog edge cases hardened after the beta69 review.", "de": "History-, Bridge-, Zähler-, Boolean-, CSV- und Katalog-Grenzfälle nach dem beta69-Review gehärtet." },
       "0.0.1-beta.69": { "en": "Settings CSV now accepts valid fractional prices and current package news metadata is synchronized.", "de": "Der Settings-CSV-Import akzeptiert jetzt gültige Dezimalpreise und die aktuellen Paket-News sind synchronisiert." },
       "0.0.1-beta.68": { "en": "Release metadata and German/English configuration documentation synchronized with current token and context-window settings.", "de": "Release-Metadaten sowie deutsche und englische Konfigurationsdokumentation an die aktuellen Token- und Kontextfenster-Einstellungen angeglichen." },
       "0.0.1-beta.67": { "en": "Deep review fixes: configurable context-window token budgets, reliable usage accounting, safer history/onboarding handling, and corrected catalog/admin validation.", "de": "Deep-Review-Fixes: konfigurierbare Kontextfenster-Tokenbudgets, zuverlässige Usage-Erfassung, robustere History-/Onboarding-Verarbeitung und korrigierte Katalog-/Admin-Validierung." },

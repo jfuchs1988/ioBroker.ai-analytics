@@ -10,7 +10,7 @@ const MAX_CSV_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_CSV_ROWS = 10000;
 const MAX_CSV_FIELD_LENGTH = 4096;
 export const MAX_SOURCE_ID_LENGTH = 512;
-const MAX_ROOM_LENGTH = 200;
+const MAX_ROOM_LENGTH = 256;
 const MAX_DESCRIPTION_LENGTH = 2000;
 
 function spreadsheetSafe(value) {

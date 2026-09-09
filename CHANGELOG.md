@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.70] - 2026-09-09
+
+### Behoben
+
+- Weitere Review-Grenzfälle für Chat-History, Tageszähler, Bridge-Antworten,
+  Boolean-Zeiträume, Eigenverbrauchspaare, Raumlängen und CSV-IDs behoben.
+
 ## [0.0.1-beta.69] - 2026-09-09
 
 ### Behoben

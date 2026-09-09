@@ -204,7 +204,7 @@ describe('adminCommands', () => {
             ['updateFrequency', 'sometimes'],
             ['dataCompleteness', 'maybe'],
             ['ignored', 'true'],
-            ['room', 'x'.repeat(201)],
+            ['room', 'x'.repeat(257)],
             ['description', 'x'.repeat(2001)],
             ['derivedMetricRole', 'not-a-role'],
             ['hvacRole', 'not-a-role'],

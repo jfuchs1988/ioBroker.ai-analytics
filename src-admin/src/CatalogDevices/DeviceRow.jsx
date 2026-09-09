@@ -8,7 +8,7 @@ const HVAC_ROLES = ['window', 'heating'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
 const MAX_DESCRIPTION_LENGTH = 2000;
-const MAX_ROOM_LENGTH = 200;
+const MAX_ROOM_LENGTH = 256;
 const FIELD_OK_TIMEOUT_MS = 3000;
 
 function statusLabelOf(entry) {

@@ -730,7 +730,11 @@ class AiAnalytics extends utils.Adapter {
         }
 
         const priorEntries = await getRecentChatHistory(this, 10);
-        const priorMessages = priorEntries.map((entry) => ({ role: entry.role, content: entry.text }));
+        const priorMessages = [];
+        for (const entry of priorEntries) {
+            const expectedRole = priorMessages.length % 2 === 0 ? 'user' : 'assistant';
+            if (entry.role === expectedRole && typeof entry.text === 'string') priorMessages.push({ role: entry.role, content: entry.text });
+        }
         await appendChatMessage(this, 'user', question);
 
         await this.updateChatProgressState({

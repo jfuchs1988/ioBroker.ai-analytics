@@ -119,6 +119,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     if (!response.ok) throw new Error(response.error || 'Unbekannter Fehler');
                     return response.result;
                 }
+                await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id: requestId, command, message }), ack: false });
             }
             await new Promise(resolve => setTimeout(resolve, 400));
         }
@@ -395,7 +396,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             const rowErrors = [];
             for (let i = 0; i < dataRows.length; i++) {
                 const row = dataRows[i];
-                const sourceId = row[sourceIdIndex];
+                const sourceId = typeof row[sourceIdIndex] === 'string' ? row[sourceIdIndex].trim() : row[sourceIdIndex];
                 if (!sourceId) {
                     errorCount++;
                     rowErrors.push(`Zeile ${i + 2}: sourceId fehlt`);
