@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.65",
+    "version": "0.0.1-beta.66",
     "titleLang": {
       "en": "AI Analytics", "de": "AI Analytics", "ru": "AI Analytics", "pt": "AI Analytics",
       "nl": "AI Analytics", "fr": "AI Analytics", "it": "AI Analytics", "es": "AI Analytics",
@@ -96,7 +96,9 @@
      "maxToolCalls": 32,
      "maxPeriodsPerRequest": 256,
      "maxPeriodsPerToolCall": 72,
-    "licenseToken": ""
+     "enableValueKindBackfill": false,
+     "enableDataQualityBackfill": false,
+     "licenseToken": ""
   },
   "objects": [],
   "instanceObjects": []

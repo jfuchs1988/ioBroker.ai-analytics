@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.66] - 2026-09-09
+
+### Behoben
+
+- Restliche Review-Punkte 1 bis 6 weiter gehärtet: Bridge-Senderprüfung,
+  transportübergreifende Bridge-Vermeidung, History-/Counter-Grenzen,
+  Provider-Retry und Startup-Recovery.
+
 ## [0.0.1-beta.65] - 2026-09-08
 
 ### Behoben

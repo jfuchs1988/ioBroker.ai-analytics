@@ -697,6 +697,7 @@ function parseBridgeResponse(state, requestId) {
 }
 
 let bridgeQueue = Promise.resolve();
+const BRIDGE_ONLY_COMMANDS = new Set(['updateCatalogEntryAdmin', 'removeCatalogEntry', 'resetUsage']);
 
 /**
  * Ein Befehl ueber den State-Bridge-Kanal. Anfragen werden serialisiert, damit sich
@@ -741,7 +742,7 @@ async function callAdapter(command, message) {
 
     const bridgeTimeoutMs = SLOW_COMMANDS.includes(command) ? BRIDGE_TIMEOUT_SLOW_MS : BRIDGE_TIMEOUT_FAST_MS;
 
-    if (!SLOW_COMMANDS.includes(command)) {
+    if (!SLOW_COMMANDS.includes(command) && !BRIDGE_ONLY_COMMANDS.has(command)) {
         try {
             const response = await emitSendTo(command, message, SENDTO_TIMEOUT_MS);
             console.log(`[ai-analytics tab] '${command}' über sendTo beantwortet.`);

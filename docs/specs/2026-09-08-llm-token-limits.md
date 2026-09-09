@@ -55,9 +55,9 @@ wie die bestehenden Preisfelder (`chatPricePerMillionInputTokens` /
 | Feld | Default | Grenzen | Bedeutung |
 |---|---|---|---|
 | `chatMaxInputTokens` | 100000 | 1000–1000000 | Sicherheitsmarge für die geschätzte Eingabegröße (Chat/proaktive Prüfung) |
-| `chatMaxOutputTokens` | 4096 | 256–32768 | An den Provider gesendetes Ausgabe-Limit (Chat/proaktive Prüfung) |
+| `chatMaxOutputTokens` | 4096 | 256–128000 | An den Provider gesendetes Ausgabe-Limit (Chat/proaktive Prüfung) |
 | `onboardingMaxInputTokens` | 100000 | 1000–1000000 | Sicherheitsmarge für die geschätzte Eingabegröße (Onboarding-Klassifikation) |
-| `onboardingMaxOutputTokens` | 4096 | 256–32768 | An den Provider gesendetes Ausgabe-Limit (Onboarding-Klassifikation) |
+| `onboardingMaxOutputTokens` | 4096 | 256–128000 | An den Provider gesendetes Ausgabe-Limit (Onboarding-Klassifikation) |
 
 **Bewusste Verhaltensänderung:** Der heutige faktische Anthropic-Output-Cap
 ist 2048 (hartkodierter Fallback in `lib/providers/anthropic.js`, da

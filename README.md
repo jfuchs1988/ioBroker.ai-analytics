@@ -58,6 +58,9 @@ Configure the adapter in the ioBroker Admin UI:
 - Optional independent onboarding provider
 - Proactive-check interval and silent/no-result behavior
 - Daily budget in EUR and manually maintained token prices
+- Separate Chat/Onboarding input and output token limits (1,000–1,000,000
+  input; 256–128,000 output)
+- Agent safety limits for iterations, tool calls, and requested periods
 - Optional value-kind and data-quality backfills
 - Sponsorship entitlement token for the future stable release policy
 

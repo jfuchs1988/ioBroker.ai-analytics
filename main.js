@@ -76,6 +76,7 @@ class AiAnalytics extends utils.Adapter {
         this.proactiveCheckPromise = null;
         this.catalogSyncPromise = null;
         this.bridgeStateChangePromise = Promise.resolve();
+        this.requireTrustedBridgeSender = true;
         this.licenseState = { status: 'beta', fullAccess: true };
         this.runtimeLimits = getLimits(this.config || {});
     }
@@ -164,6 +165,20 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async onReady() {
+        try {
+            await this.initializeRuntime();
+        } catch (error) {
+            this.log.error(`Adapter-Initialisierung fehlgeschlagen: ${error && error.message ? error.message : String(error)}`);
+            this.chatProviderOk = false;
+            this.onboardingProviderOk = false;
+            await Promise.allSettled([
+                this.setStateAsync(CHAT_STATE, { val: false, ack: true }),
+                this.setStateAsync(ONBOARDING_STATE, { val: false, ack: true }),
+            ]);
+        }
+    }
+
+    async initializeRuntime() {
         await ensureChatHistoryState(this);
         await ensureUsageState(this);
         await refreshTodaySummary(this);

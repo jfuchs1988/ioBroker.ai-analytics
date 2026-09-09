@@ -25,7 +25,7 @@ function makeAdapter(overrides = {}) {
 describe('adminBridge', () => {
     describe('ensureBridgeState', () => {
         it('creates the bridge state with write enabled', async () => {
-            const adapter = makeAdapter();
+            const adapter = makeAdapter({ requireTrustedBridgeSender: true });
             await ensureBridgeState(adapter);
             expect(adapter.setObjectNotExistsAsync.calledOnce).to.equal(true);
             const [id, obj] = adapter.setObjectNotExistsAsync.firstCall.args;
@@ -50,10 +50,16 @@ describe('adminBridge', () => {
         });
 
         it('rejects bridge requests written by another adapter', () => {
-            const adapter = makeAdapter();
+            const adapter = makeAdapter({ requireTrustedBridgeSender: true });
             const state = { val: JSON.stringify({ id: 'tab-1', command: 'listCatalogEntries' }), ack: false, from: 'system.adapter.javascript.0' };
             expect(parseRequest(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state)).to.equal(null);
             expect(adapter.log.warn.calledOnce).to.equal(true);
+        });
+
+        it('rejects missing sender metadata when strict bridge authorization is enabled', () => {
+            const adapter = makeAdapter({ requireTrustedBridgeSender: true });
+            const state = { val: JSON.stringify({ id: 'tab-1', command: 'listCatalogEntries' }), ack: false };
+            expect(parseRequest(adapter, `ai-analytics.0.${BRIDGE_STATE}`, state)).to.equal(null);
         });
 
         it('ignores its own responses (ack=true)', () => {
