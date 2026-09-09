@@ -16,16 +16,20 @@ const SETTINGS_COLUMNS = [
     'providerType', 'baseUrl', 'model', 'apiKey',
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'chatMaxInputTokens', 'chatMaxOutputTokens',
+    'chatContextWindowTokens',
     'onboardingProviderType', 'onboardingBaseUrl', 'onboardingModel', 'onboardingApiKey',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
     'onboardingMaxInputTokens', 'onboardingMaxOutputTokens',
+    'onboardingContextWindowTokens',
     'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
 ];
 const SETTINGS_NUMBER_COLUMNS = new Set([
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
     'chatMaxInputTokens', 'chatMaxOutputTokens',
+    'chatContextWindowTokens',
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
     'onboardingMaxInputTokens', 'onboardingMaxOutputTokens',
+    'onboardingContextWindowTokens',
     'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall',
 ]);
 const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
@@ -36,8 +40,10 @@ const OPENCODE_ZEN_MODELS = ['mimo-v2.5-free', 'ling-3.0-flash-fin-free', 'nemot
 const SETTINGS_BOUNDS = {
     chatMaxInputTokens: [1000, 1000000],
     chatMaxOutputTokens: [256, 128000],
+    chatContextWindowTokens: [4096, 2000000],
     onboardingMaxInputTokens: [1000, 1000000],
     onboardingMaxOutputTokens: [256, 128000],
+    onboardingContextWindowTokens: [4096, 2000000],
     maxAgentIterations: [1, 32],
     maxToolCalls: [1, 128],
     maxPeriodsPerRequest: [1, 1024],
@@ -58,7 +64,7 @@ export function validateSettingImportValue(key, rawValue) {
     if (SETTINGS_NUMBER_COLUMNS.has(key)) {
         value = value === '' ? 0 : Number(value);
         const bounds = SETTINGS_BOUNDS[key];
-        if (!Number.isFinite(value) || value < 0 || (key === 'checkIntervalHours' && value < 1) || (bounds && (value < bounds[0] || value > bounds[1]))) {
+        if (!Number.isSafeInteger(value) || value < 0 || (key === 'checkIntervalHours' && value < 1) || (bounds && (value < bounds[0] || value > bounds[1]))) {
             throw new Error(`${key} enthält keine gültige nicht-negative Zahl.`);
         }
     }
