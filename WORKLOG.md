@@ -16,7 +16,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist als
   beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert; die erste
   Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
-  als beta.64 veröffentlicht.
+  als beta.64 veröffentlicht; Findings 1 bis 13 sind für beta.65 vorbereitet.
 
 ## TODO
 
@@ -35,6 +35,11 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Findings 1 bis 13 für beta.65 vorbereitet: History-/Counter-Auswertung,
+  Provider-Modelllisten, HVAC-Grenzen, Katalog-/Bridge-Rennen, CSV-Atomicity,
+  Leerwerte und Formularaktionen korrigiert; 481 Unit- und 60 Admin-Tests,
+  Lint und Admin-Build grün.
 
 - Zweite Review-Fixwelle für beta.64 vorbereitet: lokale Tagesgrenzen,
   deterministische Discovery, Gauge-Vergleiche, strikte Onboarding-Antworten,

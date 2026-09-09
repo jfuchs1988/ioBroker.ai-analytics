@@ -75,6 +75,14 @@ function makeAdapter(initialData) {
             return data;
         },
         onChange(attr, newValue, cb) {
+            if (attr && typeof attr === 'object') {
+                setTimeout(() => {
+                    data = { ...attr };
+                    applyOrder.push('merged');
+                    cb && cb();
+                }, 0);
+                return Promise.resolve();
+            }
             const staleBase = { ...data };
             setTimeout(() => {
                 data = { ...staleBase, [attr]: newValue };
@@ -104,6 +112,7 @@ describe('SettingsCsvComponent settings import', () => {
             dailyBudgetEur: 0,
             maxAgentIterations: 8,
             maxToolCalls: 32,
+            chatPricePerMillionInputTokens: 1,
         });
         const component = makeComponent(adapter);
         const file = {
@@ -121,6 +130,7 @@ describe('SettingsCsvComponent settings import', () => {
             dailyBudgetEur: 999,
             maxAgentIterations: 7,
             maxToolCalls: 31,
+            chatPricePerMillionInputTokens: 1,
         });
         expect(component.state.status).to.equal('4 Settings importiert und sofort übernommen.');
     });

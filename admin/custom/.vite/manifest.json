@@ -14,15 +14,15 @@
     "name": "remoteEntry",
     "src": "../virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-Dq__a0U-.js"
+      "_chunk-F61ivgMG.js"
     ]
   },
   "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js": {
-    "file": "assets/chunk-BmtFtgxg.js",
+    "file": "assets/chunk-B499S2T3.js",
     "name": "virtualExposes",
     "src": "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-B4O4CAlU.js"
+      "_chunk-ChWuoiGI.js"
     ]
   },
   "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1": {
@@ -51,16 +51,6 @@
       "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1"
     ]
   },
-  "_chunk-B4O4CAlU.js": {
-    "file": "assets/chunk-B4O4CAlU.js",
-    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
-    "imports": [
-      "_chunk-B7qeedMF.js"
-    ],
-    "dynamicImports": [
-      "src/Components.js"
-    ]
-  },
   "_chunk-B7qeedMF.js": {
     "file": "assets/chunk-B7qeedMF.js",
     "name": "vite-preload-helper"
@@ -69,6 +59,16 @@
     "file": "assets/chunk-C0FnF6B9.js",
     "name": "rolldown-runtime"
   },
+  "_chunk-ChWuoiGI.js": {
+    "file": "assets/chunk-ChWuoiGI.js",
+    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
+    "imports": [
+      "_chunk-B7qeedMF.js"
+    ],
+    "dynamicImports": [
+      "src/Components.js"
+    ]
+  },
   "_chunk-DjLodWHf.js": {
     "file": "assets/chunk-DjLodWHf.js",
     "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__1__loadShare___mf_0_iobroker_mf_1_gui_mf_2_components__loadShare__.js",
@@ -76,8 +76,8 @@
       "_chunk-C0FnF6B9.js"
     ]
   },
-  "_chunk-Dq__a0U-.js": {
-    "file": "assets/chunk-Dq__a0U-.js",
+  "_chunk-F61ivgMG.js": {
+    "file": "assets/chunk-F61ivgMG.js",
     "name": "virtual_mf-REMOTE_ENTRY_ID___mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
       "_chunk-B7qeedMF.js",
@@ -101,7 +101,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-BE_6YkgB.js",
+    "file": "assets/index-9NzjNbGm.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -111,14 +111,14 @@
     ]
   },
   "src/Components.js": {
-    "file": "assets/chunk-DEVCJfwx.js",
+    "file": "assets/chunk-TPxPqp8n.js",
     "name": "Components",
     "src": "src/Components.js",
     "isEntry": true,
     "imports": [
-      "_chunk-B4O4CAlU.js",
+      "_chunk-ChWuoiGI.js",
       "_chunk-iA33aMeH.js",
-      "_chunk-Dq__a0U-.js",
+      "_chunk-F61ivgMG.js",
       "_chunk-DjLodWHf.js"
     ]
   }

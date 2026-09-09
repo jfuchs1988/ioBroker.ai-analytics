@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.65] - 2026-09-08
+
+### Behoben
+
+- Review-Fixes 1 bis 13 abgeschlossen: Counter-/History-Felder,
+  Provider-Modelllisten, HVAC-Grenzen, Katalog-/Bridge-Rennen, CSV-Importe
+  und Formularaktionen korrigiert.
+
 ## [0.0.1-beta.64] - 2026-09-08
 
 ### Behoben

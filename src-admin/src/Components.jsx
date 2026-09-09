@@ -45,6 +45,13 @@ const SETTINGS_BOUNDS = {
 };
 const MAX_CSV_FIELD_LENGTH = 4096;
 
+function getStateWithTimeout(socket, id, timeoutMs = 5000) {
+    return Promise.race([
+        socket.getState(id),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('State-Bridge-Abfrage hat zu lange gedauert.')), timeoutMs)),
+    ]);
+}
+
 export function validateSettingImportValue(key, rawValue) {
     if (rawValue.length > MAX_CSV_FIELD_LENGTH) throw new Error(`${key} ist zu lang.`);
     let value = rawValue;
@@ -104,7 +111,13 @@ export class UsageResetComponent extends ConfigGeneric {
         await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id: requestId, command: 'resetUsage', message: {} }), ack: false });
         const deadline = Date.now() + 60000;
         while (Date.now() < deadline) {
-            const state = await socket.getState(`${instance}.admin.bridge`);
+            let state;
+            try {
+                state = await getStateWithTimeout(socket, `${instance}.admin.bridge`);
+            } catch (_error) {
+                await new Promise(resolve => setTimeout(resolve, 400));
+                continue;
+            }
             if (state && state.ack === true && typeof state.val === 'string') {
                 let response;
                 try {
@@ -126,7 +139,7 @@ export class UsageResetComponent extends ConfigGeneric {
 
     renderItem() {
         return <div>
-            <button onClick={() => this.reset().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Tokenzähler zurücksetzen</button>
+            <button type="button" onClick={() => this.reset().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Tokenzähler zurücksetzen</button>
             <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status || 'Setzt usage.today und usage.history zurück.'}</span>
         </div>;
     }
@@ -178,9 +191,18 @@ export class SettingsCsvComponent extends ConfigGeneric {
                 imported++;
             });
             if (!importedValues.length) throw new Error('Settings-CSV enthält keine bekannten Einstellungen.');
-            for (const [key, value] of importedValues) {
-                await this.onChangeAsync(key, value);
+            const merged = { ...(this.props.data || {}) };
+            importedValues.forEach(([key, value]) => { merged[key] = value; });
+            if (Number(merged.dailyBudgetEur) > 0 &&
+                Number(merged.chatPricePerMillionInputTokens || 0) + Number(merged.chatPricePerMillionOutputTokens || 0) +
+                Number(merged.onboardingPricePerMillionInputTokens || 0) + Number(merged.onboardingPricePerMillionOutputTokens || 0) <= 0) {
+                throw new Error('Ein Tagesbudget erfordert mindestens einen Tokenpreis.');
             }
+            await new Promise(resolve => {
+                const change = this.props.onChange || this.onChange.bind(this);
+                const result = change(merged, undefined, resolve);
+                if (result instanceof Promise) result.then(resolve).catch(resolve);
+            });
             this.setState({ status: `${imported} Settings importiert und sofort übernommen.` });
         } catch (error) {
             this.setState({ status: `Fehler: ${error.message || error}` });
@@ -189,8 +211,8 @@ export class SettingsCsvComponent extends ConfigGeneric {
 
     renderItem() {
         return <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => this.exportCsv()}>Settings als CSV exportieren</button>
-            <button onClick={() => {
+            <button type="button" onClick={() => this.exportCsv()}>Settings als CSV exportieren</button>
+            <button type="button" onClick={() => {
                 if (this.fileInputRef.current) {
                     this.fileInputRef.current.value = '';
                     this.fileInputRef.current.click();

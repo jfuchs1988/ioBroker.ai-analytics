@@ -28,6 +28,13 @@ export function bridgeTimeoutForCommand(command) {
     return LONG_RUNNING_COMMANDS.has(command) ? LONG_RUNNING_COMMAND_TIMEOUT_MS : BRIDGE_TIMEOUT_MS;
 }
 
+function getStateWithTimeout(socket, id, timeoutMs = 5000) {
+    return Promise.race([
+        socket.getState(id),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('State-Bridge-Abfrage hat zu lange gedauert.')), timeoutMs)),
+    ]);
+}
+
 function readVisibleColumns(key) {
     try {
         const stored = window.localStorage.getItem(key);
@@ -93,7 +100,13 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         const deadline = Date.now() + bridgeTimeoutForCommand(command);
         while (Date.now() < deadline) {
             if (this.unmounted) throw new Error('Komponente wurde geschlossen.');
-            const state = await socket.getState(`${instance}.admin.bridge`);
+            let state;
+            try {
+                state = await getStateWithTimeout(socket, `${instance}.admin.bridge`);
+            } catch (_error) {
+                await new Promise(resolve => setTimeout(resolve, 400));
+                continue;
+            }
             if (state && state.ack === true && typeof state.val === 'string') {
                 let response;
                 try {
@@ -307,7 +320,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     if (!this.unmounted) this.setState({ status: 'Fortschrittsanzeige wegen Zeitüberschreitung beendet.', progress: null });
                     return;
                 }
-                const state = await this.props.oContext.socket.getState(`ai-analytics.${this.props.oContext.instance}.catalogSync`);
+                const state = await getStateWithTimeout(this.props.oContext.socket, `ai-analytics.${this.props.oContext.instance}.catalogSync`);
                 if (this.unmounted) return;
                 if (!state || !state.val) return;
                 let progress;
@@ -379,12 +392,18 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
             const dataRows = rows.slice(1);
             let updatedCount = 0;
             let errorCount = 0;
+            const rowErrors = [];
             for (let i = 0; i < dataRows.length; i++) {
                 const row = dataRows[i];
                 const sourceId = row[sourceIdIndex];
-                if (!sourceId) continue;
+                if (!sourceId) {
+                    errorCount++;
+                    rowErrors.push(`Zeile ${i + 2}: sourceId fehlt`);
+                    continue;
+                }
                 if (sourceId.length > MAX_SOURCE_ID_LENGTH) {
                     errorCount++;
+                    rowErrors.push(`Zeile ${i + 2}: sourceId ist zu lang`);
                     continue;
                 }
 
@@ -393,21 +412,34 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     const values = {};
                     fieldIndexes.forEach(({ field, index }) => {
                         if (row[index] === undefined) return;
-                        if (row[index] === '' && !['description', 'room'].includes(field)) return;
+                        if (row[index] === '' && !['description', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'].includes(field)) return;
+                        if (row[index] === '' && field === 'derivedMetricGroupId') {
+                            values.derivedMetricRole = '';
+                            return;
+                        }
+                        if (row[index] === '' && field === 'ignored') {
+                            values.ignored = false;
+                            return;
+                        }
+                        if (row[index] === '' && ['valueKind', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricInverted', 'hvacRole'].includes(field)) {
+                            values[field] = '';
+                            return;
+                        }
                         values[field] = validateCatalogImportValue(field, row[index]);
                     });
                     const response = await this.callAdapter('updateCatalogEntryAdmin', { sourceId, ...values });
                     if (response && response.error) throw new Error(response.error);
                     updatedCount++;
-                } catch (_error) {
+                } catch (error) {
                     errorCount++;
+                    rowErrors.push(`Zeile ${i + 2} (${sourceId}): ${error.message || String(error)}`);
                 }
             }
 
             this.setState({
                 status:
                     errorCount > 0
-                        ? `CSV-Import abgeschlossen: ${updatedCount} aktualisiert, ${errorCount} fehlgeschlagen.`
+                        ? `CSV-Import abgeschlossen: ${updatedCount} aktualisiert, ${errorCount} fehlgeschlagen. ${rowErrors.slice(0, 3).join(' | ')}`
                         : `CSV-Import abgeschlossen: ${updatedCount} Eintraege aktualisiert.`,
             });
             await this.loadEntries();
@@ -422,7 +454,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         const indicator = active ? (sort.direction === 'asc' ? ' ▲' : ' ▼') : '';
         return (
             <th scope="col" key={key}>
-                <button aria-label={`Nach ${label} sortieren`} onClick={() => this.setState({ sort: nextSortState(sort, key) })}>
+                <button type="button" aria-label={`Nach ${label} sortieren`} onClick={() => this.setState({ sort: nextSortState(sort, key) })}>
                     {label}{indicator}
                 </button>
             </th>
@@ -477,16 +509,16 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
         return (
             <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
-                    <button onClick={() => this.runCommand('runDiscoveryNow', 'Re-Scan läuft ...', 'Re-Scan abgeschlossen.')}>Geräte neu einlesen</button>
-                    <button onClick={() => this.runCommand('runDiscoveryOnly', 'Sync läuft ...', 'Sync abgeschlossen.')}>Nur Updates einlesen</button>
-                    <button onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
-                    <button onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle sichtbaren auswählen</button>
-                    <button onClick={() => this.setState({ selected: [] })}>Auswahl aufheben</button>
+                    <button type="button" onClick={() => this.runCommand('runDiscoveryNow', 'Re-Scan läuft ...', 'Re-Scan abgeschlossen.')}>Geräte neu einlesen</button>
+                    <button type="button" onClick={() => this.runCommand('runDiscoveryOnly', 'Sync läuft ...', 'Sync abgeschlossen.')}>Nur Updates einlesen</button>
+                    <button type="button" onClick={() => this.runCommand('runProactiveCheckNow', 'Prüfung läuft ...', 'Prüfung gestartet.')}>Prüfung jetzt ausführen</button>
+                    <button type="button" onClick={() => this.setState({ selected: entries.map(entry => entry.sourceId) })}>Alle sichtbaren auswählen</button>
+                    <button type="button" onClick={() => this.setState({ selected: [] })}>Auswahl aufheben</button>
                     <button type="button" aria-pressed={this.state.showIgnored} onClick={() => this.setShowIgnored(!this.state.showIgnored)}>
                         {this.state.showIgnored ? 'Ignorierte ausblenden' : 'Ignorierte anzeigen'}
                     </button>
-                    <button onClick={() => this.exportCsv()}>Als CSV exportieren</button>
-                    <button onClick={() => this.triggerCsvImport()}>CSV importieren</button>
+                    <button type="button" onClick={() => this.exportCsv()}>Als CSV exportieren</button>
+                    <button type="button" onClick={() => this.triggerCsvImport()}>CSV importieren</button>
                     <input
                         ref={this.fileInputRef}
                         type="file"

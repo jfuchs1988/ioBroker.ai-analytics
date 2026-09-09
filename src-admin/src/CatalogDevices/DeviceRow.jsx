@@ -155,12 +155,12 @@ export default class DeviceRow extends React.Component {
                 {this.feedback('room')}
             </td>;
             case 'ignored': return <td key={column}>
-                {entry.ignored ? 'Ja' : 'Nein'} <button onClick={() => this.save({ ignored: !entry.ignored })}>{entry.ignored ? 'Aktivieren' : 'Ignorieren'}</button>{this.feedback('ignored')}
+                 {entry.ignored ? 'Ja' : 'Nein'} <button type="button" onClick={() => this.save({ ignored: !entry.ignored })}>{entry.ignored ? 'Aktivieren' : 'Ignorieren'}</button>{this.feedback('ignored')}
             </td>;
             case 'active': return <td key={column}>{entry.active === false ? 'Nein' : 'Ja'}</td>;
             case 'needsReview': return <td key={column}>
                 {entry.needsReview ? 'Ja' : 'Nein'}{' '}
-                <button onClick={() => this.save({ needsReview: !entry.needsReview })}>
+                <button type="button" onClick={() => this.save({ needsReview: !entry.needsReview })}>
                     {entry.needsReview ? 'Als geprüft markieren' : 'Prüfung wieder öffnen'}
                 </button>{this.feedback('needsReview')}
             </td>;
@@ -192,7 +192,7 @@ export default class DeviceRow extends React.Component {
             </td>;
             case 'status': return <td key={column}>{statusLabelOf(entry)}</td>;
             case 'actions': return <td key={column}>
-                <button aria-label={`${entry.sourceId} entfernen`} onClick={() => this.props.onRemove()}>Entfernen</button>
+                 <button type="button" aria-label={`${entry.sourceId} entfernen`} onClick={() => this.props.onRemove()}>Entfernen</button>
             </td>;
             default: return null;
         }
@@ -210,7 +210,7 @@ export default class DeviceRow extends React.Component {
             <>
                 <tr>
                     <td>
-                        <button aria-label={`${entry.sourceId} Details ${expanded ? 'schließen' : 'öffnen'}`} aria-expanded={expanded} aria-controls={detailId} onClick={() => this.props.onToggleExpanded()}>
+                        <button type="button" aria-label={`${entry.sourceId} Details ${expanded ? 'schließen' : 'öffnen'}`} aria-expanded={expanded} aria-controls={detailId} onClick={() => this.props.onToggleExpanded()}>
                             {expanded ? '▾' : '▸'}
                         </button>
                         <input type="checkbox" aria-label={`${entry.sourceId} auswählen`} checked={selected} onChange={() => this.props.onToggleSelected()} />
