@@ -20,9 +20,10 @@ Third-party dependency attribution is summarized in
 
 `lib/license.js` enthält bereits die dormant-fähige Offline-Prüfung für
 Ed25519-JWS, Claims, die 30-tägige Grace-Period und den täglichen
-Chat-Fallback. Die Ausstellungs-Webanwendung muss die vertraglichen 30 Tage
-Sponsoring und 35 Tage Tokenlaufzeit beim Erzeugen des Tokens durchsetzen.
-Während der Beta gewährt der Versionsguard Vollzugriff.
+Chat-Fallback. Die Ausstellungs-Webanwendung muss beim Erzeugen des Tokens
+`exp = sponsorUntil` durchsetzen (30 Tage Sponsoring, keine separate
+technische Pufferfrist; siehe Backend-ADR 0004). Während der Beta gewährt der
+Versionsguard Vollzugriff.
 
 ## Änderungsregeln
 
