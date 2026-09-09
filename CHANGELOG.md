@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.67] - 2026-09-09
+
+### Behoben
+
+- Tokenbudgets berücksichtigen jetzt das konfigurierbare Modell-Kontextfenster;
+  fehlerhafte Chatnutzung wird verbucht, und Tokenlimits sind ganzzahlig.
+- Onboarding-Platzhalter, alte Boolean-Zustände, abgeschnittene History,
+  Energy-Balance-Vollständigkeit und `null`-Katalogzustände korrigiert.
+
 ## [0.0.1-beta.66] - 2026-09-09
 
 ### Behoben

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.66",
+    "version": "0.0.1-beta.67",
     "titleLang": {
       "en": "AI Analytics", "de": "AI Analytics", "ru": "AI Analytics", "pt": "AI Analytics",
       "nl": "AI Analytics", "fr": "AI Analytics", "it": "AI Analytics", "es": "AI Analytics",
@@ -80,7 +80,8 @@
     "chatPricePerMillionInputTokens": 0,
     "chatPricePerMillionOutputTokens": 0,
     "chatMaxInputTokens": 100000,
-    "chatMaxOutputTokens": 4096,
+     "chatMaxOutputTokens": 4096,
+     "chatContextWindowTokens": 128000,
     "onboardingProviderType": "",
     "onboardingApiKey": "",
     "onboardingModel": "",
@@ -88,7 +89,8 @@
     "onboardingPricePerMillionInputTokens": 0,
     "onboardingPricePerMillionOutputTokens": 0,
     "onboardingMaxInputTokens": 100000,
-    "onboardingMaxOutputTokens": 4096,
+     "onboardingMaxOutputTokens": 4096,
+     "onboardingContextWindowTokens": 128000,
     "checkIntervalHours": 24,
     "silentIfNothingFound": false,
      "dailyBudgetEur": 0,

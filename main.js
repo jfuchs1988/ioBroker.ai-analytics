@@ -743,7 +743,10 @@ class AiAnalytics extends utils.Adapter {
         });
 
         const timeAndLocation = await buildTimeAndLocationContext(this);
-        const { finalText, usage } = await runAgent({
+        let finalText;
+        let usage;
+        try {
+            ({ finalText, usage } = await runAgent({
             provider: this.chatProvider,
             tools: this.tools,
             limits: this.runtimeLimits,
@@ -776,10 +779,14 @@ class AiAnalytics extends utils.Adapter {
                      phase: 'chat',
                      processed,
                      total,
-                     message: `${processed < total ? 'Daten werden zusammengestellt' : 'Antwort wird erstellt'} ... ${percent}%`,
-                 });
-             },
-         });
+                      message: `${processed < total ? 'Daten werden zusammengestellt' : 'Antwort wird erstellt'} ... ${percent}%`,
+                  });
+              },
+            }));
+        } catch (error) {
+            if (error && error.usage) await recordUsage(this, error.usage, 'chat').catch(() => {});
+            throw error;
+        }
 
         await recordUsage(this, usage, 'chat');
         await this.appendHistoryFailureReports();

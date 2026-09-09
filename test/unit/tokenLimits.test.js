@@ -10,14 +10,14 @@ const {
 describe('tokenLimits', () => {
     describe('getTokenLimits', () => {
         it('returns defaults when the config has no values for the given role', () => {
-            expect(getTokenLimits({}, 'chat')).to.deep.equal({ maxInputTokens: 100000, maxOutputTokens: 4096 });
-            expect(getTokenLimits({}, 'onboarding')).to.deep.equal({ maxInputTokens: 100000, maxOutputTokens: 4096 });
+            expect(getTokenLimits({}, 'chat')).to.deep.equal({ maxInputTokens: 100000, maxOutputTokens: 4096, contextWindowTokens: 128000 });
+            expect(getTokenLimits({}, 'onboarding')).to.deep.equal({ maxInputTokens: 100000, maxOutputTokens: 4096, contextWindowTokens: 128000 });
         });
 
         it('reads role-specific config fields', () => {
             const config = { chatMaxInputTokens: 5000, chatMaxOutputTokens: 1000, onboardingMaxInputTokens: 8000, onboardingMaxOutputTokens: 2000 };
-            expect(getTokenLimits(config, 'chat')).to.deep.equal({ maxInputTokens: 5000, maxOutputTokens: 1000 });
-            expect(getTokenLimits(config, 'onboarding')).to.deep.equal({ maxInputTokens: 8000, maxOutputTokens: 2000 });
+            expect(getTokenLimits(config, 'chat')).to.deep.equal({ maxInputTokens: 5000, maxOutputTokens: 1000, contextWindowTokens: 128000 });
+            expect(getTokenLimits(config, 'onboarding')).to.deep.equal({ maxInputTokens: 8000, maxOutputTokens: 2000, contextWindowTokens: 128000 });
         });
 
         it('clamps values below the minimum bound up to the minimum', () => {
