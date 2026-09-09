@@ -18,7 +18,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
   als beta.64 veröffentlicht; Findings 1 bis 13 sind als beta.65 behoben;
   Resthärtung 1 bis 6 ist als beta.66 veröffentlicht; Deep-Review-Fixes sind
-  für beta.67 vorbereitet.
+  als beta.67 veröffentlicht.
 
 ## TODO
 
@@ -42,6 +42,11 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Provider-Modelllisten, HVAC-Grenzen, Katalog-/Bridge-Rennen, CSV-Atomicity,
   Leerwerte und Formularaktionen korrigiert; 481 Unit- und 60 Admin-Tests,
   E2E, Lint, Admin-Build und Paketbau erfolgreich.
+
+- Deep-Review-Fixes für beta.67: Kontextfenster-Tokenbudget, Usage bei
+  Fehlversuchen, Onboarding-Platzhalter, alte Boolean-Zustände, Truncation,
+  Energy-Balance-Vollständigkeit, `null`-Katalogzustände und ganzzahlige
+  Tokenlimits korrigiert; Tests, E2E, Lint, Build und Paketbau erfolgreich.
 
 - Zweite Review-Fixwelle für beta.64 vorbereitet: lokale Tagesgrenzen,
   deterministische Discovery, Gauge-Vergleiche, strikte Onboarding-Antworten,
