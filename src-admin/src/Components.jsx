@@ -64,7 +64,7 @@ export function validateSettingImportValue(key, rawValue) {
     if (SETTINGS_NUMBER_COLUMNS.has(key)) {
         value = value === '' ? 0 : Number(value);
         const bounds = SETTINGS_BOUNDS[key];
-        if (!Number.isSafeInteger(value) || value < 0 || (key === 'checkIntervalHours' && value < 1) || (bounds && (value < bounds[0] || value > bounds[1]))) {
+        if (!Number.isFinite(value) || (bounds && (!Number.isSafeInteger(value) || value < bounds[0] || value > bounds[1])) || value < 0 || (key === 'checkIntervalHours' && value < 1)) {
             throw new Error(`${key} enthält keine gültige nicht-negative Zahl.`);
         }
     }

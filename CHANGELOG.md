@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.69] - 2026-09-09
+
+### Behoben
+
+- Settings-CSV akzeptiert wieder gültige Dezimalwerte für Tokenpreise und
+  Tagesbudget; ganzzahlige Limits bleiben strikt.
+- `io-package.json` enthält jetzt aktuelle News bis beta.68.
+
 ## [0.0.1-beta.68] - 2026-09-09
 
 ### Geändert
