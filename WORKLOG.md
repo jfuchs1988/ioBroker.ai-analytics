@@ -18,7 +18,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
   als beta.64 veröffentlicht; Findings 1 bis 13 sind als beta.65 behoben;
   Resthärtung 1 bis 6 ist als beta.66 veröffentlicht; Deep-Review-Fixes sind
-  als beta.67 veröffentlicht.
+  als beta.67 veröffentlicht; Release-Metadaten sind für beta.68 synchronisiert.
 
 ## TODO
 

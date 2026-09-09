@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.68] - 2026-09-09
+
+### Geändert
+
+- Release-Metadaten und deutsche/englische Konfigurationsdokumentation an die
+  aktuellen Token- und Kontextfenster-Einstellungen angeglichen.
+
 ## [0.0.1-beta.67] - 2026-09-09
 
 ### Behoben

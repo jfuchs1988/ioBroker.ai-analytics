@@ -60,6 +60,9 @@ Im ioBroker-Admin konfigurierbar:
 - Optional eigener Onboarding-Provider
 - Prüfintervall und Verhalten bei keinem Fund
 - Tagesbudget in EUR und manuell gepflegte Tokenpreise
+- Separate Input-/Output-Tokenlimits für Chat und Onboarding sowie ein
+  konfigurierbares Modell-Kontextfenster
+- Sicherheitslimits für Agent-Iterationen, Tool-Aufrufe und Zeiträume
 - Optionale valueKind- und Datenqualitäts-Backfills
 - Sponsoring-Entitlement-Token für die spätere stabile Release-Policy
 
