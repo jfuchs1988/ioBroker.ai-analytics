@@ -19,7 +19,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   als beta.64 veröffentlicht; Findings 1 bis 13 sind als beta.65 behoben;
   Resthärtung 1 bis 6 ist als beta.66 veröffentlicht; Deep-Review-Fixes sind
   als beta.67 veröffentlicht; Release-Metadaten sind als beta.68 synchronisiert;
-  CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind für
+  CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind als
   beta.70 korrigiert.
 
 ## TODO
