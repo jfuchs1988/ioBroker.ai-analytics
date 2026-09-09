@@ -20,7 +20,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Resthärtung 1 bis 6 ist als beta.66 veröffentlicht; Deep-Review-Fixes sind
   als beta.67 veröffentlicht; Release-Metadaten sind als beta.68 synchronisiert;
   CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind als
-  beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht.
+  beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht;
+  der versionierte Nachtrag ist als beta.72 veröffentlicht.
 
 ## TODO
 
