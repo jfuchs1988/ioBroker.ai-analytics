@@ -6,8 +6,25 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`.
-- Status: Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
+- Branch: `docs/align-token-timing-adr0004` (nicht committet; Doku-Korrektur,
+  kein Codechange).
+- Status: `README.md`/`README.de.md`/`LICENSES/SPONSOR-REQUIRED.md`/
+  `docs/adr/0027-hybrid-lizenzmodell-referenzprojekt.md`/`docs/adr/backlog.md`/
+  `docs/specs/2026-09-03-hybrid-license-and-entitlements.md` beschrieben noch
+  eine separate 35-Tage-Token-Gültigkeit. Backend-ADR 0004
+  (`ioBroker.AiAnalytics.Backend`) hat das verworfen: `exp = sponsorUntil`
+  ohne Pufferzeitraum. `docs/agents/licensing.md` war bereits korrigiert
+  (voriger Commit `0302b0d`); die übrigen Fundstellen wurden jetzt
+  nachgezogen. Kein Codechange nötig, `lib/license.js` berechnet Grace
+  bereits aus `sponsorUntil`. Das eigentliche Sponsor-Token-Projekt läuft im
+  Backend-Repository weiter: dort ist Phase 0 (Vertrags-Freeze:
+  Aktivierungs-/Entitlement-Spec, ADR 0005 zur GitHub-OAuth-Integration)
+  abgeschlossen, siehe dessen `WORKLOG.md`. `npm test`/`npm run lint` konnten
+  in dieser Sitzung nicht ausgeführt werden (kein `npm` im PATH dieser
+  Umgebung); auf Nutzerwunsch trotzdem committed, da ausschließlich
+  Markdown-Dateien geändert wurden. Sollte auf einer Maschine mit Node
+  nachgeholt werden, bevor dieser Branch nach `master` gemergt wird.
+- Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
   als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
