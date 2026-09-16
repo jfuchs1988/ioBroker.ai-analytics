@@ -7,7 +7,7 @@ import { CATALOG_COLUMNS, DEFAULT_VISIBLE_COLUMNS } from './catalogColumns.js';
 import { csvEscape, parseCsv, normalizeHeader, validateFile, validateCatalogImportValue, MAX_SOURCE_ID_LENGTH } from '../csvHelpers.js';
 
 const CSV_COLUMNS = ['sourceId', 'description', 'category', 'valueKind', 'unit', 'room', 'ignored', 'active', 'needsReview', 'writable', 'writePattern', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'];
-const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'];
+const CSV_EDITABLE_COLUMNS = ['description', 'category', 'room', 'unit', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'];
 const COLUMN_STORAGE_VERSION = 1;
 const BRIDGE_TIMEOUT_MS = 60000;
 const LONG_RUNNING_COMMAND_TIMEOUT_MS = 10 * 60 * 1000;
@@ -413,7 +413,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                     const values = {};
                     fieldIndexes.forEach(({ field, index }) => {
                         if (row[index] === undefined) return;
-                        if (row[index] === '' && !['description', 'room', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'].includes(field)) return;
+                        if (row[index] === '' && !['description', 'room', 'unit', 'valueKind', 'ignored', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricGroupId', 'derivedMetricInverted', 'hvacRole'].includes(field)) return;
                         if (row[index] === '' && field === 'derivedMetricGroupId') {
                             values.derivedMetricRole = '';
                             return;
@@ -422,7 +422,7 @@ export default class CatalogDevicesComponent extends ConfigGeneric {
                             values.ignored = false;
                             return;
                         }
-                        if (row[index] === '' && ['valueKind', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricInverted', 'hvacRole'].includes(field)) {
+                        if (row[index] === '' && ['unit', 'valueKind', 'updateFrequency', 'dataCompleteness', 'derivedMetricRole', 'derivedMetricInverted', 'hvacRole'].includes(field)) {
                             values[field] = '';
                             return;
                         }

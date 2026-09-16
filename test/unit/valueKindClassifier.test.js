@@ -10,10 +10,12 @@ function loadClassifierWithStubs({ getHistory }) {
 }
 
 describe('VALUE_KINDS', () => {
-    it('lists exactly the five defined value kinds', () => {
+    it('lists the defined value kinds', () => {
         expect(VALUE_KINDS).to.deep.equal([
             'gauge',
             'boolean_state',
+            'enum_state',
+            'text_state',
             'daily_reset_counter',
             'cumulative_total',
             'event_count',
@@ -69,6 +71,22 @@ describe('classifyFromMetadata', () => {
             valueKindConfidence: 'low',
             valueKindSource: 'metadata',
         });
+    });
+
+    it('keeps string metadata conservative until history confirms its shape', () => {
+        expect(classifyFromMetadata({ common: { type: 'string' } })).to.deep.equal({
+            valueKind: 'text_state', valueKindConfidence: 'low', valueKindSource: 'metadata',
+        });
+    });
+});
+
+describe('text samples', () => {
+    it('recognizes bounded named values as enum_state', () => {
+        expect(detectPatternFromSamples([{ val: 'heating' }, { val: 'standby' }, { val: 'heating' }])).to.equal('enum_state');
+    });
+
+    it('recognizes long text as text_state', () => {
+        expect(detectPatternFromSamples([{ val: 'a'.repeat(200) }, { val: 'b'.repeat(200) }, { val: 'c'.repeat(200) }])).to.equal('text_state');
     });
 });
 

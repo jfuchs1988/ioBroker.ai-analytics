@@ -170,11 +170,11 @@ const HOW_TO_SECTIONS = [
     },
     {
         title: 'Katalog und valueKind',
-        text: 'valueKind beschreibt die Rechenbedeutung eines Datenpunkts: gauge ist ein Momentanwert, boolean_state ein Zustand, daily_reset_counter ein Tageszähler, cumulative_total ein fortlaufender Zähler und event_count eine Ereignisanzahl. Die KI darf valueKind nach ausdrücklicher Nutzerangabe ändern. Der Wert wird zentral validiert, als manuell gesetzt markiert und bei inkompatiblen Energie-/HVAC-Rollen abgelehnt.',
+        text: 'valueKind beschreibt die Rechenbedeutung eines Datenpunkts: gauge ist ein Momentanwert, boolean_state ein Zustand, enum_state/text_state sind benannte Textzustände, daily_reset_counter ein Tageszähler, cumulative_total ein fortlaufender Zähler und event_count eine Ereignisanzahl. Die KI darf valueKind nach ausdrücklicher Nutzerangabe ändern. Der Wert wird zentral validiert, als manuell gesetzt markiert und bei inkompatiblen Energie-/HVAC-Rollen abgelehnt.',
     },
     {
         title: 'Weitere wichtige Spalten',
-        text: 'Beschreibung und Raum machen Antworten lesbar. Kategorie steuert die fachliche Einordnung. updateFrequency beschreibt, wie oft Werte geschrieben werden; dataCompleteness zeigt vollständige, lückenhafte oder veraltete Historie. ignored blendet Datenpunkte aus Analysen aus. needsReview markiert offene Klassifikationsfragen. Energie- und HVAC-Rollen verbinden Datenpunkte zu Bilanzgruppen bzw. Raumregeln.',
+        text: 'Beschreibung, Einheit und Raum machen Antworten lesbar. Kategorie steuert die fachliche Einordnung. updateFrequency beschreibt, wie oft Werte geschrieben werden; dataCompleteness zeigt vollständige, lückenhafte oder veraltete Historie. ignored blendet Datenpunkte aus Analysen aus. needsReview markiert offene Klassifikationsfragen; reviewReasons erklärt sie maschinenlesbar. Energie- und HVAC-Rollen verbinden Datenpunkte zu Bilanzgruppen bzw. Raumregeln.',
     },
     {
         title: 'Energierollen und Bilanzgruppen',

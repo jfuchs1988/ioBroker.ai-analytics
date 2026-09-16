@@ -167,7 +167,7 @@ describe('runOnboarding', () => {
         const result = await runOnboarding({}, provider, discovered);
 
         expect(result.classifiedCount).to.equal(1);
-        expect(result.needsReview).to.deep.equal([]);
+        expect(result.needsReview[0].reviewReasons).to.include.members(['value_kind_uncertain', 'data_quality_unknown']);
         expect(setCatalogEntry.calledOnce).to.equal(true);
         const [, entry] = setCatalogEntry.firstCall.args;
         expect(entry).to.deep.include({
@@ -175,7 +175,7 @@ describe('runOnboarding', () => {
             description: 'Gesamtstromverbrauch Haus',
             category: 'consumption',
             confidence: 'high',
-            needsReview: false,
+            needsReview: true,
             active: true,
             historyInstance: 'influxdb.0',
         });
@@ -1034,7 +1034,7 @@ describe('runOnboarding', () => {
         expect(obj20Call.args[1].needsReview).to.equal(true);
     });
 
-    it('leaves entries untouched when the LLM proposes no role, unchanged from prior behaviour', async () => {
+    it('marks entries for review when the LLM proposes no role but evidence is uncertain', async () => {
         const discovered = [
             { id: 'javascript.0.x', historyInstance: 'influxdb.0', common: { name: 'x' } },
         ];
@@ -1053,7 +1053,8 @@ describe('runOnboarding', () => {
 
         const [, entry] = setCatalogEntry.firstCall.args;
         expect(entry).to.not.have.property('derivedMetricRole');
-        expect(entry.needsReview).to.equal(false);
+        expect(entry.needsReview).to.equal(true);
+        expect(entry.reviewReasons).to.include('value_kind_uncertain');
     });
 
     it('skips a batch whose prompt exceeds the configured onboarding input-token limit, without aborting the run', async () => {
