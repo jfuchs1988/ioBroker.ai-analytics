@@ -2,7 +2,7 @@
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Ersetzt für die Gesamt-Lizenzierung durch [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md)
+**Status:** Ersetzt für die Gesamt-Lizenzierung durch [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md); die Katalog-Ablehnung unten ist aufgehoben durch [ADR-0030](0030-aufnahme-offizielle-adapter-liste.md)
 **Datum:** 2026-08-22
 
 ## Kontext

@@ -9,11 +9,15 @@ Kurzreferenz, wie an `ioBroker.ai-analytics` gearbeitet wird. Details/Begründun
 - Die Lösung wird auf dem Task-Branch umgesetzt. Wenn Commits beauftragt sind,
   werden sie in sinnvolle, thematisch geschlossene Zwischenstände geteilt.
 - Nach erfolgreicher Verifikation wird nur auf ausdrücklichen Auftrag committed,
-  gepusht, nach `master` gemergt oder veröffentlicht.
-- Releases werden bewusst manuell erstellt; es gibt keine GitHub-Actions-
-  Workflows im Repository. Ein Release-Task aktualisiert Version,
-  `CHANGELOG.md` und `io-package.json`, baut das Paket lokal und erstellt danach
-  Tag und GitHub-Release.
+  gepusht oder veröffentlicht.
+- Jeder Merge nach `master` läuft über einen Pull Request: Branch erstellen,
+  Änderung committen, Pull Request eröffnen, Pull Request mergen. Kein
+  direkter Push oder Merge nach `master`.
+- Auf jeden gemergten Pull Request nach `master` folgt immer ein Release —
+  das steht fest und ist kein separater Auftrag. Releases werden manuell
+  erstellt; ein Release-Task aktualisiert Version, `CHANGELOG.md` und
+  `io-package.json`, baut das Paket lokal und erstellt danach Tag und
+  GitHub-Release.
 
 ## Wann Spec / Plan / ADR nötig sind
 
@@ -66,12 +70,14 @@ Bei jeder Änderung, die eines der folgenden betrifft, wird die entsprechende Do
 4. Zwischenstände und den vollständigen Stand vor einer angeforderten
    Veröffentlichung committen.
 5. `npm test`, Build und bei UI-Änderungen die Live-Abnahme durchführen.
-6. Auf ausdrücklichen Auftrag Branch pushen, nach `master` mergen und Branch
-   löschen.
-7. Bei einem Release-Auftrag Version/Changelog aktualisieren, Paket prüfen,
-   `npm run test:e2e` einmal manuell ausführen (echter js-controller-Test,
-   siehe `docs/agents/testing.md`), Tag pushen und GitHub-Release manuell
-   erstellen.
+6. Auf ausdrücklichen Auftrag Branch pushen, Pull Request eröffnen, Pull
+   Request nach `master` mergen und Branch löschen.
+7. Direkt im Anschluss an jeden Merge nach `master`: Version/Changelog/
+   `io-package.json` aktualisieren, Paket prüfen, `npm run test:e2e` einmal
+   manuell ausführen (echter js-controller-Test, siehe
+   `docs/agents/testing.md`), Tag pushen und GitHub-Release manuell
+   erstellen. Kein separater Auftrag nötig — das Release ist Teil des
+   Merge-Abschlusses.
 8. `WORKLOG.md` auf `DONE` setzen und Status sauber hinterlassen.
 
 ## Commits

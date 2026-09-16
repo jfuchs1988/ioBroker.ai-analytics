@@ -12,6 +12,12 @@
 5. Änderung testgetrieben umsetzen und Dokumentation synchron halten.
 6. Status, Diff und Log prüfen; Tests, Lint und erforderlichen Build ausführen.
 7. Nur auf ausdrücklichen Auftrag committen oder veröffentlichen.
+8. Jeder Merge nach `master` läuft über einen Pull Request: Branch pushen,
+   Pull Request eröffnen, Pull Request mergen. Kein direkter Push/Merge nach
+   `master`.
+9. Auf jeden gemergten Pull Request folgt immer ein Release (Version,
+   `CHANGELOG.md`, `io-package.json`, Paketbau, Tag, GitHub-Release) — das
+   ist kein separater Auftrag.
 
 ## Dokumentationsquellen
 
@@ -33,8 +39,10 @@ duplizieren.
   Änderungen nie verwerfen oder überschreiben.
 - Admin-Quellen unter `src-admin/` sind nicht Teil des Releasepakets; das
   gebaute Bundle unter `admin/` muss aktuell sein.
-- Es gibt bewusst keine GitHub-Actions-Workflows (CI/Release) im Repository;
-  Lint, Tests und Build laufen manuell lokal. Releases werden deshalb nur auf
-  ausdrücklichen Auftrag und nach lokaler Verifikation erstellt.
+- `.github/workflows/test.yml` (Lint/Test/Admin-Build) und `codeql.yml`
+  (Security-Scan) laufen automatisch bei Push/PR auf `master`
+  (siehe [Backlog-Punkt 5](../adr/backlog.md)). Der Release selbst bleibt ein
+  manueller Schritt direkt nach jedem gemergten Pull Request, kein separater
+  Auftrag nötig.
 - `AGENTS.md` und `CLAUDE.md` bleiben lokal und sind über `.gitignore` sowie
   `.npmignore` von Repository und Paket ausgeschlossen.

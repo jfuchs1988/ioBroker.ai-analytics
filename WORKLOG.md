@@ -6,42 +6,29 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `fix/documentation-audit` (Dokumentations- und Sicherheitsaudit).
-- Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
-  wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
-  wurde neu gebaut. Die Aktivierung öffnet das Verifizierungsfenster automatisch,
-  wartet auf den Adapterabschluss und zeigt die erfolgreiche Speicherung ohne
-  Token-Offenlegung an. Die Statusanzeige ergänzt gespeicherten Token, GitHub-
-  Login und Ablaufdatum. Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
-  Aktivierung/Polling/Issue/Renewal, geschützte UUID-Installation-ID und
-  Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
-  schmale Aktivierungs-UI. Offline-`evaluateLicense` und
-  `info.licenseStatus` bleiben maßgeblich.
-- Letzte Verifikation: `npm test` (aktuelle Zahlen aus dem Testlauf), Lint,
-  Admin-Build, E2E und Paketbau erfolgreich. Die Lizenz-/Backend-Integration
-  ist produktiv deployed.
-- Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
-  eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
-- Release-Notes nie mit literalen `\n`-Sequenzen an GitHub übergeben; für
-  Markdown müssen echte Zeilenumbrüche verwendet werden, sonst zeigt GitHub
-  den gesamten Text in einer Zeile an.
-- Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
-  konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
-  JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
-  als beta.56 veröffentlicht; Gerätefilter und Rollenlegende sind als beta.57
-  veröffentlicht; Statusaktionen sind als beta.58 veröffentlicht; Foundry-
-  Responses-Unterstützung ist als beta.59 veröffentlicht; Output-Limit-
-  Erweiterung ist als beta.60 veröffentlicht; Foundry-Toolcall-Fix ist als
-  beta.61 veröffentlicht; `resetUsage` ist als beta.62 korrigiert; die erste
-  Whole-Review-Fixwelle ist als beta.63 veröffentlicht; die zweite Welle ist
-  als beta.64 veröffentlicht; Findings 1 bis 13 sind als beta.65 behoben;
-  Resthärtung 1 bis 6 ist als beta.66 veröffentlicht; Deep-Review-Fixes sind
-  als beta.67 veröffentlicht; Release-Metadaten sind als beta.68 synchronisiert;
-  CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind als
-  beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht;
-  die Releasekette bis `0.1.2` ist veröffentlicht. Backend v0.3.0 liefert
-  GitHub-Login und Ablaufdaten und ist produktiv deployed.
-
+- Branch: `feature/catalog-submission-prep` (Vorbereitung der Aufnahme in die
+  offizielle ioBroker-Adapter-Liste).
+- Status: Lizenzmodell auf das evcc-Muster korrigiert (siehe
+  [ADR-0030](docs/adr/0030-aufnahme-offizielle-adapter-liste.md), die die
+  Katalog-Ablehnung aus ADR-0018 aufhebt): `LICENSE`/`admin/LICENSE` sind
+  reiner, unveränderter MIT-Text ohne Scope-Klausel; `package.json license`
+  und `io-package.json common.licenseInformation.license` sind synchron
+  `"MIT"`; `licenseInformation.type` korrigiert von `"commercial"` auf
+  `"limited"`. `common.news` in `io-package.json` auf 7 aktuelle, vollständig
+  übersetzte Einträge gekürzt, Eintrag für `0.1.3` ergänzt (behebt
+  `@iobroker/repochecker`-Fehler E0016/E1017/E1031/E1036 und Warnung W1054).
+  Neuer GitHub-Actions-Workflow `.github/workflows/test.yml` (Lint, Test,
+  Admin-Build auf Node 22.x/24.x) erfüllt die Katalog-Anforderung "Tests via
+  GitHub Actions" (siehe Backlog-Punkt 5). PR-Pflicht für jeden Merge nach
+  `master` in `AGENTS.md`/`CONTRIBUTING.md` verankert (auch im Backend-Repo).
+- Verifikation: `npm test`, `npm run lint`, `npm run build:admin` lokal
+  grün. `@iobroker/repochecker` lokal noch nicht erneut gelaufen (Nutzer
+  hatte die o.g. Fehler zuvor selbst mit dem echten Checker gemeldet).
+- Offen vor der PR an `ioBroker.repositories` (siehe Backlog-Punkt 13):
+  `npm publish` inkl. ioBroker-Org als NPM-Owner (aktuell 404 auf npm);
+  Klärung mit `info@iobroker.net` zum Sponsoring-/Umsatzmodell für
+  Bezahlpflicht-Funktionen; erneuter Lauf des offiziellen Checkers
+  (`adapter-check.iobroker.in`) gegen den finalen Stand.
 ## TODO
 
 - GitHub-Sicherheitsfunktionen aktiviert: Vulnerability Alerts, private
