@@ -203,6 +203,33 @@ export class LicenseActivationComponent extends ConfigGeneric {
         throw new Error('Keine Antwort vom Adapter.');
     }
 
+    async clearToken() {
+        if (!window.confirm('Gespeichertes Sponsoring-Entitlement wirklich löschen?')) return;
+        const socket = this.props.socket || this.props.oContext.socket;
+        const instance = `ai-analytics.${this.props.oContext.instance}`;
+        const id = `license-clear-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id, command: 'clearLicenseToken', message: {} }), ack: false });
+        const deadline = Date.now() + 30000;
+        while (Date.now() < deadline) {
+            const state = await getStateWithTimeout(socket, `${instance}.admin.bridge`).catch(() => null);
+            if (state && state.ack === true && typeof state.val === 'string') {
+                try {
+                    const response = JSON.parse(state.val);
+                    if (response.id === id) {
+                        if (!response.ok) throw new Error(response.error || 'Token konnte nicht gelöscht werden.');
+                        await this.loadLicenseStatus();
+                        this.setState({ status: 'Lokaler Token wurde gelöscht.' });
+                        return;
+                    }
+                } catch (error) {
+                    if (error.message !== 'Unexpected end of JSON input') throw error;
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+        throw new Error('Keine Antwort vom Adapter.');
+    }
+
     async waitForActivation(instance, socket, expiresAt) {
         const deadline = Math.min(Number(expiresAt) * 1000 || Date.now() + 10 * 60 * 1000, Date.now() + 10 * 60 * 1000);
         while (Date.now() < deadline) {
@@ -235,6 +262,7 @@ export class LicenseActivationComponent extends ConfigGeneric {
         const identity = license && license.githubLogin ? `GitHub-Benutzer: ${license.githubLogin}` : null;
         return <div>
             <button type="button" onClick={() => this.activate().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Aktivierung starten</button>
+            {license && license.tokenStored ? <button type="button" onClick={() => this.clearToken().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Gespeicherten Token löschen</button> : null}
             {activation ? <span style={{ marginLeft: 8 }}>Status: {activation.status}; URL: <a href={activation.verificationUri} target="_blank" rel="noreferrer">Aktivierung öffnen</a>; Code: {activation.activationCode}</span> : null}
             <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status}</span>
             <div role="status" aria-live="polite" style={{ marginTop: 8 }}>

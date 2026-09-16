@@ -17,7 +17,7 @@
           "lg": 12,
           "xl": 12
         },
-         "sponsorLink": {
+        "sponsorLink": {
           "type": "staticLink",
           "label": "GitHub Sponsors",
           "href": "https://github.com/sponsors/jfuchs1988",
@@ -28,6 +28,42 @@
           "md": 5,
           "lg": 3,
           "xl": 3
+        },
+        "accessHeader": {
+          "type": "header",
+          "text": "Sponsoring & API-Schlüssel",
+          "size": 3,
+          "newLine": true
+        },
+        "apiKey": {
+          "type": "password",
+          "label": "API-Key Chat & Prüfung",
+          "help": "Der Schlüssel wird geschützt gespeichert und nicht exportiert.",
+          "newLine": true,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 6,
+          "xl": 6
+        },
+        "onboardingApiKey": {
+          "type": "password",
+          "label": "API-Key Onboarding",
+          "help": "Leer lassen, um den Chat-/Prüfungs-Key mitzubenutzen.",
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 6,
+          "xl": 6
+        },
+        "licenseActivation": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/LicenseActivationComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
+          "label": "Sponsoring-Aktivierung",
+          "newLine": true
         },
         "settingsCsv": {
           "type": "custom",
@@ -65,7 +101,8 @@
           "label": "OpenCode Zen ansehen (alternative Gratis-API)",
           "href": "https://opencode.ai/auth",
           "button": true,
-          "variant": "text",
+          "variant": "outlined",
+          "newLine": true,
           "sm": 12,
           "md": 6,
           "lg": 4,
@@ -106,15 +143,6 @@
           "bundlerType": "module",
           "label": "Modell",
           "newLine": true,
-          "xs": 12,
-          "sm": 12,
-          "md": 6,
-          "lg": 4,
-          "xl": 4
-        },
-        "apiKey": {
-          "type": "password",
-          "label": "API-Key",
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -216,15 +244,6 @@
           "bundlerType": "module",
           "label": "Modell (Onboarding)",
           "newLine": true,
-          "xs": 12,
-          "sm": 12,
-          "md": 6,
-          "lg": 4,
-          "xl": 4
-        },
-        "onboardingApiKey": {
-          "type": "password",
-          "label": "API-Key (Onboarding)",
           "xs": 12,
           "sm": 12,
           "md": 6,
@@ -382,26 +401,6 @@
           "md": 3,
           "lg": 2,
           "xl": 2
-        },
-        "licenseToken": {
-          "type": "password",
-          "label": "Sponsoring-Entitlement-Token (geschützt)",
-          "help": "Der Token wird nach der GitHub-Aktivierung automatisch gespeichert und aus Sicherheitsgründen nicht angezeigt. Der aktuelle Status steht direkt darunter.",
-          "newLine": true,
-          "xs": 12,
-          "sm": 12,
-          "md": 8,
-          "lg": 8,
-          "xl": 8
-        },
-        "licenseActivation": {
-          "type": "custom",
-          "url": "custom/customComponents.js",
-          "name": "AiAnalyticsConfig/Components/LicenseActivationComponent",
-          "guiApi": 2,
-          "bundlerType": "module",
-          "label": "Sponsoring-Aktivierung",
-          "newLine": true
         },
         "silentIfNothingFound": {
           "type": "checkbox",

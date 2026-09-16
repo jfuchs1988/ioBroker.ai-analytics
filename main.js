@@ -128,8 +128,8 @@ class AiAnalytics extends utils.Adapter {
         const metadata = {
             tokenStored: typeof config.licenseToken === 'string' && config.licenseToken.length > 0,
             githubLogin: typeof config.licenseGithubLogin === 'string' ? config.licenseGithubLogin : undefined,
-            tokenExpiresAt: Number.isSafeInteger(config.licenseTokenExpiresAt) ? config.licenseTokenExpiresAt : undefined,
-            sponsorUntil: Number.isSafeInteger(config.licenseSponsorUntil) ? config.licenseSponsorUntil : undefined,
+            tokenExpiresAt: Number.isSafeInteger(config.licenseTokenExpiresAt) && config.licenseTokenExpiresAt > 0 ? config.licenseTokenExpiresAt : undefined,
+            sponsorUntil: Number.isSafeInteger(config.licenseSponsorUntil) && config.licenseSponsorUntil > 0 ? config.licenseSponsorUntil : undefined,
         };
         const nextState = PACKAGE_VERSION.includes('-beta.') ? { status: 'beta', fullAccess: true, ...this.licenseState, ...metadata } : {
             ...evaluateLicense({ version: PACKAGE_VERSION, token: config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS }),
@@ -162,6 +162,14 @@ class AiAnalytics extends utils.Adapter {
             ...(Number.isSafeInteger(metadata.sponsorUntil) ? { licenseSponsorUntil: metadata.sponsorUntil } : {}),
         });
         await this.refreshLicenseState();
+    }
+
+    async clearLicenseToken() {
+        await this.persistLicenseNative({ licenseToken: '', licenseGithubLogin: '', licenseTokenExpiresAt: 0, licenseSponsorUntil: 0 });
+        this.licenseActivation = null;
+        await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ status: 'none' }), ack: true });
+        await this.refreshLicenseState();
+        return { cleared: true };
     }
 
     async startLicenseActivation() {
@@ -948,6 +956,7 @@ class AiAnalytics extends utils.Adapter {
             runProactiveCheckNow: () => adminCommands.runProactiveCheckNow(this),
             startLicenseActivation: () => adminCommands.startLicenseActivation(this),
             getLicenseActivationStatus: () => adminCommands.getLicenseActivationStatus(this),
+            clearLicenseToken: () => adminCommands.clearLicenseToken(this),
         };
 
         const handler = adminCommandHandlers[command];
