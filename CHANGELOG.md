@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.75] - 2026-09-16
+
+### Behoben
+
+- Lizenzaktivierung öffnet die GitHub-Verifizierung automatisch in einem Popup
+  und zeigt nach erfolgreicher Rückkehr des Adapters die gespeicherte Aktivierung.
+- Der rohe Entitlement-Token wird nicht im Admin angezeigt; die Speicherung
+  erfolgt weiterhin automatisch in der geschützten Native-Konfiguration.
+
 ## [0.0.1-beta.74] - 2026-09-16
 
 ### Behoben
