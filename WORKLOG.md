@@ -6,16 +6,17 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `release/0.1.4`, Commit `505d331` (`release: 0.1.4`), auf
-  `origin/release/0.1.4` gepusht. PR [#31](https://github.com/jfuchs1988/ioBroker.ai-analytics/pull/31)
-  nach `master` ist offen und `CLEAN`/mergebar.
-- CI für PR #31 abgeschlossen und vollständig grün: CodeQL, Lint/Test/Admin-
+- Branch: `master`, Merge-Commit `5601006` aus PR
+  [#31](https://github.com/jfuchs1988/ioBroker.ai-analytics/pull/31) ist
+  abgeschlossen. Release `v0.1.4` wurde als GitHub-Release veröffentlicht.
+- CI für PR #31 war vollständig grün: CodeQL, Lint/Test/Admin-
   Build auf Node 22.x und Node 24.x. Lokal waren 489 Unit- und 60 Admin-Tests
   sowie Lint erfolgreich. Es wurden genau die drei erwarteten Release-Felder
   geändert; keine Dependency-Baum-Änderungen.
-- Nächster Schritt: PR-Review bzw. Merge nach Freigabe. Danach den in
-  `AGENTS.md` beschriebenen Release-Folgeschritt durchführen (Version/News,
-  Paketbau, Tag und GitHub-Release).
+- Release-Verifikation: `npm run pack:release` erfolgreich; `npm run test:e2e`
+  erfolgreich mit 2 Tests. Tag `v0.1.4` ist auf dem Remote vorhanden.
+- Nächster Schritt: Veröffentlichung in bzw. Abstimmung mit der offiziellen
+  ioBroker-Adapter-Liste.
 - Status: Lizenzmodell auf das evcc-Muster korrigiert (siehe
   [ADR-0030](docs/adr/0030-aufnahme-offizielle-adapter-liste.md), die die
   Katalog-Ablehnung aus ADR-0018 aufhebt): `LICENSE`/`admin/LICENSE` sind
