@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.2] - 2026-09-16
+
+### Geändert
+
+- API-Key Chat & Prüfung und API-Key Onboarding stehen jetzt direkt unter den
+  jeweiligen Modellbereichen.
+
 ## [0.1.1] - 2026-09-16
 
 ### Geändert
