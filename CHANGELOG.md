@@ -3,6 +3,18 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.3] - 2026-09-16
+
+### Geändert
+
+- History-Ausfälle stoppen nach dem vollständigen Retry-Zeitplan zuverlässig
+  (`exhausted`) statt dauerhaft weitere Abfragen auszulösen.
+- Dokumentation, Architekturstatus, Lizenzvertrag und Roadmap an den stabilen
+  Produktstand angeglichen.
+- GitHub-Sicherheitsrichtlinie, Dependabot und CodeQL-Workflow ergänzt.
+- KI-Onboarding weist Energie-/HVAC-Rollen nicht mehr aus Namen oder Objekt-IDs
+  ab; diese Rollen werden explizit im Katalog gesetzt.
+
 ## [0.1.2] - 2026-09-16
 
 ### Geändert
