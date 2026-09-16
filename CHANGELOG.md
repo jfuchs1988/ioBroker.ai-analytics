@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.77] - 2026-09-16
+
+### Geändert
+
+- API-Schlüssel und Sponsoring-Aktivierung stehen jetzt gebündelt oben im
+  Einstellungsbereich.
+- Das separate Tokenfeld wurde entfernt; ein gespeicherter Token kann über
+  einen eigenen Löschbutton entfernt werden.
+- Die Links für OpenRouter und OpenCode Zen verwenden jetzt das gleiche Design.
+
 ## [0.0.1-beta.76] - 2026-09-16
 
 ### Geändert

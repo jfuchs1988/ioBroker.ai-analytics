@@ -47,7 +47,9 @@ describe('admin configuration links and model discovery', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         const settings = config.items.settingsTab.items;
         expect(settings.licenseBackendUrl).to.equal(undefined);
+        expect(settings.licenseToken).to.equal(undefined);
         expect(settings.licenseActivation.name).to.equal('AiAnalyticsConfig/Components/LicenseActivationComponent');
+        expect(fs.readFileSync(path.join(ROOT, 'lib', 'adminBridge.js'), 'utf8')).to.include('clearLicenseToken');
         const component = fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.js'), 'utf8');
         const activation = fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.jsx'), 'utf8');
         expect(component).to.include('LicenseActivationComponent');
