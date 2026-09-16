@@ -3,6 +3,22 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.4] - 2026-09-17
+
+### Geändert
+
+- Lizenzmodell auf das evcc-Muster korrigiert: `LICENSE`/`admin/LICENSE` sind
+  wieder reiner, unveränderter MIT-Text; `package.json license` und
+  `io-package.json common.licenseInformation.license` sind synchron `"MIT"`;
+  `licenseInformation.type` korrigiert von `"commercial"` auf `"limited"`.
+- `common.news` in `io-package.json` auf vollständig übersetzte, aktuelle
+  Einträge bereinigt (`@iobroker/repochecker`-Fehler E0016/E1017/E1031/E1036
+  und Warnung W1054 behoben).
+- Neuer GitHub-Actions-Workflow `.github/workflows/test.yml` (Lint, Test,
+  Admin-Build) für die Aufnahme in die offizielle ioBroker-Adapterliste.
+- ADR-0030 hebt die frühere Entscheidung gegen eine Katalog-Aufnahme
+  (ADR-0018) auf.
+
 ## [0.1.3] - 2026-09-16
 
 ### Geändert

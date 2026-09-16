@@ -15,6 +15,7 @@ const {
     MAX_HISTORY_DAYS,
     formatTodaySummary,
 } = require('../../lib/usage');
+const { getTodayKey } = require('../../lib/license');
 
 function makeAdapter(config) {
     return {
@@ -59,7 +60,7 @@ describe('usage', () => {
     });
 
     it('recordUsage adds to an existing same-day counter', async () => {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = getTodayKey();
         const adapter = makeAdapter();
         adapter.getStateAsync.resolves({ val: JSON.stringify({ date: today, tokensToday: 500 }) });
 
@@ -87,7 +88,7 @@ describe('usage', () => {
     it('getTodayUsage resets malformed and nonnumeric stored usage', async () => {
         const adapter = makeAdapter();
         adapter.getStateAsync.onFirstCall().resolves({ val: '{broken' });
-        adapter.getStateAsync.onSecondCall().resolves({ val: JSON.stringify({ date: new Date().toISOString().slice(0, 10), tokensToday: 'many' }) });
+        adapter.getStateAsync.onSecondCall().resolves({ val: JSON.stringify({ date: getTodayKey(), tokensToday: 'many' }) });
 
         expect((await getTodayUsage(adapter)).tokensToday).to.equal(0);
         expect((await getTodayUsage(adapter)).tokensToday).to.equal(0);
@@ -110,7 +111,7 @@ describe('usage', () => {
 
     describe('isBudgetExceeded (EUR-based)', () => {
         it('is false when dailyBudgetEur is 0 or unset, regardless of usage', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({ dailyBudgetEur: 0, chatPricePerMillionInputTokens: 3 });
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
                 val: JSON.stringify([{ date: today, chat: { inputTokens: 1000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
@@ -119,7 +120,7 @@ describe('usage', () => {
         });
 
         it('is false when a budget is set but no price is configured, even with heavy usage', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({ dailyBudgetEur: 1 });
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
                 val: JSON.stringify([{ date: today, chat: { inputTokens: 100000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
@@ -128,7 +129,7 @@ describe('usage', () => {
         });
 
         it('compares today\'s calculated cost (chat + onboarding) against the configured EUR budget', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({
                 dailyBudgetEur: 4,
                 chatPricePerMillionInputTokens: 3,
@@ -148,7 +149,7 @@ describe('usage', () => {
         });
 
         it('is false when under budget', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({ dailyBudgetEur: 10, chatPricePerMillionInputTokens: 3 });
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
                 val: JSON.stringify([{ date: today, chat: { inputTokens: 1000000, outputTokens: 0 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
@@ -209,7 +210,7 @@ describe('usage', () => {
         });
 
         it('drops malformed history entries and repairs nonnumeric purpose totals', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter();
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
@@ -234,7 +235,7 @@ describe('usage', () => {
 
     describe('refreshTodaySummary', () => {
         it('recomputes TODAY_SUMMARY_STATE from persisted history and current config without recording new usage', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({ dailyBudgetEur: 5, chatPricePerMillionInputTokens: 0.4, chatPricePerMillionOutputTokens: 1.8 });
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves({
                 val: JSON.stringify([{ date: today, chat: { inputTokens: 100000, outputTokens: 20000 }, onboarding: { inputTokens: 0, outputTokens: 0 } }]),
@@ -261,7 +262,7 @@ describe('usage', () => {
 
     describe('recordUsage with purpose / history', () => {
         it('defaults to purpose "chat" and creates a new history entry for today', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter();
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
@@ -276,7 +277,7 @@ describe('usage', () => {
         });
 
         it('accumulates onboarding usage separately from chat usage on the same day', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const existingHistory = [
                 { date: today, chat: { inputTokens: 50, outputTokens: 10 }, onboarding: { inputTokens: 0, outputTokens: 0 } },
             ];
@@ -294,7 +295,7 @@ describe('usage', () => {
         });
 
         it('repairs a malformed existing entry that is missing the purpose key', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const existingHistory = [{ date: today, chat: { inputTokens: 50, outputTokens: 10 } }];
             const adapter = makeAdapter();
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
@@ -310,7 +311,7 @@ describe('usage', () => {
         });
 
         it('appends a separate entry for a new day without touching prior days', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const existingHistory = [
                 { date: '2000-01-01', chat: { inputTokens: 999, outputTokens: 999 }, onboarding: { inputTokens: 0, outputTokens: 0 } },
             ];
@@ -367,7 +368,7 @@ describe('usage', () => {
         });
 
         it('recordUsage also writes TODAY_SUMMARY_STATE with formatted string', async () => {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getTodayKey();
             const adapter = makeAdapter({ dailyBudgetEur: 5 });
             adapter.getStateAsync.withArgs(USAGE_STATE).resolves(null);
             adapter.getStateAsync.withArgs(HISTORY_STATE).resolves(null);
