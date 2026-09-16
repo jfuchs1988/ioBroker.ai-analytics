@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.74] - 2026-09-16
+
+### Behoben
+
+- Lizenz-Aktivierungsbutton im Admin ist jetzt im Module-Federation-Bundle
+  exportiert und wird in den Adapter-Einstellungen angezeigt.
+
 ## [0.0.1-beta.73] - 2026-09-16
 
 ### Hinzugefügt

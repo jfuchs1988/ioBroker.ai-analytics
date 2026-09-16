@@ -6,7 +6,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `fix/license-activation-button` (nicht committet).
+- Branch: `master` (Release beta.74 veröffentlicht).
 - Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
   wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
   wurde neu gebaut. Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
@@ -14,12 +14,12 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
   schmale Aktivierungs-UI. Offline-`evaluateLicense` und
   `info.licenseStatus` bleiben maßgeblich.
-- Verifikation: `npm test` (486 Unit- und 60 Admin-Tests), `npm run lint`,
-  `npm run build:admin` und `git diff --check` erfolgreich. Nächste Aktion:
-  Bundle in ioBroker installieren und den Button mit Hard-Reload prüfen.
-- Der Backend-Endpunkt bleibt absichtlich über `licenseBackendUrl` zu
-  konfigurieren; der Default ist leer, weil für das Backend-Repository keine
-  veröffentlichte Produktions-URL vorgegeben ist.
+- Verifikation des Fixes: `npm test` (486 Unit- und 60 Admin-Tests),
+  `npm run lint`, `npm run build:admin`, `npm run test:e2e`, Paketbau und
+  `git diff --check` erfolgreich. Release beta.74 ist bereit für Tag und
+  GitHub-Release.
+- Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
+  eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
@@ -34,7 +34,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   als beta.67 veröffentlicht; Release-Metadaten sind als beta.68 synchronisiert;
   CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind als
   beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht;
-  der versionierte Nachtrag ist als beta.72 veröffentlicht.
+  der versionierte Nachtrag ist als beta.72 veröffentlicht; der Lizenz-
+  Aktivierungsbutton ist als beta.74 veröffentlicht.
 
 ## TODO
 
