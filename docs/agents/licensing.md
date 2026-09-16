@@ -13,18 +13,18 @@ Third-party dependency attribution is summarized in
   MIT-Umfang ausgenommen und tragen einen Dateikopf mit diesem Hinweis.
 - Auch Beta-Versionen benötigen für Chat, Onboarding und proaktive Analysen ein
   gespeichertes, gültiges Sponsoring-Entitlement.
-- Die produktive Durchsetzung beginnt frühestens mit `0.1.0` und erst nach
-  Bereitstellung der separaten Ausstellungs-Webanwendung und öffentlicher
-  Ed25519-Schlüssel.
+- Die produktive Durchsetzung ist seit `0.1.0` aktiv; die separate
+  Ausstellungs-Webanwendung und der öffentliche Ed25519-Schlüssel sind produktiv
+  angebunden.
 
 ## Technischer Vertrag
 
-`lib/license.js` enthält bereits die dormant-fähige Offline-Prüfung für
+`lib/license.js` enthält die aktive Offline-Prüfung für
 Ed25519-JWS, Claims, die 30-tägige Grace-Period und den täglichen
 Chat-Fallback. Die Ausstellungs-Webanwendung muss beim Erzeugen des Tokens
 `exp = sponsorUntil` durchsetzen (30 Tage Sponsoring, keine separate
-technische Pufferfrist; siehe Backend-ADR 0004). Während der Beta gewährt der
-Versionsguard Vollzugriff.
+technische Pufferfrist; siehe Backend-ADR 0004). Auch Beta-Versionen passieren
+keinen Versions-Bypass.
 
 ## Änderungsregeln
 

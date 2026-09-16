@@ -4,7 +4,7 @@
 
 Architekturrelevante Fragen, die noch **nicht** entschieden wurden. Jeder Eintrag wird erst zu einer eigenen ADR unter `docs/adr/`, sobald eine Entscheidung getroffen ist. Sortiert nach grober Priorität (dringend/blockierend zuerst).
 
-_Aktualisiert 2026-08-21: die vorherigen Punkte 1 (Chat-Tab-Technologie), 2 (Onboarding-Rückfragen), 3 (Konversationsgedächtnis) und 5 (Kosten-/Token-Budget) sind durch [ADR-0017](0017-scoped-catalog-write-capability.md) und die zugehörige [Spec](../specs/2026-08-21-chat-fixes-and-safeguards.md) aufgelöst. Die verbleibenden Punkte wurden entsprechend neu nummeriert._
+_Aktualisiert 2026-09-16: Releases `0.1.0` bis `0.1.2` sind veröffentlicht; die frühere Beta-/Release-Entscheidung ist erledigt. Historische Nummern bleiben für Querverweise erhalten._
 
 _Aktualisiert 2026-08-22: der manuelle Re-Discovery-Trigger aus Punkt 1 und der vormalige Punkt 12 (manueller Trigger für die proaktive Prüfung) sind durch den Geräte-Tab ([Spec](../specs/2026-08-22-geraete-tab-design.md), [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md)) aufgelöst — Punkt 12 entfällt, Punkt 1 ist auf die verbleibende Instanz-Auswahl-Frage verengt._
 
@@ -20,7 +20,9 @@ Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen ber
 
 ## 2. Deduplizierung und abgestufte Wiederholung von Ausfallmeldungen
 
-Implementiert: pro History-Instanz wird ein persistenter Health-Status geführt. Nach drei aufeinanderfolgenden Fehlern wird einmalig im Chat gemeldet und die Instanz wird aus den Prüfungen genommen. Wiederholungen erfolgen nach 12, 24 und 48 Stunden. Nach dem letzten erfolglosen Retry wird die Instanz nicht weiter automatisch belastet. Eine erfolgreiche Abfrage setzt den Status zurück.
+Teilweise implementiert: pro History-Instanz wird ein persistenter Health-Status
+mit Fehlerzähler, Meldungszustand und Retry-Zeitpunkt geführt. Die vollständige
+Deduplizierung und ein endgültiger „exhausted“-Zustand sind noch offen.
 
 ## 3. Teststrategie für main.js und die Admin-UI — gelöst
 
@@ -42,9 +44,11 @@ vorhanden. Die zuvor nur deaktivierten GitHub-Actions-Workflow-Dateien
 Repository entfernt worden statt sie reaktiviert vorzuhalten; Prüfung und
 Release bleiben dauerhaft manuell.
 
-## 6. Versionierungs-/Release-Policy nach der Beta-Phase — TODO
+## 6. Versionierungs-/Release-Policy nach der Beta-Phase — gelöst
 
-Wann wird aus `0.0.x-beta` eine `0.1.0`? Nach welchen Kriterien (alle bekannten Lücken behoben? erfolgreicher Langzeit-Betrieb?). Noch nicht festgelegt.
+`0.1.0` wurde am 2026-09-16 als stabile Version veröffentlicht. Die
+Entitlement-Prüfung ist aktiv; bekannte Produkt- und Live-Abnahmelücken bleiben
+als Folgeaufgaben dokumentiert.
 
 ## 7. Katalog-Skalierung bei großen Installationen — TODO
 
@@ -52,7 +56,7 @@ Von der Spec als spätere Optimierung markiert. Zu klären: Vorfilterung nach Ka
 
 ## 8. Sicherheitsmodell für zukünftige schreibende Werkzeuge
 
-[ADR-0017](0017-scoped-catalog-write-capability.md) hat die erste, eng begrenzte Schreibfähigkeit des **LLM-Tools** (`updateCatalogEntry`, nur für `needsReview`-Einträge) eingeführt. [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) hat den **Admin-Message-Bus**-Pfad (Mensch über Admin-UI, voller Katalog-Schreibzugriff) als separate, bereits geklärte Vertrauensgrenze definiert. Offen bleibt das generelle Modell für künftige, weitergehende **LLM**-Schreibzugriffe (z. B. Geräte schalten): reicht eine enge, feld-/status-beschränkte Freigabe wie bei ADR-0017 weiterhin, oder braucht es ab einem bestimmten Wirkungsgrad eine explizite Nutzerbestätigung pro Schreibaktion?
+[ADR-0017](0017-scoped-catalog-write-capability.md) hat die erste, eng begrenzte Schreibfähigkeit des **LLM-Tools** eingeführt. Das Werkzeug darf zusätzlich `valueKind` nach ausdrücklicher Nutzerangabe korrigieren; zentrale Enum-/Rollenvalidierung bleibt aktiv. [ADR-0020](0020-admin-message-bus-voller-katalog-schreibzugriff.md) definiert weiterhin den separaten Admin-Message-Bus. Offen bleiben weitergehende LLM-Schreibzugriffe wie Geräte schalten.
 
 ## 9. Mehrinstanz-Unterstützung — Entscheidung: global
 

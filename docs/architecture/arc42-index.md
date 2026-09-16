@@ -2,7 +2,10 @@
 
 [← zurück zur Dokumentations-Übersicht](../README.md)
 
-Status: v0.0.1-beta released; manueller Abnahmetest läuft — Installation/Start/Discovery/Katalog bestätigt funktionierend, Admin-Chat-Tab bestätigt defekt (Diagnose unterbrochen, wird fortgesetzt). Details in [Abschnitt 11](11-risiken-und-schulden.md).
+Status: `0.1.2` released; Adapter-Lifecycle, Backend-Lizenzintegration und
+automatisierte Tests sind umgesetzt. Die verbleibende Live-Abnahme betrifft
+vor allem die Browser-Interaktion des Admin-Geräte-Tabs und die aktuelle
+Klassifikationsqualität. Details in [Abschnitt 11](11-risiken-und-schulden.md).
 
 Diese Dokumentation folgt dem [arc42-Template](https://arc42.org/) (Multi-Page-Markdown-Edition), eine Datei pro Kapitel.
 

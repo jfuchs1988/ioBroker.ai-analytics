@@ -38,13 +38,14 @@ npx vitest run test/admin/<name>.test.jsx
 - Fehlerpfade, Grenzen und ungültige persistierte Daten gehören zu jedem
   relevanten Vertrag.
 
-## Bekannte Grenze
+## Bekannte Grenzen
 
 Kein Playwright-/Browser-E2E-Test der Admin-Oberfläche gegen eine laufende
 ioBroker-Installation; das bleibt manuelle Live-Abnahme (siehe
 `WORKLOG.md`-TODO). Der js-controller-E2E-Test deckt Adapter-Lifecycle und
 Objekt-/State-Verträge ab, nicht die KI-Pfade (die bleiben Unit-getestet mit
-Fake-Providern).
+Fake-Providern). Die React-Komponenten selbst haben Vitest/jsdom-Abdeckung;
+echte Browser-/Socket-Interaktion bleibt die manuelle Live-Abnahme.
 
 Die jeweils aktuelle Anzahl erfolgreicher Tests kommt aus der Testausgabe und
 wird nicht in dauerhaften Dokumenten festgeschrieben.

@@ -30,6 +30,11 @@ Dieser Index trennt Produkt-, Architektur-, Umsetzungs- und Agentenkontext.
 - [Datenpunkt-Klassifizierung](specs/2026-08-24-datenpunkt-klassifizierung.md)
 - [Hybride Anomalieerkennung](specs/2026-09-03-hybride-anomalieerkennung.md)
 - [Hybrides Lizenzmodell und Entitlements](specs/2026-09-03-hybrid-license-and-entitlements.md)
+- [Lizenz-Backend-Integration](specs/2026-09-16-license-backend-integration.md)
+- [Admin-Lizenzstatus](specs/2026-09-16-license-status-display.md)
+- [Entitlement für Chat-Anfragen](specs/2026-09-16-token-required-for-chat.md)
+- [How-To- und Admin-Konzept](../admin/jsonConfig.json): operative Erklärung im
+  Admin-Tab „How To“
 - [Deep Security Hardening](specs/2026-09-04-deep-security-hardening.md)
 - [Session-Kontext und Dokumentationsstruktur](specs/2026-09-04-session-kontext-und-dokumentation.md)
 

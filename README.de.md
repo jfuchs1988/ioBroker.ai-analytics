@@ -20,11 +20,12 @@ ungewöhnliche Beobachtungen.
 - Datenqualitätsfelder für Schreibbarkeit, Schreibmuster, Frequenz und
   Vollständigkeit
 - Geräte- und Katalogverwaltung im ioBroker-Admin
-- CSV-Export/-Import für die Katalogpflege
+- CSV-Export/-Import für die Katalogpflege im Geräte-Tab
 - Anthropic, OpenAI, OpenRouter und lokale OpenAI-kompatible Provider
 - Optional eigener Provider für das Onboarding
 - Tagesbudget in EUR mit Token- und Kostenhistorie
-- Offline-fähige Grundlage für die spätere Sponsoring-Entitlement-Prüfung
+- Interaktive GitHub-Sponsoring-Aktivierung mit geschützter Token-Speicherung
+- How-To-Seite für Prüfungen, Chat-Fragen, valueKind und Datenqualität
 
 ## Voraussetzungen
 
@@ -64,10 +65,10 @@ Im ioBroker-Admin konfigurierbar:
   konfigurierbares Modell-Kontextfenster
 - Sicherheitslimits für Agent-Iterationen, Tool-Aufrufe und Zeiträume
 - Optionale valueKind- und Datenqualitäts-Backfills
-- Sponsoring-Entitlement-Token für die spätere stabile Release-Policy
+- Sponsoring-Aktivierung, gespeicherter Tokenstatus, GitHub-Identität und Ablaufdatum
 
-Das Tokenfeld wird von ioBroker geschützt und verschlüsselt. Es wird nicht in
-den Settings-CSV-Export aufgenommen.
+Der Entitlement-Token wird von ioBroker geschützt und verschlüsselt. Er wird im
+Admin nicht angezeigt und kann dort bewusst lokal gelöscht werden.
 
 ## Provider und Datenschutz
 
@@ -94,7 +95,8 @@ aktives Logging über History, InfluxDB und SQL:
 ## Sponsoring und Lizenz
 
 Das Repository enthält einen MIT-lizenzierten Kern und separat dokumentierte
-`sponsor-required`-KI-Komponenten. Alle `-beta`-Versionen bleiben kostenlos.
+`sponsor-required`-KI-Komponenten. Alle Versionen benötigen ein gültiges
+Sponsoring-Entitlement.
 Die technische Entitlement-Policy startet mit `0.1.0`: Eine separate
 Sponsoring-Webanwendung stellt Ed25519-signierte JWS-Tokens aus. Sie stehen
 für 30 Tage Sponsoring, der technische Tokenablauf entspricht genau diesem

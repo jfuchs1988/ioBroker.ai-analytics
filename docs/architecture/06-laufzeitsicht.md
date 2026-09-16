@@ -20,20 +20,20 @@
 3. Der Agent ruft iterativ Katalog-, Rohdaten- und typbewusste Periodenwerkzeuge auf, bis genug Datengrundlage vorliegt. `getPeriodTotal` und `comparePeriods` werden für bekannte `valueKind`-Einträge bevorzugt.
 4. Finale Antwort wird geloggt und als Socket-Antwort (bzw. Bridge-Antwort-State) an den Chat-Tab zurückgegeben; Fehler erscheinen sichtbar als Fehlerbubble im Chat.
 
-**Abnahmetest-Status:** der ursprünglich ausschließlich `sendTo`-basierte Ablauf war auf der Testinstanz blockiert. Mit dem State-Bridge-Ausweichkanal und den korrigierten Antwort-/Polling-Formaten (2026-08-24) existiert ein funktionsfähiger Weg; ein erneuter Live-Test nach dem aktuellen Deployment bleibt als manueller Abnahmepunkt offen.
+**Abnahmetest-Status:** der ursprünglich ausschließlich `sendTo`-basierte Ablauf war auf der Testinstanz blockiert. Mit dem State-Bridge-Ausweichkanal und den korrigierten Antwort-/Polling-Formaten (2026-08-24) existiert ein funktionsfähiger Weg; ein erneuter Browser-Live-Test bleibt als manueller Abnahmepunkt offen.
 
 ## 6.3 Proaktive Prüfung
 
-1. `scheduler.startProactiveScheduler` löst nach konfigurierbarem Intervall (Default 24h) `runProactiveCheck` aus.
-2. Derselbe Agent-Loop läuft mit einem Prüfauftrags-Prompt statt einer Nutzerfrage.
+1. `scheduler.startProactiveScheduler` löst nach konfigurierbarem Intervall (Default 24h) `runProactiveCheck` aus; Lizenz, Provider und Budget werden vorher geprüft.
+2. Eine statistische, HVAC- und Energiebilanz-Voranalyse erzeugt Kandidaten. Nur diese Kandidaten gehen mit read-only Werkzeugen an den Agent-Loop.
 3. Ergebnis wird geloggt und nach `recordUsage` im Token-Verbrauch erfasst — bei "keine Auffälligkeiten" nur, wenn `silentIfNothingFound` **nicht** gesetzt ist (Default: Bestätigung posten, siehe [ADR-0006](../adr/0006-default-bestaetigung-posten.md)).
 
 Noch nicht im aktuellen Abnahmetest geprüft; der manuelle Trigger „Prüfung jetzt ausführen“ ist inzwischen vorhanden.
 
 ## 6.4 Modellvorschläge in der Admin-Konfiguration
 
-1. Das `autocompleteSendTo`-Feld sendet Provider-Typ, API-Key und optionale Basis-URL direkt an `listProviderModels`.
-2. `providers.listModels` ruft den Modell-Endpunkt des gewählten Providers mit einem 15-Sekunden-Timeout auf. Der API-Key wird nur für diesen Aufruf verwendet und nicht geloggt oder persistiert.
+1. Die Modellfelder sind freie Eingaben mit Vorschlagsauswahl für bekannte OpenCode-Zen-Modelle; die frühere `autocompleteSendTo`-Anbindung ist nicht mehr aktiv.
+2. `providers.listModels` und `listProviderModels` bleiben als Backend-Fallback für Provider-Modelllisten erhalten, sind aber nicht an ein sichtbares Modellfeld gekoppelt.
 3. OpenRouter verwendet standardmäßig `https://openrouter.ai/api/v1/models` und liefert nur Modelle zurück, deren Live-Metadaten kostenlose Ein-/Ausgabe und Tool-Calling ausweisen. Andere Provider liefern ihre verfügbaren Modelle ohne Kostenklassifikation.
 4. Bei Fehlern erhält die UI eine leere Vorschlagsliste. `freeSolo:true` erlaubt weiterhin die manuelle Eingabe einer Modell-ID.
 

@@ -1,8 +1,8 @@
-# ADR-0005: Proaktive Prüfung — KI bewertet Daten komplett selbst, keine festen Regeln
+# ADR-0005: Proaktive Prüfung — historische Entscheidung, durch Hybridmodell ersetzt
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Angenommen
+**Status:** Überholt durch die hybride Anomalieerkennung seit 2026-09-04
 **Datum:** 2026-08-21
 
 ## Kontext
@@ -11,9 +11,12 @@ Für die proaktive Prüfung wurden im Brainstorming drei Varianten erwogen: (1) 
 
 ## Entscheidung
 
-Die proaktive Prüfung (`runProactiveCheck` in `main.js`) übergibt der KI keine festen Schwellwerte. Sie bekommt Zugriff auf dieselben Werkzeuge wie der Chat-Agent und entscheidet komplett selbst, was sie als auffällig einstuft.
+Die ursprüngliche Entscheidung für eine vollständig KI-basierte Prüfung wurde
+durch die hybride Anomalieerkennung ersetzt. `main.js` berechnet zunächst
+statistische, HVAC- und Energiebilanz-Kandidaten; die KI erklärt anschließend
+nur diese belegten Kandidaten.
 
-## Konsequenzen
+## Historische Konsequenzen
 
 - Erkennt auch unerwartete Muster, die keine Regel vorhergesehen hätte.
 - Kosten pro Prüflauf und Vorhersagbarkeit der Ergebnisse sind geringer als bei einer Regel-Engine — akzeptierter Trade-off.

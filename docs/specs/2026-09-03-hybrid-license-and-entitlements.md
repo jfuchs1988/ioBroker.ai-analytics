@@ -10,7 +10,8 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
 - Der Adapterkern wird unter MIT veröffentlicht.
 - KI-Provider, Agent, KI-Onboarding sowie proaktive/anomaliebasierte Analyse
   sind sponsor-required und in `LICENSES/SPONSOR-REQUIRED.md` aufgelistet.
-- Alle Beta-Versionen dürfen die sponsor-required Komponenten kostenlos nutzen.
+- Alle Versionen benötigen für die sponsor-required Komponenten ein gültiges
+  Sponsoring-Entitlement.
 - Ab der ersten stabilen Version `0.1.0` benötigen diese Komponenten ein
   gültiges Sponsoring-Entitlement.
 - Der Lizenzstatus darf API-Schlüssel und Nutzerdaten nicht protokollieren oder
@@ -31,9 +32,8 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
 - Die technische Prüfung erfolgt offline anhand des signierten Tokens. Der
   separate Backend-Client dient nur der Aktivierung und freiwilligen Erneuerung;
   Nichterreichbarkeit darf den lokal gültigen/gracefähigen Token nicht entwerten.
-- Die erste Adapterimplementierung darf während der Beta dormant bleiben,
-  solange das öffentliche Schlüsselregister noch nicht mit dem Schlüssel der
-  Ausstellungs-Webanwendung bestückt ist.
+- Die Adapterimplementierung ist aktiv; öffentliche Schlüssel und Backend-
+  Aktivierung sind produktiv angebunden.
 
 Das JWS-Payload enthält mindestens `tokenVersion: 1`, `iss: "ai-analytics-license"`,
 `aud: "ioBroker.ai-analytics"`, `licenseId`, `iat`, `nbf`, `exp` und
