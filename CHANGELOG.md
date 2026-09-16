@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.73] - 2026-09-16
+
+### Hinzugefügt
+
+- Sichere Backend-Aktivierung mit geschützter Installations-ID und automatischer
+  Token-Ausgabe.
+- Automatische Entitlement-Erneuerung ohne erneute Benutzerinteraktion.
+- Fester Production-Lizenzdienst-Endpunkt; keine URL-Konfiguration im Admin.
+
 ## [0.0.1-beta.72] - 2026-09-09
 
 ### Behoben
