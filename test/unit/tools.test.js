@@ -326,6 +326,28 @@ describe('buildTools', () => {
         expect(setCatalogEntry.called).to.equal(false);
     });
 
+    it('updateCatalogEntry allows an explicit valueKind correction on a known entry', async () => {
+        const existingEntry = {
+            sourceId: 'javascript.0.meter', description: 'Zaehler', unit: 'kWh', category: 'consumption',
+            room: '', valueKind: 'gauge', needsReview: false, active: true, historyInstance: 'history.0',
+        };
+        const setCatalogEntry = sinon.stub().resolves();
+        const { buildTools } = loadToolsWithStubs({
+            getAllCatalogEntries: sinon.stub().resolves([existingEntry]),
+            setCatalogEntry,
+        });
+
+        await buildTools({}).execute('updateCatalogEntry', { sourceId: existingEntry.sourceId, valueKind: 'cumulative_total' });
+
+        expect(setCatalogEntry.firstCall.args[1]).to.deep.include({
+            sourceId: existingEntry.sourceId,
+            valueKind: 'cumulative_total',
+            valueKindConfidence: 'high',
+            valueKindSource: 'manual',
+            needsReview: false,
+        });
+    });
+
     it('updateCatalogEntry throws for an unknown sourceId', async () => {
         const { buildTools } = loadToolsWithStubs({
             getAllCatalogEntries: sinon.stub().resolves([]),

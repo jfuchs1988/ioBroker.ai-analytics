@@ -65,15 +65,6 @@
           "label": "Sponsoring-Aktivierung",
           "newLine": true
         },
-        "settingsCsv": {
-          "type": "custom",
-          "url": "custom/customComponents.js",
-          "name": "AiAnalyticsConfig/Components/SettingsCsvComponent",
-          "guiApi": 2,
-          "bundlerType": "module",
-          "newLine": true,
-          "label": "Settings sichern / importieren"
-        },
         "topDivider": {
           "type": "divider",
           "newLine": true
@@ -357,7 +348,7 @@
         "maxAgentIterations": {
           "type": "number",
           "label": "Maximale KI-Schritte pro Anfrage (1-32)",
-          "default": 8,
+          "default": 32,
           "min": 1,
           "max": 32,
           "xs": 12,
@@ -369,7 +360,7 @@
         "maxToolCalls": {
           "type": "number",
           "label": "Maximale Werkzeug-Aufrufe (1-128)",
-          "default": 32,
+          "default": 128,
           "min": 1,
           "max": 128,
           "xs": 12,
@@ -381,7 +372,7 @@
         "maxPeriodsPerRequest": {
           "type": "number",
           "label": "Maximale Zeiträume pro Anfrage (1-1024)",
-          "default": 256,
+          "default": 1024,
           "min": 1,
           "max": 1024,
           "xs": 12,
@@ -393,7 +384,7 @@
         "maxPeriodsPerToolCall": {
           "type": "number",
           "label": "Maximale Zeiträume je Werkzeug (1-120)",
-          "default": 72,
+          "default": 120,
           "min": 1,
           "max": 120,
           "xs": 12,
@@ -432,6 +423,26 @@
           "md": 6,
           "lg": 4,
           "xl": 4
+        }
+      }
+    },
+    "howToTab": {
+      "type": "panel",
+      "label": "How To",
+      "items": {
+        "howToHeader": {
+          "type": "header",
+          "text": "How To: AI Analytics verstehen",
+          "size": 3,
+          "newLine": true
+        },
+        "howToContent": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/HowToComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
+          "newLine": true
         }
       }
     },
