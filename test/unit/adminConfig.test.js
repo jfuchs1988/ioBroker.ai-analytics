@@ -43,10 +43,10 @@ describe('admin configuration links and model discovery', () => {
         expect(config.items.settingsTab.items.usageReset.name).to.equal('AiAnalyticsConfig/Components/UsageResetComponent');
     });
 
-    it('configures the backend URL and activation component', () => {
+    it('exposes activation without allowing the backend URL to be changed', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         const settings = config.items.settingsTab.items;
-        expect(settings.licenseBackendUrl.type).to.equal('text');
+        expect(settings.licenseBackendUrl).to.equal(undefined);
         expect(settings.licenseActivation.name).to.equal('AiAnalyticsConfig/Components/LicenseActivationComponent');
     });
 

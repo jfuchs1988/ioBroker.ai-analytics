@@ -107,7 +107,6 @@
      "enableValueKindBackfill": false,
      "enableDataQualityBackfill": false,
       "licenseToken": "",
-      "licenseBackendUrl": "https://iob-ai-analytics.jfuchs.de",
       "installationId": ""
   },
   "objects": [],

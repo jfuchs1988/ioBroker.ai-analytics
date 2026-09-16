@@ -155,7 +155,7 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async startLicenseActivation() {
-        const result = await licenseBackend.createActivation({ url: this.config.licenseBackendUrl, installationId: await this.ensureInstallationId() });
+        const result = await licenseBackend.createActivation({ url: licenseBackend.DEFAULT_BACKEND_URL, installationId: await this.ensureInstallationId() });
         this.licenseActivation = { ...result, status: 'pending' };
         await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify(this.licenseActivation), ack: true });
         this.pollLicenseActivation().catch(error => this.log.warn(`Lizenzaktivierung fehlgeschlagen: ${error.message}`));
@@ -171,11 +171,11 @@ class AiAnalytics extends utils.Adapter {
         if (!activation) return;
         const deadline = Math.min(activation.expiresAt * 1000, Date.now() + 10 * 60 * 1000);
         while (this.licenseActivation === activation && Date.now() < deadline) {
-            const result = await licenseBackend.getActivationStatus({ url: this.config.licenseBackendUrl, activationCode: activation.activationCode });
+            const result = await licenseBackend.getActivationStatus({ url: licenseBackend.DEFAULT_BACKEND_URL, activationCode: activation.activationCode });
             activation.status = result.status;
             await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
             if (result.status === 'authorized') {
-                const entitlement = await licenseBackend.issueEntitlement({ url: this.config.licenseBackendUrl, activationCode: activation.activationCode });
+                const entitlement = await licenseBackend.issueEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, activationCode: activation.activationCode });
                 await this.storeLicenseToken(entitlement.token);
                 activation.status = 'redeemed';
                 await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
@@ -187,9 +187,9 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async renewLicense() {
-        if (!this.config.licenseBackendUrl || !this.config.licenseToken) return;
+        if (!this.config.licenseToken) return;
         try {
-            const entitlement = await licenseBackend.renewEntitlement({ url: this.config.licenseBackendUrl, token: this.config.licenseToken });
+            const entitlement = await licenseBackend.renewEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, token: this.config.licenseToken });
             await this.storeLicenseToken(entitlement.token);
         } catch (error) {
             this.log.warn(`Lizenzverlängerung nicht möglich; Offline-Status bleibt aktiv (${error.message})`);

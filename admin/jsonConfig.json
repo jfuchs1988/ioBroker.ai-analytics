@@ -394,17 +394,6 @@
           "lg": 8,
           "xl": 8
         },
-        "licenseBackendUrl": {
-          "type": "text",
-          "label": "Lizenzdienst-URL (HTTPS)",
-          "help": "Leer lassen, wenn kein Lizenzdienst konfiguriert ist.",
-          "newLine": true,
-          "xs": 12,
-          "sm": 12,
-          "md": 8,
-          "lg": 8,
-          "xl": 8
-        },
         "licenseActivation": {
           "type": "custom",
           "url": "custom/customComponents.js",
