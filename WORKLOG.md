@@ -6,19 +6,17 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `feature/adapter-license-backend` (nicht committet).
-- Status: Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
+- Branch: `fix/license-activation-button` (nicht committet).
+- Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
+  wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
+  wurde neu gebaut. Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
   Aktivierung/Polling/Issue/Renewal, geschützte UUID-Installation-ID und
   Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
   schmale Aktivierungs-UI. Offline-`evaluateLicense` und
-  `info.licenseStatus` bleiben maßgeblich. Ein gebündelter Admin-Build konnte
-  nicht aktualisiert werden, weil `npm` und `node` in dieser Umgebung fehlen;
-  `admin/custom/customComponents.js` muss nach dem Build vor Release geprüft
-  und aktualisiert werden.
-- Verifikation: `git diff --check` erfolgreich. `npm test`, `npm run lint` und
-  `npm run build:admin` sowie Syntaxprüfung konnten wegen fehlendem `npm`/`node`
-  nicht ausgeführt werden. Nächste Aktion: auf einer Node-22-Umgebung diese
-  drei Befehle ausführen und den generierten Admin-Bundle-Stand prüfen.
+  `info.licenseStatus` bleiben maßgeblich.
+- Verifikation: `npm test` (486 Unit- und 60 Admin-Tests), `npm run lint`,
+  `npm run build:admin` und `git diff --check` erfolgreich. Nächste Aktion:
+  Bundle in ioBroker installieren und den Button mit Hard-Reload prüfen.
 - Der Backend-Endpunkt bleibt absichtlich über `licenseBackendUrl` zu
   konfigurieren; der Default ist leer, weil für das Backend-Repository keine
   veröffentlichte Produktions-URL vorgegeben ist.

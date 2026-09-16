@@ -48,6 +48,7 @@ describe('admin configuration links and model discovery', () => {
         const settings = config.items.settingsTab.items;
         expect(settings.licenseBackendUrl).to.equal(undefined);
         expect(settings.licenseActivation.name).to.equal('AiAnalyticsConfig/Components/LicenseActivationComponent');
+        expect(fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.js'), 'utf8')).to.include('LicenseActivationComponent');
     });
 
     it('provides the required size for the onboarding section header', () => {

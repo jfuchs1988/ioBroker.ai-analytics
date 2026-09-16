@@ -1,4 +1,4 @@
-import CatalogDevicesComponent, { SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent } from './Components.jsx';
+import CatalogDevicesComponent, { LicenseActivationComponent, SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent } from './Components.jsx';
 
-export { CatalogDevicesComponent, SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent };
-export default { CatalogDevicesComponent, SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent };
+export { CatalogDevicesComponent, LicenseActivationComponent, SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent };
+export default { CatalogDevicesComponent, LicenseActivationComponent, SettingsCsvComponent, ProviderSelectComponent, ModelSelectComponent, UsageResetComponent };
