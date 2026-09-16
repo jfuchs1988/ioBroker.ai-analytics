@@ -94,7 +94,8 @@ documentation is available at:
 ## Sponsoring and License
 
 The repository contains an MIT-licensed core and separately documented
-`sponsor-required` AI components. All `-beta` versions remain free. The
+`sponsor-required` AI components. All versions require a valid stored
+Sponsoring-Entitlement. The
 technical entitlement policy starts with `0.1.0`: Ed25519-signed JWS tokens are
 issued by a separate sponsorship web application, represent 30 days of
 sponsorship with a technical expiry equal to that period, and include a

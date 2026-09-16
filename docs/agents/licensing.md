@@ -11,7 +11,8 @@ Third-party dependency attribution is summarized in
 - Der allgemeine Adapterkern steht unter MIT.
 - Die in `LICENSES/SPONSOR-REQUIRED.md` aufgeführten KI-Komponenten sind vom
   MIT-Umfang ausgenommen und tragen einen Dateikopf mit diesem Hinweis.
-- Alle Beta-Versionen erlauben deren kostenlose Nutzung.
+- Auch Beta-Versionen benötigen für Chat, Onboarding und proaktive Analysen ein
+  gespeichertes, gültiges Sponsoring-Entitlement.
 - Die produktive Durchsetzung beginnt frühestens mit `0.1.0` und erst nach
   Bereitstellung der separaten Ausstellungs-Webanwendung und öffentlicher
   Ed25519-Schlüssel.

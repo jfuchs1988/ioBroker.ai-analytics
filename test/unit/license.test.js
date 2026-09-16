@@ -24,12 +24,12 @@ function makeKeys() {
 }
 
 describe('license evaluation', () => {
-    it('keeps all beta versions fully enabled without a token', () => {
+    it('requires a token for beta versions as well', () => {
         const result = evaluateLicense({ version: '0.0.1-beta.28', token: '', now: 1000, publicKeys: {} });
 
-        expect(result).to.deep.include({ status: 'beta', fullAccess: true });
-        expect(canRunProactive(result)).to.equal(true);
-        expect(canUseChat(result, null, '2026-09-03')).to.equal(true);
+        expect(result).to.deep.include({ status: 'invalid', fullAccess: false });
+        expect(canRunProactive(result)).to.equal(false);
+        expect(canUseChat(result, null, '2026-09-03')).to.equal(false);
     });
 
     it('accepts a valid Ed25519 JWS without requiring instance binding', () => {
@@ -101,7 +101,7 @@ describe('license evaluation', () => {
 
         expect(result.status).to.equal('invalid');
         expect(result.fullAccess).to.equal(false);
-        expect(canUseChat(result, null, '2026-09-03')).to.equal(true);
+        expect(canUseChat(result, null, '2026-09-03')).to.equal(false);
     });
 
     it('rejects malformed claim timelines despite a valid signature', () => {
