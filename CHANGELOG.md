@@ -3,6 +3,17 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.0] - 2026-09-16
+
+### Veröffentlicht
+
+- Erste stabile Version mit verpflichtendem Sponsoring-Entitlement für Chat,
+  Onboarding und proaktive Analysen.
+- Interaktive GitHub-Aktivierung mit geschützter Token-Speicherung,
+  Benutzer-/Gültigkeitsstatus und lokalem Löschen.
+- Neu strukturierte Admin-Einstellungen für Provider, API-Schlüssel, Budget und
+  Sponsoring.
+
 ## [0.0.1-beta.78] - 2026-09-16
 
 ### Geändert
