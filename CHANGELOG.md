@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.5] - 2026-09-17
+
+### Sicherheit
+
+- Abhängigkeiten aktualisiert und die providerseitige URL-Bereinigung ohne
+  polynomiales Regex-Verhalten umgesetzt.
+
 ## [0.1.4] - 2026-09-17
 
 ### Geändert
