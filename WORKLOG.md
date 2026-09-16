@@ -16,8 +16,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   `info.licenseStatus` bleiben maßgeblich.
 - Verifikation des Fixes: `npm test` (486 Unit- und 60 Admin-Tests),
   `npm run lint`, `npm run build:admin`, `npm run test:e2e`, Paketbau und
-  `git diff --check` erfolgreich. Release beta.74 ist bereit für Tag und
-  GitHub-Release.
+  `git diff --check` erfolgreich. Release beta.74 ist getaggt und als
+  GitHub-Release veröffentlicht.
 - Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
   eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
