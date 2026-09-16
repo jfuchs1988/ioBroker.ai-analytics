@@ -124,12 +124,17 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async refreshLicenseState() {
-        if (PACKAGE_VERSION.includes('-beta.')) return this.licenseState;
-        const nextState = evaluateLicense({
-            version: PACKAGE_VERSION,
-            token: this.config && this.config.licenseToken,
-            publicKeys: LICENSE_PUBLIC_KEYS,
-        });
+        const config = this.config || {};
+        const metadata = {
+            tokenStored: typeof config.licenseToken === 'string' && config.licenseToken.length > 0,
+            githubLogin: typeof config.licenseGithubLogin === 'string' ? config.licenseGithubLogin : undefined,
+            tokenExpiresAt: Number.isSafeInteger(config.licenseTokenExpiresAt) ? config.licenseTokenExpiresAt : undefined,
+            sponsorUntil: Number.isSafeInteger(config.licenseSponsorUntil) ? config.licenseSponsorUntil : undefined,
+        };
+        const nextState = PACKAGE_VERSION.includes('-beta.') ? { status: 'beta', fullAccess: true, ...this.licenseState, ...metadata } : {
+            ...evaluateLicense({ version: PACKAGE_VERSION, token: config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS }),
+            ...metadata,
+        };
         this.licenseState = nextState;
         if (typeof this.setStateAsync === 'function') {
             await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(nextState), ack: true });
@@ -149,8 +154,13 @@ class AiAnalytics extends utils.Adapter {
         return installationId;
     }
 
-    async storeLicenseToken(token) {
-        await this.persistLicenseNative({ licenseToken: token });
+    async storeLicenseToken(token, metadata = {}) {
+        await this.persistLicenseNative({
+            licenseToken: token,
+            ...(typeof metadata.githubLogin === 'string' ? { licenseGithubLogin: metadata.githubLogin } : {}),
+            ...(Number.isSafeInteger(metadata.tokenExpiresAt) ? { licenseTokenExpiresAt: metadata.tokenExpiresAt } : {}),
+            ...(Number.isSafeInteger(metadata.sponsorUntil) ? { licenseSponsorUntil: metadata.sponsorUntil } : {}),
+        });
         await this.refreshLicenseState();
     }
 
@@ -176,7 +186,7 @@ class AiAnalytics extends utils.Adapter {
             await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
             if (result.status === 'authorized') {
                 const entitlement = await licenseBackend.issueEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, activationCode: activation.activationCode });
-                await this.storeLicenseToken(entitlement.token);
+                await this.storeLicenseToken(entitlement.token, entitlement);
                 activation.status = 'redeemed';
                 await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
                 return;
@@ -190,7 +200,7 @@ class AiAnalytics extends utils.Adapter {
         if (!this.config.licenseToken) return;
         try {
             const entitlement = await licenseBackend.renewEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, token: this.config.licenseToken });
-            await this.storeLicenseToken(entitlement.token);
+            await this.storeLicenseToken(entitlement.token, entitlement);
         } catch (error) {
             this.log.warn(`Lizenzverlängerung nicht möglich; Offline-Status bleibt aktiv (${error.message})`);
         }

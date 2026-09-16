@@ -385,8 +385,8 @@
         },
         "licenseToken": {
           "type": "password",
-          "label": "Sponsoring-Entitlement-Token (ab Version 0.1.0)",
-          "help": "Token aus der Sponsoring-Webanwendung hier einfügen. Beta-Versionen benötigen kein Token.",
+          "label": "Sponsoring-Entitlement-Token (geschützt)",
+          "help": "Der Token wird nach der GitHub-Aktivierung automatisch gespeichert und aus Sicherheitsgründen nicht angezeigt. Der aktuelle Status steht direkt darunter.",
           "newLine": true,
           "xs": 12,
           "sm": 12,

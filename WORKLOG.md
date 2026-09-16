@@ -6,20 +6,21 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master` (Release beta.75 veröffentlicht).
+- Branch: `fix/license-status-display` (Release beta.76 wird vorbereitet).
 - Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
   wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
   wurde neu gebaut. Die Aktivierung öffnet das Verifizierungsfenster automatisch,
   wartet auf den Adapterabschluss und zeigt die erfolgreiche Speicherung ohne
-  Token-Offenlegung an. Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
+  Token-Offenlegung an. Die Statusanzeige ergänzt gespeicherten Token, GitHub-
+  Login und Ablaufdatum. Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
   Aktivierung/Polling/Issue/Renewal, geschützte UUID-Installation-ID und
   Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
   schmale Aktivierungs-UI. Offline-`evaluateLicense` und
   `info.licenseStatus` bleiben maßgeblich.
 - Verifikation des Fixes: `npm test` (486 Unit- und 60 Admin-Tests),
   `npm run lint`, `npm run build:admin`, `npm run test:e2e`, Paketbau und
-  `git diff --check` erfolgreich. Release beta.75 ist getaggt und als
-  GitHub-Release veröffentlicht.
+  `git diff --check` erfolgreich. Nächste Aktion: Release beta.76 bauen und
+  veröffentlichen; Backend-Antworterweiterung separat deployen.
 - Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
   eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
@@ -38,7 +39,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht;
   der versionierte Nachtrag ist als beta.72 veröffentlicht; der Lizenz-
   Aktivierungsbutton ist als beta.74 veröffentlicht; der interaktive
-  Aktivierungsabschluss ist als beta.75 veröffentlicht.
+  Aktivierungsabschluss ist als beta.75 veröffentlicht; die Statusanzeige ist
+  als beta.76 vorbereitet.
 
 ## TODO
 

@@ -152,11 +152,31 @@ export class UsageResetComponent extends ConfigGeneric {
 }
 
 export class LicenseActivationComponent extends ConfigGeneric {
+    constructor(props) {
+        super(props);
+        this.state = { ...this.state, status: '', licenseStatus: null };
+    }
+
+    componentDidMount() {
+        this.loadLicenseStatus().catch(() => {});
+    }
+
+    async loadLicenseStatus() {
+        const socket = this.props.socket || this.props.oContext.socket;
+        const instance = `ai-analytics.${this.props.oContext.instance}`;
+        const state = await getStateWithTimeout(socket, `${instance}.info.licenseStatus`);
+        if (!state || typeof state.val !== 'string') return;
+        try {
+            this.setState({ licenseStatus: JSON.parse(state.val) });
+        } catch (_error) {
+            // Ignore a partially written state and keep the last valid display.
+        }
+    }
+
     async activate() {
         const socket = this.props.socket || this.props.oContext.socket;
         const instance = `ai-analytics.${this.props.oContext.instance}`;
         const id = `license-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        const popup = typeof window !== 'undefined' ? window.open('', 'ai-analytics-license-activation', 'popup,width=520,height=720') : null;
         this.setState({ status: 'Aktivierung wird angefordert ...' });
         await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id, command: 'startLicenseActivation', message: {} }), ack: false });
         const deadline = Date.now() + 30000;
@@ -167,7 +187,9 @@ export class LicenseActivationComponent extends ConfigGeneric {
                     const response = JSON.parse(state.val);
                     if (response.id === id) {
                         if (!response.ok) throw new Error(response.error || 'Aktivierung konnte nicht gestartet werden.');
-                        if (popup && response.result && response.result.verificationUri) popup.location.href = response.result.verificationUri;
+                        const popup = typeof window !== 'undefined' && response.result && response.result.verificationUri
+                            ? window.open(response.result.verificationUri, 'ai-analytics-license-activation', 'popup,width=520,height=720')
+                            : null;
                         this.setState({ activation: response.result, status: 'Aktivierung gestartet.' });
                         await this.waitForActivation(instance, socket, response.result.expiresAt);
                         return;
@@ -189,6 +211,7 @@ export class LicenseActivationComponent extends ConfigGeneric {
                 try {
                     const activation = JSON.parse(state.val);
                     if (activation.status === 'redeemed') {
+                        await this.loadLicenseStatus().catch(() => {});
                         this.setState({ status: 'Token erfolgreich gespeichert. Lizenz ist jetzt aktiv.' });
                         return;
                     }
@@ -207,10 +230,16 @@ export class LicenseActivationComponent extends ConfigGeneric {
 
     renderItem() {
         const activation = this.state.activation;
+        const license = this.state.licenseStatus;
+        const expiry = Number.isSafeInteger(license && license.tokenExpiresAt) ? new Date(license.tokenExpiresAt * 1000).toLocaleString() : null;
+        const identity = license && license.githubLogin ? `GitHub-Benutzer: ${license.githubLogin}` : null;
         return <div>
             <button type="button" onClick={() => this.activate().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Aktivierung starten</button>
             {activation ? <span style={{ marginLeft: 8 }}>Status: {activation.status}; URL: <a href={activation.verificationUri} target="_blank" rel="noreferrer">Aktivierung öffnen</a>; Code: {activation.activationCode}</span> : null}
             <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status}</span>
+            <div role="status" aria-live="polite" style={{ marginTop: 8 }}>
+                {license && license.tokenStored ? `Token gespeichert. ${identity || 'GitHub-Benutzer nicht übermittelt.'}${expiry ? ` Gültig bis: ${expiry}.` : ' Gültigkeitsdatum nicht verfügbar.'}` : 'Kein Sponsoring-Entitlement-Token gespeichert.'}
+            </div>
         </div>;
     }
 }

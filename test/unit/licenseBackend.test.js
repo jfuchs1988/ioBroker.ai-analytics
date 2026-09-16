@@ -27,7 +27,7 @@ describe('licenseBackend', () => {
     });
 
     it('sends renewal tokens only as bearer headers and validates the response', async () => {
-        request.readJsonResponse.resolves({ token: 'new-token', licenseId: 'license-1' });
+        request.readJsonResponse.resolves({ token: 'new-token', licenseId: 'license-1', githubLogin: 'octocat', sponsorUntil: 200, tokenExpiresAt: 200 });
         const client = require('../../lib/licenseBackend');
         await client.renewEntitlement({ url: 'https://example.test', token: 'old-token' });
         expect(request.fetchWithTimeout.firstCall.args[1].headers.authorization).to.equal('Bearer old-token');
