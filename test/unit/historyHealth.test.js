@@ -27,7 +27,7 @@ describe('historyHealth', () => {
         expect(adapter.setObjectNotExistsAsync.calledOnceWith(STATE_ID)).to.equal(true);
     });
 
-    it('starts backoff after three failures and retries forever with a capped delay', async () => {
+    it('starts backoff after three failures and stops after the retry schedule', async () => {
         const adapter = makeAdapter();
         const clock = sinon.useFakeTimers(new Date('2026-09-03T12:00:00Z').getTime());
         try {
@@ -49,7 +49,7 @@ describe('historyHealth', () => {
             await recordHistoryFailure(adapter, 'history.0', new Error('offline'));
             expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
             clock.tick(48 * 3600 * 1000);
-            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(true);
+            expect(await isHistoryAvailable(adapter, 'history.0')).to.equal(false);
         } finally {
             clock.restore();
         }
