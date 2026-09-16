@@ -49,10 +49,12 @@ describe('buildClassificationPrompt', () => {
         expect(prompt).to.include('heating');
     });
 
-    it('instructs the model to answer null when the role is not evident from the name', () => {
+    it('never asks the model to infer roles from names or object IDs', () => {
         const prompt = buildClassificationPrompt([{ id: 'sun2000.0.x', common: { name: 'x' } }]);
 
         expect(prompt.toLowerCase()).to.include('null');
+        expect(prompt).to.include('immer auf null');
+        expect(prompt).to.not.include('Batterie Ladeleistung gesamt');
     });
 });
 

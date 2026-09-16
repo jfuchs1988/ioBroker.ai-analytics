@@ -19,12 +19,12 @@ the recorded data, and explains unusual observations.
 - Data-quality fields for writability, write pattern, update frequency, and
   completeness
 - Device catalog management in the ioBroker Admin UI
-- CSV export/import for catalog maintenance
+- CSV export/import for catalog maintenance in the device catalog
 - Anthropic, OpenAI, OpenRouter, and local OpenAI-compatible providers
 - Optional separate provider for onboarding
 - Daily cost budget in EUR with token and cost history
-- Offline-capable sponsorship entitlement foundation; enforcement starts at
-  `0.1.0` according to the documented entitlement contract
+- Interactive GitHub Sponsoring activation with protected entitlement storage
+- Admin How-To for analyses, chat questions, value kinds, and data quality
 
 ## Requirements
 
@@ -64,10 +64,10 @@ Configure the adapter in the ioBroker Admin UI:
   configured output budget before accepting input.
 - Agent safety limits for iterations, tool calls, and requested periods
 - Optional value-kind and data-quality backfills
-- Sponsorship entitlement token for the future stable release policy
+- Sponsoring activation, stored-token status, GitHub identity, and expiry
 
-The token field is protected and encrypted by ioBroker. It is not included in
-the settings CSV export.
+The entitlement token is protected and encrypted by ioBroker. It is not
+displayed in the Admin UI; the UI offers a deliberate local delete action.
 
 ## Providers and Privacy
 

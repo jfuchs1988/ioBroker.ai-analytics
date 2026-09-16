@@ -11,10 +11,9 @@
 
 ## Status
 
-Schritte 1 bis 3 sind spezifiziert. Ein dormant-fähiges `lib/license.js`-
-Prüfmodul und die geschützte Token-Konfiguration sind als Vorbereitung
-umgesetzt. Die produktive Sperre bleibt bis zur Ausstellungs-Webanwendung und
-der Veröffentlichung von `0.1.0` deaktiviert.
+Die Spec und der Implementierungsplan sind umgesetzt. `lib/license.js` prüft
+Entitlements aktiv, die Token-Konfiguration ist geschützt und die separate
+Ausstellungs-Webanwendung ist produktiv angebunden.
 
 ## Festgelegte Entitlement-Regeln
 
@@ -42,5 +41,5 @@ der Veröffentlichung von `0.1.0` deaktiviert.
 
 ## Festgelegte Beta-Regel
 
-Mit Veröffentlichung von `0.1.0` wird die technische Entitlement-Prüfung
-aktiviert. Bis dahin bleiben alle Beta-Versionen vollständig frei.
+Die technische Entitlement-Prüfung ist seit `0.1.0` aktiv; Beta-Versionen sind
+nicht ausgenommen.

@@ -6,7 +6,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master` (Release beta.76 veröffentlicht).
+- Branch: `master` (Release `0.1.2` veröffentlicht).
 - Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
   wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
   wurde neu gebaut. Die Aktivierung öffnet das Verifizierungsfenster automatisch,
@@ -17,12 +17,14 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
   schmale Aktivierungs-UI. Offline-`evaluateLicense` und
   `info.licenseStatus` bleiben maßgeblich.
-- Verifikation des Fixes: `npm test` (486 Unit- und 60 Admin-Tests),
-  `npm run lint`, `npm run build:admin`, `npm run test:e2e`, Paketbau und
-  `git diff --check` erfolgreich. Backend-Antworterweiterung ist mit v0.3.0
-  produktiv deployed.
+- Letzte Verifikation: `npm test` (aktuelle Zahlen aus dem Testlauf), Lint,
+  Admin-Build, E2E und Paketbau erfolgreich. Die Lizenz-/Backend-Integration
+  ist produktiv deployed.
 - Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
   eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
+- Release-Notes nie mit literalen `\n`-Sequenzen an GitHub übergeben; für
+  Markdown müssen echte Zeilenumbrüche verwendet werden, sonst zeigt GitHub
+  den gesamten Text in einer Zeile an.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist
@@ -37,13 +39,16 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   als beta.67 veröffentlicht; Release-Metadaten sind als beta.68 synchronisiert;
   CSV-/News-Korrektur ist als beta.69 veröffentlicht; Rest-Grenzfälle sind als
   beta.70 korrigiert; Boolean-/HVAC-Fixes sind als beta.71 veröffentlicht;
-  der versionierte Nachtrag ist als beta.72 veröffentlicht; der Lizenz-
-  Aktivierungsbutton ist als beta.74 veröffentlicht; der interaktive
-  Aktivierungsabschluss ist als beta.75 veröffentlicht; die Statusanzeige ist
-  als beta.76 veröffentlicht. Backend v0.3.0 liefert GitHub-Login und
-  Ablaufdaten und ist produktiv deployed.
+  die Releasekette bis `0.1.2` ist veröffentlicht. Backend v0.3.0 liefert
+  GitHub-Login und Ablaufdaten und ist produktiv deployed.
 
 ## TODO
+
+- GitHub-Sicherheitsfunktionen aktiviert: Vulnerability Alerts, private
+  Vulnerability Reporting, Dependabot Security Updates, der CodeQL-Workflow,
+  Secret Scanning und Push Protection. `SECURITY.md`, Dependabot und Workflows
+  sind aktuell uncommittete Arbeitsbaumänderungen und müssen separat geprüft
+  werden.
 
 - Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
   zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).

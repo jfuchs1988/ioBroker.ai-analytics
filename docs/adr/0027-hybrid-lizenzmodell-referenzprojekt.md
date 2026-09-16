@@ -2,7 +2,7 @@
 
 [← ADR-Übersicht](adr-index.md)
 
-**Status:** Angenommen (Prüfgrundlage umgesetzt, produktive Aktivierung offen)
+**Status:** Angenommen und produktiv umgesetzt
 **Datum:** 2026-09-03
 
 ## Kontext
@@ -17,21 +17,20 @@ Integrationen sponsor-pflichtig sind.
 - Der allgemeine Adapterkern wird unter MIT veröffentlicht.
 - KI-Ausführung und KI-gestützte Analyse werden als sponsor-required
   Komponenten ausgenommen und in `LICENSES/SPONSOR-REQUIRED.md` festgehalten.
-- Beta-Versionen dürfen diese Komponenten kostenlos verwenden.
-- Ab der ersten stabilen Version `0.1.0` ist für diese Komponenten ein aktives
-  Sponsoring oder eine andere ausgestellte Entitlement erforderlich.
+- Alle Versionen benötigen für diese Komponenten ein aktives Sponsoring oder
+  eine andere ausgestellte Entitlement.
 - Der Sponsor-Link ist GitHub Sponsors unter
   `https://github.com/sponsors/jfuchs1988`.
-- Token, Trial, Contributor-Entitlements und technische Durchsetzung werden
-  in einer folgenden Spec und einem eigenen Implementierungs-Task festgelegt.
+- Token, Trial-Entitlements und technische Durchsetzung sind in der
+  Entitlement-Spec und der produktiven Backend-Integration festgelegt.
 - Die Entitlement-Spec legt verbindlich fest: Token-Ausgabe über eine separate
-  Webanwendung, JWS/JWT mit EdDSA/Ed25519, 35 Tage technische Token-Gültigkeit,
+  Webanwendung, JWS/JWT mit EdDSA/Ed25519, 30 Tage technische Token-Gültigkeit,
   30 Tage Sponsoring, 30 Tage Grace-Period ab Sponsoring-Ablauf, keine
   Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag
   statt proaktiver KI-Läufe.
-- Die Offline-Prüfgrundlage ist in `lib/license.js` umgesetzt. Der Beta-Guard
-  gewährt bis `0.1.0` Vollzugriff; produktive Sperren bleiben bis zur
-  Ausstellungs-Webanwendung und Veröffentlichung der Signaturschlüssel inaktiv.
+- Die aktive Offline-Prüfung ist in `lib/license.js` umgesetzt; die
+  Ausstellungs-Webanwendung und der öffentliche Signaturschlüssel sind
+  produktiv angebunden.
 
 ## Konsequenzen
 
@@ -42,7 +41,8 @@ Integrationen sponsor-pflichtig sind.
   ergänzt und mit einem Lizenzheader versehen werden.
 - Die technische Freischaltung muss offline-fähig, testbar und unabhängig von
   der Speicherung von API-Schlüsseln umgesetzt werden.
-- Das Beta-Ende ist mit `0.1.0` festgelegt.
+- `0.1.0` ist die erste stabile Version; die Entitlement-Prüfung gilt bereits
+  für Beta-Versionen.
 - Die Lizenztexte sind nicht anwaltlich geprüft.
 
 ## Abgrenzung zu ADR-0018

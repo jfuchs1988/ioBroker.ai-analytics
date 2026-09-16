@@ -1,6 +1,6 @@
 # Produkt-Roadmap und globale TODO-Liste
 
-Stand: 2026-09-03
+Stand: 2026-09-16
 
 Diese Liste bündelt die Nutzerwünsche und die in der Markt- und Bedarfsanalyse
 identifizierten Produktlücken. Sie ist nach erwartetem Nutzwert, Risiko und
@@ -32,7 +32,7 @@ begrenztem und testbarem KI-Einsatz.
 
 **Nutzen: sehr hoch · Risiko: niedrig · Status: offen**
 
-- `v0.0.1-beta.21` auf einer echten ioBroker-Instanz installieren
+- `v0.1.2` auf einer echten ioBroker-Instanz installieren
 - Discovery, Onboarding und Katalogeinträge prüfen
 - Chat-Fragen mit Tages-/Wochenvergleich prüfen
 - proaktive Prüfung und Datenqualitätsfelder prüfen
@@ -186,11 +186,10 @@ Die automatische Kandidatenauswahl ist derzeit ausdrücklich nicht erforderlich.
 
 ### 14. Release- und Beta-Entscheidung
 
-**Nutzen: mittel · Risiko: niedrig · Status: offen**
+**Nutzen: mittel · Risiko: niedrig · Status: erledigt**
 
-- Kriterien für `0.1.0` festlegen
-- erfolgreicher Langzeitbetrieb und Live-Abnahme berücksichtigen
-- bekannte kritische Lücken und Qualitätsziele bewerten
+- `0.1.0` wurde am 2026-09-16 veröffentlicht; Folgepatches `0.1.1` und
+  `0.1.2` enthalten Admin- und KI-Verfeinerungen.
 
 ## Bewusste Nicht-Ziele
 
@@ -207,7 +206,6 @@ priorisiert:
 
 ## Nächster empfohlener Entwicklungsschritt
 
-Nach der Live-Abnahme ist **hybride Anomalieerkennung** der beste nächste
-Produkt-Task. Sie schließt die größte verbleibende Nutzwertlücke, verbessert
-gleichzeitig Kosten und Zuverlässigkeit und bildet die technische Grundlage für
-Belege, Alarm-Lebenszyklus und strukturierte Berichte.
+Nächster Schritt ist die Live-Abnahme von Admin-Geräteliste, Aktivierung und
+How-To auf einer echten ioBroker-Installation. Danach sollten Belege pro
+KI-Aussage und der Alarm-Lebenszyklus priorisiert werden.
