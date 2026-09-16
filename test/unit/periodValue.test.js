@@ -31,4 +31,18 @@ describe('periodValue', () => {
 
         expect(result).to.deep.equal({ onDurationMs: 5, switchCount: 1 });
     });
+
+    it('does not treat named text states as numeric gauges', async () => {
+        const { computePeriodValue } = load(async () => [{ ts: 1, val: 'heating' }]);
+
+        let error;
+        try {
+            await computePeriodValue({}, { historyInstance: 'history.0', sourceId: 'heating.0.mode', valueKind: 'enum_state' }, { start: 0, end: 10 });
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error).to.be.instanceOf(Error);
+        expect(error.message).to.include('nicht numerisch');
+    });
 });

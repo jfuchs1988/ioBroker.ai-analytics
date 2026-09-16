@@ -2,13 +2,14 @@ import React from 'react';
 import GroupIdPicker from './GroupIdPicker.jsx';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
-const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
+const VALUE_KINDS = ['gauge', 'boolean_state', 'enum_state', 'text_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
 const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption', 'grid_power', 'battery_power'];
 const HVAC_ROLES = ['window', 'heating'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
 const MAX_DESCRIPTION_LENGTH = 2000;
 const MAX_ROOM_LENGTH = 256;
+const MAX_UNIT_LENGTH = 64;
 const FIELD_OK_TIMEOUT_MS = 3000;
 
 function statusLabelOf(entry) {
@@ -24,6 +25,7 @@ export default class DeviceRow extends React.Component {
         this.state = {
             description: props.entry.description || '',
             room: props.entry.room || '',
+            unit: props.entry.unit || '',
             fieldErrors: {},
             fieldOk: {},
             pendingRole: undefined,
@@ -36,6 +38,7 @@ export default class DeviceRow extends React.Component {
             this.setState({
                 description: this.props.entry.description || '',
                 room: this.props.entry.room || '',
+                unit: this.props.entry.unit || '',
                 pendingRole: undefined,
             });
         }
@@ -148,7 +151,10 @@ export default class DeviceRow extends React.Component {
                     <option value="">nicht klassifiziert</option>{VALUE_KINDS.map(value => <option key={value} value={value}>{value}</option>)}
                 </select>{this.feedback('valueKind')}
             </td>;
-            case 'unit': return <td key={column}>{entry.unit || ''}</td>;
+            case 'unit': return <td key={column}>
+                <input aria-label={`Einheit für ${entry.sourceId}`} maxLength={MAX_UNIT_LENGTH} value={this.state.unit} onChange={event => this.setState({ unit: event.target.value })} onBlur={() => this.handleTextBlur('unit', MAX_UNIT_LENGTH)} />
+                {this.feedback('unit')}
+            </td>;
             case 'writable': return <td key={column}>{entry.writable === true ? 'Ja' : entry.writable === false ? 'Nein' : ''}</td>;
             case 'room': return <td key={column}>
                 <input aria-label={`Raum für ${entry.sourceId}`} maxLength={MAX_ROOM_LENGTH} value={this.state.room} placeholder="z. B. Keller" onChange={event => this.setState({ room: event.target.value })} onBlur={() => this.handleTextBlur('room', MAX_ROOM_LENGTH)} />
@@ -164,6 +170,7 @@ export default class DeviceRow extends React.Component {
                     {entry.needsReview ? 'Als geprüft markieren' : 'Prüfung wieder öffnen'}
                 </button>{this.feedback('needsReview')}
             </td>;
+            case 'reviewReasons': return <td key={column}>{(entry.reviewReasons || []).join(', ')}</td>;
             case 'writePattern': return <td key={column}>{entry.writePattern || ''}</td>;
             case 'updateFrequency': return <td key={column}>
                 <select aria-label={`Update-Frequenz für ${entry.sourceId}`} value={entry.updateFrequency || ''} onChange={event => this.save({ updateFrequency: event.target.value })}>

@@ -2,15 +2,17 @@ import React from 'react';
 import GroupIdPicker from './GroupIdPicker.jsx';
 
 const CATEGORIES = ['consumption', 'generation_pv', 'lighting', 'device_usage', 'environment'];
-const VALUE_KINDS = ['gauge', 'boolean_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
+const VALUE_KINDS = ['gauge', 'boolean_state', 'enum_state', 'text_state', 'daily_reset_counter', 'cumulative_total', 'event_count'];
 const DERIVED_METRIC_ROLES = ['pv_generation', 'grid_feed_in', 'grid_import', 'battery_charge', 'battery_discharge', 'consumption', 'grid_power', 'battery_power'];
 const HVAC_ROLES = ['window', 'heating'];
 const UPDATE_FREQUENCIES = ['unknown', 'seconds', 'minutes', 'hourly', 'daily', 'weekly_or_slower', 'event_driven'];
 const DATA_COMPLETENESS = ['unknown', 'complete', 'gaps', 'stale'];
 const MAX_ROOM_LENGTH = 200;
+const MAX_UNIT_LENGTH = 64;
 const FIELD_OPTIONS = [
     { value: 'category', label: 'Kategorie' },
     { value: 'room', label: 'Raum' },
+    { value: 'unit', label: 'Einheit' },
     { value: 'valueKind', label: 'Verhalten' },
     { value: 'updateFrequency', label: 'Update-Frequenz' },
     { value: 'dataCompleteness', label: 'Vollständigkeit' },
@@ -84,7 +86,7 @@ export default class BulkEditToolbar extends React.Component {
                 ) : null}
             </>;
         }
-        return <input aria-label="Wert für Bulk-Raum" maxLength={MAX_ROOM_LENGTH} value={value} onChange={event => this.setState({ value: event.target.value })} />;
+        return <input aria-label={`Wert für Bulk-${field === 'unit' ? 'Einheit' : 'Raum'}`} maxLength={field === 'unit' ? MAX_UNIT_LENGTH : MAX_ROOM_LENGTH} value={value} onChange={event => this.setState({ value: event.target.value })} />;
     }
 
     render() {

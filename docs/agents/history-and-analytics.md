@@ -19,6 +19,10 @@ Kategorie, Raum, `valueKind`, Reviewstatus und Datenqualitätsfeldern. Neue oder
 unsichere Einträge werden klassifiziert bzw. zur Prüfung markiert, nicht
 erraten.
 
+`enum_state` und `text_state` sind benannte Textzustände und werden nicht als
+numerische Gauges ausgewertet. Onboarding-Prüfgründe stehen in `reviewReasons`;
+Einheiten aus Quellmetadaten haben Vorrang vor Modellvorschlägen.
+
 ## Typgerechte Auswertung
 
 - Gauges verwenden zeitgewichtete bzw. aggregierte Messwerte.
