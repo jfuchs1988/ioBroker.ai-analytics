@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.76] - 2026-09-16
+
+### Geändert
+
+- Die Sponsoring-Aktivierung zeigt jetzt eindeutig, ob ein Token gespeichert
+  ist, welchen GitHub-Benutzer der Backend-Dienst geliefert hat und bis wann
+  das Entitlement gültig ist. Der Token selbst bleibt verborgen.
+
 ## [0.0.1-beta.75] - 2026-09-16
 
 ### Behoben
