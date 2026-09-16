@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.7] - 2026-09-17
+
+### Hinzugefügt
+
+- Detaillierte Onboarding-Prüfung für Einheiten, Energie-/HVAC-Rollen,
+  Textzustände, Datenfrische und maschinenlesbare Prüfgründe.
+
 ## [0.1.6] - 2026-09-17
 
 ### 修复
