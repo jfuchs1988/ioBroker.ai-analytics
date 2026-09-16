@@ -67,6 +67,8 @@ describe('admin configuration links and model discovery', () => {
         const settings = config.items.settingsTab.items;
         expect(settings.settingsCsv).to.equal(undefined);
         expect(settings.apiKey.label).to.equal('API-Key Chat & Prüfung');
+        expect(Object.keys(settings).indexOf('apiKey')).to.be.greaterThan(Object.keys(settings).indexOf('model'));
+        expect(Object.keys(settings).indexOf('onboardingApiKey')).to.be.greaterThan(Object.keys(settings).indexOf('onboardingModel'));
         expect(settings.maxAgentIterations.default).to.equal(32);
         expect(settings.maxToolCalls.default).to.equal(128);
         expect(settings.maxPeriodsPerRequest.default).to.equal(1024);
