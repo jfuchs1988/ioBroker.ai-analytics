@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.0.1-beta.78] - 2026-09-16
+
+### Geändert
+
+- Chat, Onboarding und proaktive Analysen benötigen jetzt auch in Beta-Versionen
+  ein gespeichertes Sponsoring-Entitlement.
+
 ## [0.0.1-beta.77] - 2026-09-16
 
 ### Geändert

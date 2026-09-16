@@ -131,10 +131,7 @@ class AiAnalytics extends utils.Adapter {
             tokenExpiresAt: Number.isSafeInteger(config.licenseTokenExpiresAt) && config.licenseTokenExpiresAt > 0 ? config.licenseTokenExpiresAt : undefined,
             sponsorUntil: Number.isSafeInteger(config.licenseSponsorUntil) && config.licenseSponsorUntil > 0 ? config.licenseSponsorUntil : undefined,
         };
-        const nextState = PACKAGE_VERSION.includes('-beta.') ? { status: 'beta', fullAccess: true, ...this.licenseState, ...metadata } : {
-            ...evaluateLicense({ version: PACKAGE_VERSION, token: config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS }),
-            ...metadata,
-        };
+        const nextState = { ...evaluateLicense({ version: PACKAGE_VERSION, token: config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS }), ...metadata };
         this.licenseState = nextState;
         if (typeof this.setStateAsync === 'function') {
             await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(nextState), ack: true });
@@ -268,8 +265,7 @@ class AiAnalytics extends utils.Adapter {
         await refreshTodaySummary(this);
         await ensureHealthState(this);
         await ensureLicenseStates(this);
-        this.licenseState = evaluateLicense({ version: PACKAGE_VERSION, token: this.config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS });
-        await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(this.licenseState), ack: true });
+        await this.refreshLicenseState();
         await this.setObjectNotExistsAsync(licenseBackend.ACTIVATION_STATE, {
             type: 'state',
             common: { name: 'License activation', type: 'string', role: 'json', read: true, write: false },
@@ -805,7 +801,8 @@ class AiAnalytics extends utils.Adapter {
      * als {error}-Antwort. Genau dieselben Guard-Texte wie vor dem Refactoring.
      */
     async processChatQuestion(question) {
-        const license = (await this.refreshLicenseState()) || { fullAccess: true };
+        const license = await this.refreshLicenseState();
+        if (!license || !license.tokenStored) throw new Error('Kein Sponsoring-Entitlement-Token gespeichert. Bitte zuerst die GitHub-Aktivierung abschließen.');
         const today = getTodayKey();
         const lastChatState = !license.fullAccess && (await this.getStateAsync(LICENSE_CHAT_LAST_USED_STATE));
         if (!canUseChat(license, lastChatState && lastChatState.val, today)) {

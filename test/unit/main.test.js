@@ -67,6 +67,7 @@ describe('AiAnalytics command dispatch', () => {
     it('rejects a second chat question on the same day in limited license mode', async () => {
         const adapter = Object.create(AiAnalytics.prototype);
         adapter.licenseState = { status: 'limited', fullAccess: false };
+        adapter.refreshLicenseState = sinon.stub().resolves({ status: 'limited', fullAccess: false, tokenStored: true });
         adapter.getStateAsync = sinon.stub().resolves({ val: getTodayKey() });
 
         let error;
@@ -78,6 +79,20 @@ describe('AiAnalytics command dispatch', () => {
 
         expect(error).to.be.an('error');
         expect(error.message).to.include('taegliche Chat-Kontingent');
+    });
+
+    it('rejects chat before any provider work when no entitlement token is stored', async () => {
+        const adapter = Object.create(AiAnalytics.prototype);
+        adapter.refreshLicenseState = sinon.stub().resolves({ status: 'invalid', fullAccess: false, tokenStored: false });
+
+        let error;
+        try {
+            await adapter.processChatQuestion('Test');
+        } catch (caught) {
+            error = caught;
+        }
+
+        expect(error.message).to.include('Kein Sponsoring-Entitlement-Token');
     });
 
     it('rejects unknown adapter commands', async () => {
@@ -427,6 +442,7 @@ describe('AiAnalytics proactive anomaly gate', () => {
         adapter.log = { silly: sinon.stub(), warn: sinon.stub(), error: sinon.stub() };
         adapter.updateCatalogSyncState = sinon.stub().resolves();
         adapter.appendHistoryFailureReports = sinon.stub().resolves();
+        adapter.refreshLicenseState = sinon.stub().resolves({ status: 'active', fullAccess: true, tokenStored: true });
         return adapter;
     }
 
