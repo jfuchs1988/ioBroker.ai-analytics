@@ -151,6 +151,42 @@ export class UsageResetComponent extends ConfigGeneric {
     }
 }
 
+export class LicenseActivationComponent extends ConfigGeneric {
+    async activate() {
+        const socket = this.props.socket || this.props.oContext.socket;
+        const instance = `ai-analytics.${this.props.oContext.instance}`;
+        const id = `license-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id, command: 'startLicenseActivation', message: {} }), ack: false });
+        const deadline = Date.now() + 30000;
+        while (Date.now() < deadline) {
+            const state = await getStateWithTimeout(socket, `${instance}.admin.bridge`).catch(() => null);
+            if (state && state.ack === true && typeof state.val === 'string') {
+                try {
+                    const response = JSON.parse(state.val);
+                    if (response.id === id) {
+                        if (!response.ok) throw new Error(response.error || 'Aktivierung konnte nicht gestartet werden.');
+                        this.setState({ activation: response.result, status: 'Aktivierung gestartet.' });
+                        return;
+                    }
+                } catch (error) {
+                    if (error.message !== 'Unexpected end of JSON input') throw error;
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+        throw new Error('Keine Antwort vom Adapter.');
+    }
+
+    renderItem() {
+        const activation = this.state.activation;
+        return <div>
+            <button type="button" onClick={() => this.activate().catch(error => this.setState({ status: `Fehler: ${error.message}` }))}>Aktivierung starten</button>
+            {activation ? <span style={{ marginLeft: 8 }}>Status: {activation.status}; URL: <a href={activation.verificationUri} target="_blank" rel="noreferrer">Aktivierung öffnen</a>; Code: {activation.activationCode}</span> : null}
+            <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status}</span>
+        </div>;
+    }
+}
+
 export class SettingsCsvComponent extends ConfigGeneric {
     constructor(props) {
         super(props);

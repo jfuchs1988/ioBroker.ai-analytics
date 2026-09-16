@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.0.1-beta.72",
+    "version": "0.0.1-beta.73",
     "titleLang": {
       "en": "AI Analytics", "de": "AI Analytics", "ru": "AI Analytics", "pt": "AI Analytics",
       "nl": "AI Analytics", "fr": "AI Analytics", "it": "AI Analytics", "es": "AI Analytics",
@@ -46,6 +46,7 @@
     "globalDependencies": [{ "admin": ">=7.0.0" }],
     "tier": 3,
     "news": {
+      "0.0.1-beta.73": { "en": "Added secure backend activation, automatic entitlement renewal, and a fixed production license service endpoint.", "de": "Sichere Backend-Aktivierung, automatische Entitlement-Erneuerung und ein fester Production-Lizenzdienst ergänzt." },
       "0.0.1-beta.72": { "en": "Boolean history data-quality and HVAC/value-kind edge cases hardened after the beta70 review.", "de": "Boolean-History sowie HVAC-/valueKind-Grenzfälle nach dem beta70-Review gehärtet." },
       "0.0.1-beta.71": { "en": "Boolean history data-quality and HVAC/value-kind edge cases hardened after the beta70 review.", "de": "Boolean-History sowie HVAC-/valueKind-Grenzfälle nach dem beta70-Review gehärtet." },
       "0.0.1-beta.70": { "en": "History, bridge, counter, Boolean, CSV, and catalog edge cases hardened after the beta69 review.", "de": "History-, Bridge-, Zähler-, Boolean-, CSV- und Katalog-Grenzfälle nach dem beta69-Review gehärtet." },
@@ -76,8 +77,8 @@
       "0.0.1-beta.29": { "en": "Offline Ed25519-JWS entitlement foundation and daily chat fallback added.", "de": "Offline-Ed25519-JWS-Entitlement-Grundlage und täglicher Chat-Fallback ergänzt.", "ru": "Добавлены основа офлайн-проверки прав Ed25519-JWS и ежедневный резервный чат.", "pt": "Adicionada a base de entitlement Ed25519-JWS offline e o fallback de chat diário.", "nl": "Offline Ed25519-JWS-entitlementbasis en dagelijkse chatfallback toegevoegd.", "fr": "Base d’habilitation Ed25519-JWS hors ligne et solution de secours quotidienne du chat ajoutées.", "it": "Aggiunte le basi dell'entitlement Ed25519-JWS offline e il fallback quotidiano della chat.", "es": "Se añadieron la base de derechos Ed25519-JWS sin conexión y el chat de respaldo diario.", "pl": "Dodano podstawę uprawnień Ed25519-JWS offline i codzienny czat awaryjny.", "uk": "Додано основу офлайн-перевірки прав Ed25519-JWS та щоденний резервний чат.", "zh-cn": "添加了离线 Ed25519-JWS 权益基础和每日聊天备用功能。" }
     }
   },
-  "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
-  "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
+  "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken", "installationId"],
+  "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken", "installationId"],
   "native": {
     "providerType": "anthropic",
     "apiKey": "",
@@ -106,7 +107,8 @@
      "maxPeriodsPerToolCall": 72,
      "enableValueKindBackfill": false,
      "enableDataQualityBackfill": false,
-     "licenseToken": ""
+      "licenseToken": "",
+      "installationId": ""
   },
   "objects": [],
   "instanceObjects": []

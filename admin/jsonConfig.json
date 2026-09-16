@@ -394,6 +394,15 @@
           "lg": 8,
           "xl": 8
         },
+        "licenseActivation": {
+          "type": "custom",
+          "url": "custom/customComponents.js",
+          "name": "AiAnalyticsConfig/Components/LicenseActivationComponent",
+          "guiApi": 2,
+          "bundlerType": "module",
+          "label": "Sponsoring-Aktivierung",
+          "newLine": true
+        },
         "silentIfNothingFound": {
           "type": "checkbox",
           "label": "Bei keinem Fund keine Nachricht senden",

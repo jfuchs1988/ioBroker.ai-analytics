@@ -28,8 +28,9 @@ abgegrenzten sponsor-pflichtigen Mehrwertfunktionen verbinden.
   möglich. Proaktive KI-Prüfungen werden in diesem eingeschränkten Zustand
   nicht ausgeführt.
 - Tokens werden nicht an eine ioBroker-Instanz gebunden.
-- Die technische Prüfung erfolgt offline anhand des signierten Tokens; eine
-  dauerhafte Online-Prüfung im Adapter ist nicht vorgesehen.
+- Die technische Prüfung erfolgt offline anhand des signierten Tokens. Der
+  separate Backend-Client dient nur der Aktivierung und freiwilligen Erneuerung;
+  Nichterreichbarkeit darf den lokal gültigen/gracefähigen Token nicht entwerten.
 - Die erste Adapterimplementierung darf während der Beta dormant bleiben,
   solange das öffentliche Schlüsselregister noch nicht mit dem Schlüssel der
   Ausstellungs-Webanwendung bestückt ist.

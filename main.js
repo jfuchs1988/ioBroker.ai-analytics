@@ -32,6 +32,7 @@ const {
     LICENSE_CHAT_LAST_USED_STATE,
 } = require('./lib/license');
 const { ensureHealthState, consumeFailureReports } = require('./lib/historyHealth');
+const licenseBackend = require('./lib/licenseBackend');
 const { version: PACKAGE_VERSION } = require('./package.json');
 
 const VALUE_KIND_BACKFILL_BATCH_SIZE = 20;
@@ -47,7 +48,11 @@ function textValue(value) {
     return Object.values(value).find((item) => typeof item === 'string') || '';
 }
 // Filled with the public keys of the separate entitlement web application.
-const LICENSE_PUBLIC_KEYS = Object.freeze({});
+const LICENSE_PUBLIC_KEYS = Object.freeze({
+    'prod-1': `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEA/qlqUJxv1FmBoV9jdzpOdDsUE1Uhl4skOwXKOG5rZ2w=
+-----END PUBLIC KEY-----`,
+});
 
 function isTrustedAdminSender(sender) {
     return sender === 'system.admin' || /^system\.adapter\.admin\.\d+$/.test(sender || '');
@@ -79,6 +84,8 @@ class AiAnalytics extends utils.Adapter {
         this.requireTrustedBridgeSender = true;
         this.licenseState = { status: 'beta', fullAccess: true };
         this.runtimeLimits = getLimits(this.config || {});
+        this.licenseActivation = null;
+        this.licenseRenewalTimer = null;
     }
 
     /**
@@ -128,6 +135,65 @@ class AiAnalytics extends utils.Adapter {
             await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(nextState), ack: true });
         }
         return nextState;
+    }
+
+    async persistLicenseNative(fields) {
+        await this.extendForeignObjectAsync(this.namespace, { native: fields });
+        Object.assign(this.config, fields);
+    }
+
+    async ensureInstallationId() {
+        if (typeof this.config.installationId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(this.config.installationId)) return this.config.installationId;
+        const installationId = licenseBackend.newInstallationId();
+        await this.persistLicenseNative({ installationId });
+        return installationId;
+    }
+
+    async storeLicenseToken(token) {
+        await this.persistLicenseNative({ licenseToken: token });
+        await this.refreshLicenseState();
+    }
+
+    async startLicenseActivation() {
+        const result = await licenseBackend.createActivation({ url: licenseBackend.DEFAULT_BACKEND_URL, installationId: await this.ensureInstallationId() });
+        this.licenseActivation = { ...result, status: 'pending' };
+        await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify(this.licenseActivation), ack: true });
+        this.pollLicenseActivation().catch(error => this.log.warn(`Lizenzaktivierung fehlgeschlagen: ${error.message}`));
+        return { ...this.licenseActivation };
+    }
+
+    async getLicenseActivationStatus() {
+        return this.licenseActivation || { status: 'none' };
+    }
+
+    async pollLicenseActivation() {
+        const activation = this.licenseActivation;
+        if (!activation) return;
+        const deadline = Math.min(activation.expiresAt * 1000, Date.now() + 10 * 60 * 1000);
+        while (this.licenseActivation === activation && Date.now() < deadline) {
+            const result = await licenseBackend.getActivationStatus({ url: licenseBackend.DEFAULT_BACKEND_URL, activationCode: activation.activationCode });
+            activation.status = result.status;
+            await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
+            if (result.status === 'authorized') {
+                const entitlement = await licenseBackend.issueEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, activationCode: activation.activationCode });
+                await this.storeLicenseToken(entitlement.token);
+                activation.status = 'redeemed';
+                await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ verificationUri: activation.verificationUri, expiresAt: activation.expiresAt, status: activation.status }), ack: true });
+                return;
+            }
+            if (['denied', 'expired'].includes(result.status)) return;
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+    }
+
+    async renewLicense() {
+        if (!this.config.licenseToken) return;
+        try {
+            const entitlement = await licenseBackend.renewEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, token: this.config.licenseToken });
+            await this.storeLicenseToken(entitlement.token);
+        } catch (error) {
+            this.log.warn(`Lizenzverlängerung nicht möglich; Offline-Status bleibt aktiv (${error.message})`);
+        }
     }
 
     async ensureCatalogSyncState() {
@@ -186,6 +252,13 @@ class AiAnalytics extends utils.Adapter {
         await ensureLicenseStates(this);
         this.licenseState = evaluateLicense({ version: PACKAGE_VERSION, token: this.config.licenseToken, publicKeys: LICENSE_PUBLIC_KEYS });
         await this.setStateAsync(LICENSE_STATUS_STATE, { val: JSON.stringify(this.licenseState), ack: true });
+        await this.setObjectNotExistsAsync(licenseBackend.ACTIVATION_STATE, {
+            type: 'state',
+            common: { name: 'License activation', type: 'string', role: 'json', read: true, write: false },
+            native: {},
+        });
+        await this.setStateAsync(licenseBackend.ACTIVATION_STATE, { val: JSON.stringify({ status: 'none' }), ack: true });
+        await this.ensureInstallationId();
         await ensureReachabilityStates(this);
         await this.ensureCatalogSyncState();
         await this.ensureChatProgressState();
@@ -249,6 +322,8 @@ class AiAnalytics extends utils.Adapter {
             intervalMs,
             runCheck: () => this.runProactiveCheck(),
         });
+        await this.renewLicense();
+        this.licenseRenewalTimer = setInterval(() => this.renewLicense().catch(() => {}), licenseBackend.DAILY_RENEWAL_MS);
 
         this.log.info('ai-analytics adapter ready');
     }
@@ -861,6 +936,8 @@ class AiAnalytics extends utils.Adapter {
             runDiscoveryNow: () => adminCommands.runDiscoveryNow(this),
             runDiscoveryOnly: () => adminCommands.runDiscoveryOnly(this),
             runProactiveCheckNow: () => adminCommands.runProactiveCheckNow(this),
+            startLicenseActivation: () => adminCommands.startLicenseActivation(this),
+            getLicenseActivationStatus: () => adminCommands.getLicenseActivationStatus(this),
         };
 
         const handler = adminCommandHandlers[command];
@@ -920,6 +997,7 @@ class AiAnalytics extends utils.Adapter {
     onUnload(callback) {
         try {
             if (this.stopScheduler) this.stopScheduler();
+            if (this.licenseRenewalTimer) clearInterval(this.licenseRenewalTimer);
             const pending = [this.chatRunPromise, this.proactiveCheckPromise, this.catalogSyncPromise, this.bridgeStateChangePromise]
                 .filter(promise => promise && typeof promise.then === 'function');
             if (!pending.length) {
