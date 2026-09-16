@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "ai-analytics",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "titleLang": {
       "en": "AI Analytics", "de": "AI Analytics", "ru": "AI Analytics", "pt": "AI Analytics",
       "nl": "AI Analytics", "fr": "AI Analytics", "it": "AI Analytics", "es": "AI Analytics",

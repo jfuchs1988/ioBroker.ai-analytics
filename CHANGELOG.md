@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.1] - 2026-09-16
+
+### Geändert
+
+- Admin-Einstellungen vollständig neu strukturiert und um eine ausführliche
+  How-To-Seite erweitert.
+- Standardlimits auf 32 KI-Schritte, 128 Werkzeugaufrufe, 1024 Zeiträume pro
+  Anfrage und 120 Zeiträume pro Werkzeug erhöht.
+- KI kann `valueKind` nach ausdrücklicher Nutzerangabe sicher korrigieren.
+
 ## [0.1.0] - 2026-09-16
 
 ### Veröffentlicht

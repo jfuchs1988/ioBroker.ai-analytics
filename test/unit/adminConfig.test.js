@@ -62,6 +62,19 @@ describe('admin configuration links and model discovery', () => {
         expect(config.items.settingsTab.items.onboardingHeader.size).to.equal(3);
     });
 
+    it('uses the streamlined settings layout and exposes the How To tab', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        const settings = config.items.settingsTab.items;
+        expect(settings.settingsCsv).to.equal(undefined);
+        expect(settings.apiKey.label).to.equal('API-Key Chat & Prüfung');
+        expect(settings.maxAgentIterations.default).to.equal(32);
+        expect(settings.maxToolCalls.default).to.equal(128);
+        expect(settings.maxPeriodsPerRequest.default).to.equal(1024);
+        expect(settings.maxPeriodsPerToolCall.default).to.equal(120);
+        expect(config.items.howToTab.items.howToContent.name).to.equal('AiAnalyticsConfig/Components/HowToComponent');
+        expect(fs.readFileSync(path.join(ROOT, 'src-admin', 'src', 'Components.js'), 'utf8')).to.include('HowToComponent');
+    });
+
     it('links OpenRouter, OpenCode Zen, and GitHub Sponsors from the configuration', () => {
         const configText = fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8');
 
@@ -72,7 +85,7 @@ describe('admin configuration links and model discovery', () => {
 
     it('keeps the catalog editor in its own adapter settings tab', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
-        expect(Object.keys(config.items)).to.deep.equal(['settingsTab', 'catalogTab']);
+        expect(Object.keys(config.items)).to.deep.equal(['settingsTab', 'howToTab', 'catalogTab']);
         expect(config.items.catalogTab.label).to.equal('Historisierte Datenpunkte');
         expect(config.items.catalogTab.items.catalogDevices.name).to.equal('AiAnalyticsConfig/Components/CatalogDevicesComponent');
     });
