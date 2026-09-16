@@ -6,7 +6,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `fix/license-status-display` (Release beta.76 wird vorbereitet).
+- Branch: `master` (Release beta.76 veröffentlicht).
 - Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
   wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
   wurde neu gebaut. Die Aktivierung öffnet das Verifizierungsfenster automatisch,
@@ -19,8 +19,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   `info.licenseStatus` bleiben maßgeblich.
 - Verifikation des Fixes: `npm test` (486 Unit- und 60 Admin-Tests),
   `npm run lint`, `npm run build:admin`, `npm run test:e2e`, Paketbau und
-  `git diff --check` erfolgreich. Nächste Aktion: Release beta.76 bauen und
-  veröffentlichen; Backend-Antworterweiterung separat deployen.
+  `git diff --check` erfolgreich. Backend-Antworterweiterung ist mit v0.3.0
+  produktiv deployed.
 - Der Backend-Endpunkt ist fest auf den HTTPS-Produktionsdienst ausgerichtet;
   eine URL-Konfiguration ist im Admin absichtlich nicht vorgesehen.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
@@ -40,7 +40,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   der versionierte Nachtrag ist als beta.72 veröffentlicht; der Lizenz-
   Aktivierungsbutton ist als beta.74 veröffentlicht; der interaktive
   Aktivierungsabschluss ist als beta.75 veröffentlicht; die Statusanzeige ist
-  als beta.76 vorbereitet.
+  als beta.76 veröffentlicht. Backend v0.3.0 liefert GitHub-Login und
+  Ablaufdaten und ist produktiv deployed.
 
 ## TODO
 
