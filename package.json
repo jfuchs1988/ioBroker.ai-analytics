@@ -52,6 +52,7 @@
   },
   "scripts": {
     "build:admin": "vite build --config src-admin/vite.config.mjs",
+    "check:release": "node scripts/check-release-metadata.js",
     "pack:release": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npm pack --pack-destination dist",
     "test:unit": "mocha test/unit/**/*.test.js",
     "test:admin": "vitest run",
