@@ -14,10 +14,10 @@ Metadaten und beobachtbare History-Muster. Bei verbleibender Unsicherheit muss
 der Eintrag `needsReview` behalten oder durch das KI-Onboarding klassifiziert
 werden. Neue Heuristiken dieser Art sind nicht zulässig.
 
-- **History-Ausfall-Lifecycle nur teilweise geschlossen**: `historyHealth` persistiert
-  Fehlerzähler, Meldungszustand und Retry-Zeitpunkte. Ein endgültiger
-  „exhausted“-Zustand nach allen Retries und eine vollständige fachliche
-  Recovery-Meldung bleiben offen.
+- **History-Ausfall-Lifecycle:** `historyHealth` persistiert Fehlerzähler,
+  Meldungszustand und Retry-Zeitpunkte. Nach den drei definierten Retries wird
+  der Zustand `exhausted` gesetzt; eine separate fachliche Recovery-Meldung ist
+  weiterhin nicht vorgesehen.
 - **Keine Katalog-Vorfilterung bei sehr großen Installationen**: Bei stark wachsender Objektzahl könnte der volle Katalog als LLM-Kontext zu groß werden. Von der Spec explizit als spätere Optimierung markiert, kein Blocker für v1.
 - ~~Kein Kosten-/Token-Budget für LLM-Aufrufe~~ — **gelöst** (2026-08-23, EUR-Umstellung 2026-09-04): Ein konfigurierbares Tagesbudget in EUR (`dailyBudgetEur`) begrenzt Chat und proaktive Prüfung anhand der aus den konfigurierten Preisen berechneten Ist-Kosten, und der Token-Kosten-Tab im Admin-UI zeigt Verbrauchshistorie, hochgerechnete Kosten sowie eine Limit-Empfehlung. Ein Preis muss gesetzt sein, damit ein Budget > 0 überhaupt greifen kann (Admin-UI verhindert sonst das Speichern). Siehe [ADR-0022](../adr/0022-manuelle-preise-unbegrenzte-verbrauchshistorie.md), [ADR-0028](../adr/0028-tagesbudget-in-eur-statt-token.md) und die [Spec zum Token-Kosten-Tab](../specs/2026-08-22-token-kosten-tab-design.md).
 - **Ein sehr großer Erst-Onboarding-Lauf kann das Tagesbudget innerhalb eines Laufs ausschöpfen:** Der Token-Verbrauch des Onboardings zählt seit dem Token-Kosten-Tab gegen `dailyBudgetEur` (vorher wurde er gar nicht erfasst). Da ein Onboarding-Lauf aber viele Batches hintereinander abarbeitet, kann ein einzelner Lauf das Budget aufbrauchen, bevor die Grenze überhaupt greifen kann. Gemildert durch die pro Batch ausgeführte `isBudgetExceeded`-Prüfung in `runOnboarding`: sobald das Budget erreicht ist, bricht der Lauf mit einer `warn`-Meldung ab, die verbleibenden Objekte bleiben unklassifiziert und werden beim nächsten Discovery-Lauf nachgeholt (es geht nichts verloren, da für sie noch kein Katalogeintrag geschrieben wurde). Der Chat kann für den Rest des Tages trotzdem blockiert sein — bewusst akzeptiert, das Budget ist eine harte Obergrenze.

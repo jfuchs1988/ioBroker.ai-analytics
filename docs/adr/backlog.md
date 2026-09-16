@@ -20,9 +20,9 @@ Aktuell werden automatisch alle aktiven `influxdb`/`history`/`sql`-Instanzen ber
 
 ## 2. Deduplizierung und abgestufte Wiederholung von Ausfallmeldungen
 
-Teilweise implementiert: pro History-Instanz wird ein persistenter Health-Status
-mit Fehlerzähler, Meldungszustand und Retry-Zeitpunkt geführt. Die vollständige
-Deduplizierung und ein endgültiger „exhausted“-Zustand sind noch offen.
+Implementiert: pro History-Instanz wird ein persistenter Health-Status mit
+Fehlerzähler, Meldungszustand, Retry-Zeitpunkten und endgültigem `exhausted`-
+Zustand geführt. Erfolgreiche Abfragen setzen den Status zurück.
 
 ## 3. Teststrategie für main.js und die Admin-UI — gelöst
 
