@@ -36,13 +36,15 @@ Details: `docs/specs/2026-09-04-teststrategie-main-und-admin-ui.md`.
 
 Durch [ADR-0018](0018-lizenzmodell-beta-frei-danach-sponsoring.md) und [ADR-0027](0027-hybrid-lizenzmodell-referenzprojekt.md) entschieden: MIT-Kern mit sponsor-pflichtigen KI-Komponenten. Die technische Token-/Entitlement-Spec ist festgelegt: separate Webanwendung, Ed25519-JWS mit definierten Audience-/Version-Claims, technischer Tokenablauf = `sponsorUntil` (korrigiert 2026-09-10, siehe ADR-0027-Korrektur und Backend-ADR 0004; vormals fälschlich als separates 35-Tage-Fenster dokumentiert), 30 Tage Sponsoring, 30 Tage Grace-Period, keine Instanzbindung, Offline-Signaturprüfung und danach eine Chat-Anfrage pro Tag. Offen bleiben Hosting/Details der Webanwendung sowie Trial-/Contributor-Entitlements. Die Backend-Gegenseite (Aktivierung, OAuth, Persistenz) ist jetzt in `ioBroker.AiAnalytics.Backend` spezifiziert (Phase 0, 2026-09-10).
 
-## 5. CI-Aktivierung — gelöst (bewusst gegen CI entschieden)
+## 5. CI-Aktivierung — reaktiviert für die Katalog-Einreichung (2026-09-16)
 
-ESLint, Mocha, Admin-Build und npm-Audit sind als lokale Prüfschritte
-vorhanden. Die zuvor nur deaktivierten GitHub-Actions-Workflow-Dateien
-(`CI`, `Release`) sind auf Nutzerwunsch am 2026-09-04 vollständig aus dem
-Repository entfernt worden statt sie reaktiviert vorzuhalten; Prüfung und
-Release bleiben dauerhaft manuell.
+Die Entscheidung vom 2026-09-04 (GitHub-Actions-Workflows vollständig
+entfernt, Prüfung dauerhaft manuell) ist durch [ADR-0030](0030-aufnahme-offizielle-adapter-liste.md)
+überholt: `ioBroker.repositories` verlangt für die Aufnahme in die
+"latest"-Liste einen Test-Workflow via GitHub Actions. `test.yml` führt
+`npm test`, `npm run lint` und `npm run build:admin` bei Push/PR auf
+`master` aus; `codeql.yml` (Security-Scan) war bereits vorhanden. Release
+bleibt weiterhin manuell (siehe [CONTRIBUTING.md](../../CONTRIBUTING.md)).
 
 ## 6. Versionierungs-/Release-Policy nach der Beta-Phase — gelöst
 
@@ -73,4 +75,12 @@ Bleibt eine spätere Erweiterung und wird derzeit nicht geplant.
 ## 12. Automatische Kandidaten-Auswahl unter mehreren LLM-Modellen — entfällt
 
 Es wird ein Provider/Modell pro Zweck konfiguriert. Eine automatische Kosten-/Qualitätsauswahl wird nicht benötigt.
+
+## 13. Offene Schritte zur Katalog-Einreichung (ADR-0030)
+
+Vor der PR an `ioBroker.repositories`: `npm publish` inkl. ioBroker-Org als
+NPM-Owner; Klärung mit `info@iobroker.net` zum Sponsoring-/Umsatzmodell für
+Adapter mit Bezahlpflicht-Funktionen; Lauf des offiziellen Checkers
+(`adapter-check.iobroker.in`) gegen den finalen Stand. Punkt 5 (CI) ist
+bereits erledigt.
 

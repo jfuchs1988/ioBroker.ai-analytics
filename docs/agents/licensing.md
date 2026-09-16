@@ -26,6 +26,29 @@ Chat-Fallback. Die Ausstellungs-Webanwendung muss beim Erzeugen des Tokens
 technische Pufferfrist; siehe Backend-ADR 0004). Auch Beta-Versionen passieren
 keinen Versions-Bypass.
 
+## Repochecker-Konsistenz (Voraussetzung für die offizielle Adapter-Liste)
+
+`@iobroker/repochecker` prüft strikt:
+
+- `package.json` `license` und `io-package.json`
+  `common.licenseInformation.license` müssen exakt gleich sein (SPDX-Wert, z. B.
+  `MIT`). `common.licenseInformation.type` muss `free`/`paid`/`commercial`/
+  `limited` sein — `limited` passt für "MIT-Kern, einzelne Funktionen
+  sponsor-pflichtig" (Referenz: evcc-Modell), nicht `commercial` (das steht für
+  "nur bei kommerzieller Nutzung lizenzpflichtig").
+- Die Root-`LICENSE`-Datei muss reiner, unveränderter Lizenztext sein (siehe
+  GitHub-Lizenzerkennung: ein angehängter Sonderabschnitt lässt GitHub die
+  Lizenz als "other" statt "MIT" erkennen). Sponsor-Ausnahmen gehören
+  ausschließlich in `LICENSES/exclusions.md`/`SPONSOR-REQUIRED.md` und in die
+  Datei-Header der betroffenen Quellen.
+- `io-package.json` `common.news` braucht einen Eintrag für die aktuelle
+  `common.version` und darf nicht über ~20 Einträge wachsen (harter Fehler);
+  der Repository-Builder kappt ohnehin bei 7 Einträgen. Bei jedem
+  Versionswechsel: neuen Eintrag ergänzen, ältesten entfernen.
+
+Diese drei Punkte vor jeder Prüfung mit dem offiziellen Checker
+(`adapter-check.iobroker.in` bzw. `@iobroker/repochecker`) gegenlesen.
+
 ## Änderungsregeln
 
 - Neue sponsor-pflichtige Dateien in `LICENSES/SPONSOR-REQUIRED.md` aufnehmen

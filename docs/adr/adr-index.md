@@ -35,3 +35,4 @@ Jede Zeile ist eine eigene Entscheidung im [Nygard-Format](https://cognitect.com
 | [0027](0027-hybrid-lizenzmodell-referenzprojekt.md) | Hybrides Lizenzmodell nach Referenzprojekt | Angenommen und produktiv umgesetzt | 2026-09-03 |
 | [0028](0028-tagesbudget-in-eur-statt-token.md) | Tagesbudget in EUR statt Rohtoken, mit Preis-Validierung und Anzeige-Refresh beim Start | Angenommen | 2026-09-04 |
 | [0029](0029-progressive-disclosure-fuer-session-kontext.md) | Progressive Disclosure für Session-Kontext | Angenommen | 2026-09-04 |
+| [0030](0030-aufnahme-offizielle-adapter-liste.md) | Aufnahme in die offizielle ioBroker-Adapter-Liste (hebt Katalog-Ablehnung aus ADR-0018 auf) | Angenommen | 2026-09-16 |
