@@ -6,15 +6,19 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`, Merge-Commit `5601006` aus PR
-  [#31](https://github.com/jfuchs1988/ioBroker.ai-analytics/pull/31) ist
-  abgeschlossen. Release `v0.1.4` wurde als GitHub-Release veröffentlicht.
-- CI für PR #31 war vollständig grün: CodeQL, Lint/Test/Admin-
+- Branch: `master`, Security-Merge `a916129` aus PR
+  [#32](https://github.com/jfuchs1988/ioBroker.ai-analytics/pull/32) und
+  Release-Merge `0d333dd` aus PR #33 sind abgeschlossen. Release `v0.1.5`
+  wurde als GitHub-Release veröffentlicht.
+- CI für PR #32/#33 war vollständig grün: CodeQL, Lint/Test/Admin-
   Build auf Node 22.x und Node 24.x. Lokal waren 489 Unit- und 60 Admin-Tests
-  sowie Lint erfolgreich. Es wurden genau die drei erwarteten Release-Felder
-  geändert; keine Dependency-Baum-Änderungen.
+- sowie Lint erfolgreich. Dependency-Updates und der CodeQL-ReDoS-Fix sind
+  enthalten.
 - Release-Verifikation: `npm run pack:release` erfolgreich; `npm run test:e2e`
-  erfolgreich mit 2 Tests. Tag `v0.1.4` ist auf dem Remote vorhanden.
+  erfolgreich mit 2 Tests. Tag `v0.1.5` ist auf dem Remote vorhanden. Alle
+  offenen PRs #19 bis #29 wurden als durch PR #32 ersetzt geschlossen; offene
+  Dependabot- und CodeQL-Funde stehen nicht mehr aus. Zwei nicht verwendete
+  Entwicklungs-Alerts (`adm-zip`, `esbuild`) wurden mit Begründung dismissed.
 - Nächster Schritt: Veröffentlichung in bzw. Abstimmung mit der offiziellen
   ioBroker-Adapter-Liste.
 - Status: Lizenzmodell auf das evcc-Muster korrigiert (siehe
