@@ -3,7 +3,7 @@
 1. Lizenzumfang mit MIT-Kern und sponsor-required Komponenten dokumentieren.
 2. Admin- und Paketmetadaten auf das Hybridmodell umstellen.
 3. Sponsoring-Entitlement mit signiertem Ed25519-JWS, separater
-   Ausstellungs-Webanwendung, 35-Tage-Token, 30-Tage-Sponsoring,
+   Ausstellungs-Webanwendung, `exp = sponsorUntil`, 30-Tage-Sponsoring,
    30-Tage-Grace-Period, Offline-Prüfung und täglichem Chat-Fallback
    spezifizieren.
 4. Vor `0.1.0` technische Prüfung, Trial und
@@ -23,7 +23,7 @@ der Veröffentlichung von `0.1.0` deaktiviert.
 - Tokenformat: JWS/JWT mit `EdDSA`/Ed25519, `kid` zur Schlüsselrotation und
   den Claims `tokenVersion`, `iss`, `aud`, `licenseId`, `iat`, `nbf`, `exp` und
   `sponsorUntil`
-- 35 Tage technische Token-Gültigkeit
+- `exp = sponsorUntil`; keine separate technische Pufferfrist
 - 30 Tage offizielle Sponsoring-Periode
 - 30 Tage Grace-Period ab Sponsoring-Ablauf; die fünf zusätzlichen Token-Tage
   liegen innerhalb dieser Grace-Period

@@ -43,6 +43,13 @@ describe('admin configuration links and model discovery', () => {
         expect(config.items.settingsTab.items.usageReset.name).to.equal('AiAnalyticsConfig/Components/UsageResetComponent');
     });
 
+    it('configures the backend URL and activation component', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
+        const settings = config.items.settingsTab.items;
+        expect(settings.licenseBackendUrl.type).to.equal('text');
+        expect(settings.licenseActivation.name).to.equal('AiAnalyticsConfig/Components/LicenseActivationComponent');
+    });
+
     it('provides the required size for the onboarding section header', () => {
         const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'admin', 'jsonConfig.json'), 'utf8'));
         expect(config.items.settingsTab.items.onboardingHeader.size).to.equal(3);

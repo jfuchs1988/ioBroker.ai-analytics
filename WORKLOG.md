@@ -6,24 +6,22 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `docs/align-token-timing-adr0004` (nicht committet; Doku-Korrektur,
-  kein Codechange).
-- Status: `README.md`/`README.de.md`/`LICENSES/SPONSOR-REQUIRED.md`/
-  `docs/adr/0027-hybrid-lizenzmodell-referenzprojekt.md`/`docs/adr/backlog.md`/
-  `docs/specs/2026-09-03-hybrid-license-and-entitlements.md` beschrieben noch
-  eine separate 35-Tage-Token-Gültigkeit. Backend-ADR 0004
-  (`ioBroker.AiAnalytics.Backend`) hat das verworfen: `exp = sponsorUntil`
-  ohne Pufferzeitraum. `docs/agents/licensing.md` war bereits korrigiert
-  (voriger Commit `0302b0d`); die übrigen Fundstellen wurden jetzt
-  nachgezogen. Kein Codechange nötig, `lib/license.js` berechnet Grace
-  bereits aus `sponsorUntil`. Das eigentliche Sponsor-Token-Projekt läuft im
-  Backend-Repository weiter: dort ist Phase 0 (Vertrags-Freeze:
-  Aktivierungs-/Entitlement-Spec, ADR 0005 zur GitHub-OAuth-Integration)
-  abgeschlossen, siehe dessen `WORKLOG.md`. `npm test`/`npm run lint` konnten
-  in dieser Sitzung nicht ausgeführt werden (kein `npm` im PATH dieser
-  Umgebung); auf Nutzerwunsch trotzdem committed, da ausschließlich
-  Markdown-Dateien geändert wurden. Sollte auf einer Maschine mit Node
-  nachgeholt werden, bevor dieser Branch nach `master` gemergt wird.
+- Branch: `feature/adapter-license-backend` (nicht committet).
+- Status: Adapter-Backend-Integration umgesetzt: fokussierter HTTPS-Client für
+  Aktivierung/Polling/Issue/Renewal, geschützte UUID-Installation-ID und
+  Token-Persistenz, Start-/Tages-Lifecycle, `sendTo`-/`admin.bridge`-Befehle und
+  schmale Aktivierungs-UI. Offline-`evaluateLicense` und
+  `info.licenseStatus` bleiben maßgeblich. Ein gebündelter Admin-Build konnte
+  nicht aktualisiert werden, weil `npm` und `node` in dieser Umgebung fehlen;
+  `admin/custom/customComponents.js` muss nach dem Build vor Release geprüft
+  und aktualisiert werden.
+- Verifikation: `git diff --check` erfolgreich. `npm test`, `npm run lint` und
+  `npm run build:admin` sowie Syntaxprüfung konnten wegen fehlendem `npm`/`node`
+  nicht ausgeführt werden. Nächste Aktion: auf einer Node-22-Umgebung diese
+  drei Befehle ausführen und den generierten Admin-Bundle-Stand prüfen.
+- Der Backend-Endpunkt bleibt absichtlich über `licenseBackendUrl` zu
+  konfigurieren; der Default ist leer, weil für das Backend-Repository keine
+  veröffentlichte Produktions-URL vorgegeben ist.
 - Discovery-Bridge-Timeout-Fix als beta.53 veröffentlicht; die
   konfigurierbaren LLM-Token-Limits sind als beta.54 veröffentlicht; der
   JSON-Schema-Fix ist als beta.55 veröffentlicht; Gauge-PV-Unterstützung ist

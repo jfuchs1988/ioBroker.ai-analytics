@@ -76,8 +76,8 @@
       "0.0.1-beta.29": { "en": "Offline Ed25519-JWS entitlement foundation and daily chat fallback added.", "de": "Offline-Ed25519-JWS-Entitlement-Grundlage und täglicher Chat-Fallback ergänzt.", "ru": "Добавлены основа офлайн-проверки прав Ed25519-JWS и ежедневный резервный чат.", "pt": "Adicionada a base de entitlement Ed25519-JWS offline e o fallback de chat diário.", "nl": "Offline Ed25519-JWS-entitlementbasis en dagelijkse chatfallback toegevoegd.", "fr": "Base d’habilitation Ed25519-JWS hors ligne et solution de secours quotidienne du chat ajoutées.", "it": "Aggiunte le basi dell'entitlement Ed25519-JWS offline e il fallback quotidiano della chat.", "es": "Se añadieron la base de derechos Ed25519-JWS sin conexión y el chat de respaldo diario.", "pl": "Dodano podstawę uprawnień Ed25519-JWS offline i codzienny czat awaryjny.", "uk": "Додано основу офлайн-перевірки прав Ed25519-JWS та щоденний резервний чат.", "zh-cn": "添加了离线 Ed25519-JWS 权益基础和每日聊天备用功能。" }
     }
   },
-  "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
-  "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken"],
+  "encryptedNative": ["apiKey", "onboardingApiKey", "licenseToken", "installationId"],
+  "protectedNative": ["apiKey", "onboardingApiKey", "licenseToken", "installationId"],
   "native": {
     "providerType": "anthropic",
     "apiKey": "",
@@ -106,7 +106,9 @@
      "maxPeriodsPerToolCall": 72,
      "enableValueKindBackfill": false,
      "enableDataQualityBackfill": false,
-     "licenseToken": ""
+      "licenseToken": "",
+      "licenseBackendUrl": "https://iob-ai-analytics.jfuchs.de",
+      "installationId": ""
   },
   "objects": [],
   "instanceObjects": []
