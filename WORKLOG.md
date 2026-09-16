@@ -49,8 +49,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Secret Scanning und Push Protection. `SECURITY.md`, Dependabot und CodeQL-
   Workflow sind geprüft und werden mit diesem Audit übernommen.
 
-- Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
-  zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
+- Die manuelle Live-Abnahme von Admin-Geräteliste, KI-Klassifikationsqualität
+  und Provenienz/Belegen pro KI-Aussage wurde vom Betreiber bestätigt.
 - Review-Fixwelle nach dem Claude-Session-Limit abgeschlossen: Bulk-Status wird
   im Parent angezeigt, Einzel-Erfolge erscheinen ca. 3 Sekunden inline,
   Gruppen-IDs werden im Picker auf Länge/Steuerzeichen validiert, ungültige
@@ -64,6 +64,9 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
   Netzzähler-Support (B).
 
 ## DONE
+
+- Live-Abnahme auf echter ioBroker-Installation bestätigt: Admin-Browserpfade,
+  reale Katalogklassifikation und KI-Belege/Provenienz geprüft.
 
 - Findings 1 bis 13 für beta.65 vorbereitet: History-/Counter-Auswertung,
   Provider-Modelllisten, HVAC-Grenzen, Katalog-/Bridge-Rennen, CSV-Atomicity,
