@@ -156,6 +156,8 @@ export class LicenseActivationComponent extends ConfigGeneric {
         const socket = this.props.socket || this.props.oContext.socket;
         const instance = `ai-analytics.${this.props.oContext.instance}`;
         const id = `license-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const popup = typeof window !== 'undefined' ? window.open('', 'ai-analytics-license-activation', 'popup,width=520,height=720') : null;
+        this.setState({ status: 'Aktivierung wird angefordert ...' });
         await socket.setState(`${instance}.admin.bridge`, { val: JSON.stringify({ id, command: 'startLicenseActivation', message: {} }), ack: false });
         const deadline = Date.now() + 30000;
         while (Date.now() < deadline) {
@@ -165,7 +167,9 @@ export class LicenseActivationComponent extends ConfigGeneric {
                     const response = JSON.parse(state.val);
                     if (response.id === id) {
                         if (!response.ok) throw new Error(response.error || 'Aktivierung konnte nicht gestartet werden.');
+                        if (popup && response.result && response.result.verificationUri) popup.location.href = response.result.verificationUri;
                         this.setState({ activation: response.result, status: 'Aktivierung gestartet.' });
+                        await this.waitForActivation(instance, socket, response.result.expiresAt);
                         return;
                     }
                 } catch (error) {
@@ -175,6 +179,30 @@ export class LicenseActivationComponent extends ConfigGeneric {
             await new Promise(resolve => setTimeout(resolve, 400));
         }
         throw new Error('Keine Antwort vom Adapter.');
+    }
+
+    async waitForActivation(instance, socket, expiresAt) {
+        const deadline = Math.min(Number(expiresAt) * 1000 || Date.now() + 10 * 60 * 1000, Date.now() + 10 * 60 * 1000);
+        while (Date.now() < deadline) {
+            const state = await getStateWithTimeout(socket, `${instance}.info.licenseActivation`).catch(() => null);
+            if (state && typeof state.val === 'string') {
+                try {
+                    const activation = JSON.parse(state.val);
+                    if (activation.status === 'redeemed') {
+                        this.setState({ status: 'Token erfolgreich gespeichert. Lizenz ist jetzt aktiv.' });
+                        return;
+                    }
+                    if (['denied', 'expired'].includes(activation.status)) {
+                        throw new Error(`Aktivierung ${activation.status === 'denied' ? 'abgelehnt' : 'abgelaufen'}.`);
+                    }
+                } catch (error) {
+                    if (error.message !== 'Unexpected end of JSON input') throw error;
+                }
+            }
+            this.setState({ status: 'Warte auf die Bestätigung im Aktivierungsfenster ...' });
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        throw new Error('Aktivierung wurde nicht rechtzeitig abgeschlossen.');
     }
 
     renderItem() {
