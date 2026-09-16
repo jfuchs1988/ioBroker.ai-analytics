@@ -6,7 +6,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master` (Release `0.1.2` veröffentlicht).
+- Branch: `fix/documentation-audit` (Dokumentations- und Sicherheitsaudit).
 - Status: Der fehlende Lizenz-Aktivierungsbutton ist behoben: `LicenseActivationComponent`
   wird jetzt auch über `src-admin/src/Components.js` exportiert und das Admin-Bundle
   wurde neu gebaut. Die Aktivierung öffnet das Verifizierungsfenster automatisch,
@@ -46,9 +46,8 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 - GitHub-Sicherheitsfunktionen aktiviert: Vulnerability Alerts, private
   Vulnerability Reporting, Dependabot Security Updates, der CodeQL-Workflow,
-  Secret Scanning und Push Protection. `SECURITY.md`, Dependabot und Workflows
-  sind aktuell uncommittete Arbeitsbaumänderungen und müssen separat geprüft
-  werden.
+  Secret Scanning und Push Protection. `SECURITY.md`, Dependabot und CodeQL-
+  Workflow sind geprüft und werden mit diesem Audit übernommen.
 
 - Nächste Produktaufgabe: Geräteliste-UI auf einer echten ioBroker-Installation
   zusätzlich manuell abnehmen (Sortierung, Detail-Panel, Bulk-Toolbar).
