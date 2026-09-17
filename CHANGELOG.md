@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.8] - 2026-09-17
+
+### Hinzugefügt
+
+- Einmalige Wertprüfung beim nächsten manuellen Neu-Einlesen von Datenpunkten.
+  `valueKind` und Datenqualität werden anhand der History neu bewertet; manuell
+  bestätigte Werte bleiben geschützt.
+- Gespeicherte Aktivierungstokens bleiben über Adapter-Updates erhalten und
+  werden erst im letzten Gültigkeitstag erneuert.
+
 ## [0.1.7] - 2026-09-17
 
 ### Hinzugefügt

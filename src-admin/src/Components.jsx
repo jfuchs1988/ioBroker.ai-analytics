@@ -21,7 +21,7 @@ const SETTINGS_COLUMNS = [
     'onboardingPricePerMillionInputTokens', 'onboardingPricePerMillionOutputTokens',
     'onboardingMaxInputTokens', 'onboardingMaxOutputTokens',
     'onboardingContextWindowTokens',
-    'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill',
+    'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall', 'silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill', 'recheckValuesOnNextDiscovery',
 ];
 const SETTINGS_NUMBER_COLUMNS = new Set([
     'chatPricePerMillionInputTokens', 'chatPricePerMillionOutputTokens',
@@ -32,7 +32,7 @@ const SETTINGS_NUMBER_COLUMNS = new Set([
     'onboardingContextWindowTokens',
     'checkIntervalHours', 'dailyBudgetEur', 'maxAgentIterations', 'maxToolCalls', 'maxPeriodsPerRequest', 'maxPeriodsPerToolCall',
 ]);
-const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill']);
+const SETTINGS_BOOLEAN_COLUMNS = new Set(['silentIfNothingFound', 'enableValueKindBackfill', 'enableDataQualityBackfill', 'recheckValuesOnNextDiscovery']);
 const SETTINGS_SECRET_COLUMNS = new Set(['apiKey', 'onboardingApiKey']);
 const PROVIDER_TYPES = new Set(['anthropic', 'openai', 'openrouter', 'opencode', 'local']);
 const OPENCODE_ZEN_BASE_URL = 'https://opencode.ai/zen/v1';
@@ -251,7 +251,7 @@ export class LicenseActivationComponent extends ConfigGeneric {
     }
 
     async clearToken() {
-        if (!window.confirm('Gespeichertes Sponsoring-Entitlement wirklich löschen?')) return;
+        if (!window.confirm('Gespeichertes Aktivierungstoken wirklich löschen?')) return;
         const socket = this.props.socket || this.props.oContext.socket;
         const instance = `ai-analytics.${this.props.oContext.instance}`;
         const id = `license-clear-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -286,7 +286,7 @@ export class LicenseActivationComponent extends ConfigGeneric {
                     const activation = JSON.parse(state.val);
                     if (activation.status === 'redeemed') {
                         await this.loadLicenseStatus().catch(() => {});
-                        this.setState({ status: 'Token erfolgreich gespeichert. Lizenz ist jetzt aktiv.' });
+                        this.setState({ status: 'Token erfolgreich gespeichert. Aktivierung ist jetzt aktiv.' });
                         return;
                     }
                     if (['denied', 'expired'].includes(activation.status)) {
@@ -313,7 +313,7 @@ export class LicenseActivationComponent extends ConfigGeneric {
             {activation ? <span style={{ marginLeft: 8 }}>Status: {activation.status}; URL: <a href={activation.verificationUri} target="_blank" rel="noreferrer">Aktivierung öffnen</a>; Code: {activation.activationCode}</span> : null}
             <span role="status" aria-live="polite" style={{ marginLeft: 8 }}>{this.state.status}</span>
             <div role="status" aria-live="polite" style={{ marginTop: 8 }}>
-                {license && license.tokenStored ? `Token gespeichert. ${identity || 'GitHub-Benutzer nicht übermittelt.'}${expiry ? ` Gültig bis: ${expiry}.` : ' Gültigkeitsdatum nicht verfügbar.'}` : 'Kein Sponsoring-Entitlement-Token gespeichert.'}
+                {license && license.tokenStored ? `Token gespeichert. ${identity || 'GitHub-Benutzer nicht übermittelt.'}${expiry ? ` Gültig bis: ${expiry}.` : ' Gültigkeitsdatum nicht verfügbar.'}` : 'Kein Aktivierungstoken gespeichert.'}
             </div>
         </div>;
     }

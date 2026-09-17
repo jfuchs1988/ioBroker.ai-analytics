@@ -203,6 +203,10 @@ class AiAnalytics extends utils.Adapter {
 
     async renewLicense() {
         if (!this.config.licenseToken) return;
+        const tokenExpiresAt = Number.isSafeInteger(this.config.licenseTokenExpiresAt)
+            ? this.config.licenseTokenExpiresAt
+            : this.licenseState && this.licenseState.tokenExpiresAt;
+        if (!licenseBackend.shouldRenewEntitlement(tokenExpiresAt)) return;
         try {
             const entitlement = await licenseBackend.renewEntitlement({ url: licenseBackend.DEFAULT_BACKEND_URL, token: this.config.licenseToken });
             await this.storeLicenseToken(entitlement.token, entitlement);
@@ -337,7 +341,7 @@ class AiAnalytics extends utils.Adapter {
             runCheck: () => this.runProactiveCheck(),
         });
         await this.renewLicense();
-        this.licenseRenewalTimer = setInterval(() => this.renewLicense().catch(() => {}), licenseBackend.DAILY_RENEWAL_MS);
+        this.licenseRenewalTimer = setInterval(() => this.renewLicense().catch(() => {}), licenseBackend.RENEWAL_CHECK_INTERVAL_MS);
 
         this.log.info('ai-analytics adapter ready');
     }
@@ -436,6 +440,7 @@ class AiAnalytics extends utils.Adapter {
             }
 
         if (options.skipClassification) {
+            await this.runOneShotValueRecheck();
             const newCount = await this.registerUnclassifiedEntries(discovered, existingById);
             const result = { foundCount: discovered.length, newCount, reactivatedCount, skipped: 'classification' };
             await this.updateCatalogSyncState({
@@ -453,6 +458,7 @@ class AiAnalytics extends utils.Adapter {
 
         if (!this.onboardingProviderOk) {
             this.log.warn('Klassifikation neuer Objekte uebersprungen, da das Onboarding-Modell nicht erreichbar ist.');
+            await this.runOneShotValueRecheck();
             // `skipped` unterscheidet "nichts Neues gefunden" von "gar nicht erst geschaut".
             const newCount = await this.registerUnclassifiedEntries(discovered, existingById);
             const skippedResult = { foundCount: discovered.length, newCount, reactivatedCount, skipped: 'onboardingProvider' };
@@ -496,6 +502,8 @@ class AiAnalytics extends utils.Adapter {
             } catch (error) {
                 this.log.warn(`Konnte Rueckfrage nicht im Chat protokollieren: ${error.message}`);
             }
+
+            await this.runOneShotValueRecheck();
 
             if (this.config.enableValueKindBackfill) {
                 const currentEntries = await getAllCatalogEntries(this);
@@ -546,10 +554,31 @@ class AiAnalytics extends utils.Adapter {
         }
     }
 
-    async backfillValueKinds(entries) {
+    async runOneShotValueRecheck() {
+        if (this.config.recheckValuesOnNextDiscovery !== true) return false;
+
+        const currentEntries = await getAllCatalogEntries(this);
+        await this.updateCatalogSyncState({
+            phase: 'backfill',
+            processed: 0,
+            total: currentEntries.length,
+            currentSourceId: null,
+            message: `Pruefe Werte fuer ${currentEntries.length} bestehende Datenpunkte...`,
+        });
+        await this.backfillValueKinds(currentEntries, { force: true });
+        const currentEntriesForDataQuality = await getAllCatalogEntries(this);
+        await this.backfillDataQuality(currentEntriesForDataQuality, { force: true });
+
+        await this.extendForeignObjectAsync(this.namespace, { native: { recheckValuesOnNextDiscovery: false } });
+        this.config.recheckValuesOnNextDiscovery = false;
+        return true;
+    }
+
+    async backfillValueKinds(entries, { force = false } = {}) {
         const pending = entries
-            .filter((entry) => entry.active !== false && !entry.ignored && !entry.valueKind)
-            .slice(0, VALUE_KIND_BACKFILL_BATCH_SIZE);
+            .filter((entry) => entry.active !== false && !entry.ignored &&
+                (force ? entry.valueKindSource !== 'manual' && entry.classificationSource !== 'user' : !entry.valueKind))
+            .slice(0, force ? undefined : VALUE_KIND_BACKFILL_BATCH_SIZE);
 
         for (let index = 0; index < pending.length; index++) {
             const entry = pending[index];
@@ -579,10 +608,13 @@ class AiAnalytics extends utils.Adapter {
         return { backfilledCount: pending.length };
     }
 
-    async backfillDataQuality(entries) {
+    async backfillDataQuality(entries, { force = false } = {}) {
         const pending = entries
-            .filter((entry) => entry.active !== false && !entry.ignored && (!entry.writePattern || entry.writePattern === 'unknown'))
-            .slice(0, DATA_QUALITY_BACKFILL_BATCH_SIZE);
+            .filter((entry) => entry.active !== false && !entry.ignored &&
+                (force
+                    ? entry.dataQualitySource !== 'manual' && entry.classificationSource !== 'user'
+                    : (!entry.writePattern || entry.writePattern === 'unknown')))
+            .slice(0, force ? undefined : DATA_QUALITY_BACKFILL_BATCH_SIZE);
 
         for (let index = 0; index < pending.length; index++) {
             const entry = pending[index];
@@ -590,7 +622,7 @@ class AiAnalytics extends utils.Adapter {
                 const sourceObj = await this.getForeignObjectAsync(entry.sourceId);
                 const obj = { id: entry.sourceId, common: (sourceObj && sourceObj.common) || {} };
                 const result = await classifyDataQuality(this, obj, entry.historyInstance);
-                await setCatalogEntry(this, { ...entry, ...result });
+                await setCatalogEntry(this, { ...entry, ...result, dataQualitySource: 'history' });
                 if (this.log && this.log.silly) {
                     this.log.silly(`Datenqualitaets-Backfill: ${entry.sourceId} -> ${result.writePattern}/${result.updateFrequency}/${result.dataCompleteness}`);
                 }

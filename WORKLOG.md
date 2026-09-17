@@ -6,7 +6,7 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 
 ## WIP
 
-- Branch: `master`, Security-Merge `a916129` aus PR
+- Branch: `feature/github-token-auto-refresh`, Security-Merge `a916129` aus PR
   [#32](https://github.com/jfuchs1988/ioBroker.ai-analytics/pull/32) und
   Release-Merge `0d333dd` aus PR #33 sind abgeschlossen. Release `v0.1.5`
   wurde als GitHub-Release veröffentlicht.
@@ -37,11 +37,24 @@ Kurzer Übergabestand für die nächste Sitzung. Abgeschlossene Historie steht i
 - Verifikation: `npm test`, `npm run lint`, `npm run build:admin` lokal
   grün. `@iobroker/repochecker` lokal noch nicht erneut gelaufen (Nutzer
   hatte die o.g. Fehler zuvor selbst mit dem echten Checker gemeldet).
+- GitHub-Token-Lifecycle umgesetzt: vorhandene Tokens bleiben persistent und
+  offline nutzbar; der Adapter ruft die Erneuerung nur im letzten Tag vor dem
+  Ablauf auf. Aktivierungsoberflaeche und Funding-Metadaten enthalten keine
+  Sponsoringdarstellung mehr.
+- Backend-Folgeaufgaben fuer 30-Tage-Tokens, den sicheren Renewal-Vertrag,
+  Idempotenz, Ablauf-/Offline-Verhalten und Sicherheitstests stehen im
+  Backend-Worklog auf Branch `feature/github-token-auto-refresh`.
+- Einmalige Wertpruefung beim naechsten Discovery-Lauf umgesetzt: `valueKind`
+  und Datenqualitaet werden fuer alle nicht manuell bestaetigten Eintraege
+  neu klassifiziert; nach erfolgreichem Lauf wird die Option automatisch
+  deaktiviert.
+- Verifikation dieses Tasks: 496 Unit-Tests und 60 Admin-Tests, Lint,
+  Admin-Build sowie Backend-Release-Build erfolgreich. `dotnet test` wurde
+  wegen Windows-Zugriffsverweigerung im OneDrive-Arbeitsbereich nicht gestartet.
 - Offen vor der PR an `ioBroker.repositories` (siehe Backlog-Punkt 13):
-  `npm publish` inkl. ioBroker-Org als NPM-Owner (aktuell 404 auf npm);
-  Klärung mit `info@iobroker.net` zum Sponsoring-/Umsatzmodell für
-  Bezahlpflicht-Funktionen; erneuter Lauf des offiziellen Checkers
-  (`adapter-check.iobroker.in`) gegen den finalen Stand.
+  `npm publish` inkl. ioBroker-Org als NPM-Owner (aktuell 404 auf npm); erneuter
+  Lauf des offiziellen Checkers (`adapter-check.iobroker.in`) gegen den finalen
+  Stand.
 ## TODO
 
 - GitHub-Sicherheitsfunktionen aktiviert: Vulnerability Alerts, private
