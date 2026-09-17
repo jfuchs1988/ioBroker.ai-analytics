@@ -1,12 +1,12 @@
 {
   "../node_modules/react-qr-code/lib/index.mjs": {
-    "file": "assets/chunk-BTd3oFGD.js",
+    "file": "assets/chunk-Bgk2jtnb.js",
     "name": "lib",
     "src": "../node_modules/react-qr-code/lib/index.mjs",
     "isDynamicEntry": true,
     "imports": [
       "_chunk-C0FnF6B9.js",
-      "_chunk-DjLodWHf.js"
+      "_chunk-C5vWAcZI.js"
     ]
   },
   "../virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__AiAnalyticsConfig__customComponents_js": {
@@ -14,94 +14,142 @@
     "name": "remoteEntry",
     "src": "../virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-cv6yxwh0.js"
+      "_chunk-B0cFKuKf.js"
     ]
   },
   "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js": {
-    "file": "assets/chunk-DR2--SIr.js",
+    "file": "assets/chunk-IFR_1zGE.js",
     "name": "virtualExposes",
     "src": "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-COeYLbHj.js"
+      "_chunk-DSMV0fib.js"
     ]
   },
   "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1": {
-    "file": "assets/chunk-CNevB4y7.js",
+    "file": "assets/chunk-CL4EApJ_.js",
     "name": "_virtual_mf-localSharedImportMap___mfe_internal__AiAnalyticsConfig__mf_owner__1",
     "src": "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1",
     "isDynamicEntry": true,
     "imports": [
-      "_chunk-B7qeedMF.js",
-      "_chunk-iA33aMeH.js"
+      "_chunk-CaC3yEL3.js",
+      "_chunk-DNBS5l1Q.js"
     ],
     "dynamicImports": [
-      "_chunk-DjLodWHf.js",
-      "_chunk-iA33aMeH.js"
+      "_chunk-C5vWAcZI.js",
+      "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
+      "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild___mf_0_iobroker_mf_1_json_mf_2_config__prebuild__.js"
     ]
   },
   "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__1__H_A_I__hostAutoInit__H_A_I__.js": {
-    "file": "assets/chunk-BgOpu4F3.js",
+    "file": "assets/chunk-CT2nlrP0.js",
     "name": "hostInit",
     "src": "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__1__H_A_I__hostAutoInit__H_A_I__.js",
     "imports": [
-      "_chunk-B7qeedMF.js"
+      "_chunk-CaC3yEL3.js"
     ],
     "dynamicImports": [
       "../virtual:mf-REMOTE_ENTRY_ID:__mfe_internal__AiAnalyticsConfig__customComponents_js",
       "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1"
     ]
   },
-  "_chunk-B7qeedMF.js": {
-    "file": "assets/chunk-B7qeedMF.js",
-    "name": "vite-preload-helper"
-  },
-  "_chunk-C0FnF6B9.js": {
-    "file": "assets/chunk-C0FnF6B9.js",
-    "name": "rolldown-runtime"
-  },
-  "_chunk-COeYLbHj.js": {
-    "file": "assets/chunk-COeYLbHj.js",
-    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
+  "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__1__P_S__pendingShares__P_S__.js": {
+    "file": "assets/chunk-CSx1DRAi.js",
+    "name": "pendingShares",
+    "src": "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__1__P_S__pendingShares__P_S__.js",
     "imports": [
-      "_chunk-B7qeedMF.js"
+      "_chunk-CaC3yEL3.js"
     ],
     "dynamicImports": [
-      "src/Components.js"
+      "_chunk-C5vWAcZI.js",
+      "_chunk-357HW12H.js",
+      "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1"
     ]
   },
-  "_chunk-DjLodWHf.js": {
-    "file": "assets/chunk-DjLodWHf.js",
-    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__1__loadShare___mf_0_iobroker_mf_1_gui_mf_2_components__loadShare__.js",
+  "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild___mf_0_iobroker_mf_1_json_mf_2_config__prebuild__.js": {
+    "file": "assets/chunk-BKdYXeBZ.js",
+    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild___mf_0_iobroker_mf_1_json_mf_2_config__prebuild__",
+    "src": "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild___mf_0_iobroker_mf_1_json_mf_2_config__prebuild__.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_chunk-C0FnF6B9.js",
+      "_chunk-CaC3yEL3.js",
+      "_chunk-DNBS5l1Q.js",
+      "_chunk-C5vWAcZI.js"
+    ],
+    "dynamicImports": [
+      "../node_modules/react-qr-code/lib/index.mjs"
+    ]
+  },
+  "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js": {
+    "file": "assets/chunk-Bce9c9IM.js",
+    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__",
+    "src": "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js",
+    "isDynamicEntry": true,
     "imports": [
       "_chunk-C0FnF6B9.js"
     ]
   },
-  "_chunk-cv6yxwh0.js": {
-    "file": "assets/chunk-cv6yxwh0.js",
+  "_chunk-357HW12H.js": {
+    "file": "assets/chunk-357HW12H.js",
+    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__loadShare___mf_0_iobroker_mf_1_json_mf_2_config__loadShare__.js",
+    "imports": [
+      "_chunk-C0FnF6B9.js",
+      "_chunk-CaC3yEL3.js"
+    ],
+    "dynamicImports": [
+      "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild___mf_0_iobroker_mf_1_json_mf_2_config__prebuild__.js"
+    ]
+  },
+  "_chunk-B0cFKuKf.js": {
+    "file": "assets/chunk-B0cFKuKf.js",
     "name": "virtual_mf-REMOTE_ENTRY_ID___mfe_internal__AiAnalyticsConfig__customComponents_js",
     "imports": [
-      "_chunk-B7qeedMF.js",
-      "_chunk-iA33aMeH.js"
+      "_chunk-CaC3yEL3.js",
+      "_chunk-DNBS5l1Q.js"
     ],
     "dynamicImports": [
       "../virtual:mf-localSharedImportMap:__mfe_internal__AiAnalyticsConfig__mf_owner__1",
       "../virtual:mf-exposes:__mfe_internal__AiAnalyticsConfig__customComponents_js"
     ]
   },
-  "_chunk-iA33aMeH.js": {
-    "file": "assets/chunk-iA33aMeH.js",
-    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__1__loadShare___mf_0_iobroker_mf_1_json_mf_2_config__loadShare__.js",
+  "_chunk-C0FnF6B9.js": {
+    "file": "assets/chunk-C0FnF6B9.js",
+    "name": "rolldown-runtime"
+  },
+  "_chunk-C5vWAcZI.js": {
+    "file": "assets/chunk-C5vWAcZI.js",
+    "name": "_virtual_mf___mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__loadShare___mf_0_iobroker_mf_1_gui_mf_2_components__loadShare__.js",
     "imports": [
       "_chunk-C0FnF6B9.js",
-      "_chunk-B7qeedMF.js",
-      "_chunk-DjLodWHf.js"
+      "_chunk-CaC3yEL3.js"
     ],
     "dynamicImports": [
-      "../node_modules/react-qr-code/lib/index.mjs"
+      "../virtual:mf:__mfe_internal__AiAnalyticsConfig__mf_owner__252138759922341__prebuild__react_mf_1_jsx_mf_2_runtime__prebuild__.js"
+    ]
+  },
+  "_chunk-CaC3yEL3.js": {
+    "file": "assets/chunk-CaC3yEL3.js",
+    "name": "vite-preload-helper"
+  },
+  "_chunk-DNBS5l1Q.js": {
+    "file": "assets/chunk-DNBS5l1Q.js",
+    "name": "dist",
+    "imports": [
+      "_chunk-CaC3yEL3.js"
+    ]
+  },
+  "_chunk-DSMV0fib.js": {
+    "file": "assets/chunk-DSMV0fib.js",
+    "name": "virtual_mf-exposes___mfe_internal__AiAnalyticsConfig__customComponents_js",
+    "imports": [
+      "_chunk-CaC3yEL3.js"
+    ],
+    "dynamicImports": [
+      "src/Components.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-ChY6ZUbw.js",
+    "file": "assets/index-C1NzNHuP.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -111,15 +159,15 @@
     ]
   },
   "src/Components.js": {
-    "file": "assets/chunk-C7dY4duz.js",
+    "file": "assets/chunk-DNlpjvBq.js",
     "name": "Components",
     "src": "src/Components.js",
     "isEntry": true,
     "imports": [
-      "_chunk-COeYLbHj.js",
-      "_chunk-iA33aMeH.js",
-      "_chunk-cv6yxwh0.js",
-      "_chunk-DjLodWHf.js"
+      "_chunk-DSMV0fib.js",
+      "_chunk-B0cFKuKf.js",
+      "_chunk-C5vWAcZI.js",
+      "_chunk-357HW12H.js"
     ]
   }
 }

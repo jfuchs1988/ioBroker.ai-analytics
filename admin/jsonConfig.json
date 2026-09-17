@@ -17,21 +17,9 @@
           "lg": 12,
           "xl": 12
         },
-        "sponsorLink": {
-          "type": "staticLink",
-          "label": "GitHub Sponsors",
-          "href": "https://github.com/sponsors/jfuchs1988",
-          "button": true,
-          "variant": "contained",
-          "newLine": true,
-          "sm": 12,
-          "md": 5,
-          "lg": 3,
-          "xl": 3
-        },
         "accessHeader": {
           "type": "header",
-          "text": "Sponsoring & API-Schlüssel",
+          "text": "Aktivierung & API-Schlüssel",
           "size": 3,
           "newLine": true
         },
@@ -41,7 +29,7 @@
           "name": "AiAnalyticsConfig/Components/LicenseActivationComponent",
           "guiApi": 2,
           "bundlerType": "module",
-          "label": "Sponsoring-Aktivierung",
+          "label": "Aktivierung",
           "newLine": true
         },
         "topDivider": {
@@ -417,6 +405,18 @@
           "type": "checkbox",
           "label": "Bestehende Datenpunkte nachtraeglich auf Schreibbarkeit/Update-Frequenz/Vollstaendigkeit pruefen",
           "default": false,
+          "xs": 12,
+          "sm": 12,
+          "md": 6,
+          "lg": 4,
+          "xl": 4
+        },
+        "recheckValuesOnNextDiscovery": {
+          "type": "checkbox",
+          "label": "Werte beim naechsten Neu-Einlesen erneut pruefen (Einmalaktion)",
+          "help": "Prueft valueKind und Datenqualitaet anhand der History. Manuell bestaetigte Werte bleiben unveraendert; danach wird die Option automatisch deaktiviert.",
+          "default": false,
+          "newLine": true,
           "xs": 12,
           "sm": 12,
           "md": 6,

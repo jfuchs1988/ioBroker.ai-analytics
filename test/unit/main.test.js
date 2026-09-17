@@ -284,6 +284,57 @@ describe('AiAnalytics data-quality backfill', () => {
     });
 });
 
+describe('AiAnalytics one-shot value recheck', () => {
+    it('rechecks non-manual classifications and preserves manually confirmed entries', async () => {
+        const classifyValueKind = sinon.stub().resolves({ valueKind: 'enum_state', valueKindConfidence: 'high', valueKindSource: 'sampled' });
+        const classifyDataQuality = sinon.stub().resolves({ writable: false, writePattern: 'event_driven', updateFrequency: 'event_driven', dataCompleteness: 'complete' });
+        const setCatalogEntry = sinon.stub().resolves();
+        const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
+            '@iobroker/adapter-core': { Adapter: class {} },
+            './lib/catalog': { getAllCatalogEntries: sinon.stub(), setCatalogEntry, markInactive: sinon.stub() },
+            './lib/valueKindClassifier': { classifyValueKind },
+            './lib/dataQualityClassifier': { classifyDataQuality },
+        });
+        const adapter = Object.create(TestAdapter.prototype);
+        adapter.config = { recheckValuesOnNextDiscovery: true };
+        adapter.namespace = 'ai-analytics.0';
+        adapter.log = { silly: sinon.stub(), error: sinon.stub() };
+        adapter.updateCatalogSyncState = sinon.stub().resolves();
+        adapter.getForeignObjectAsync = sinon.stub().resolves({ common: { type: 'string' } });
+        adapter.extendForeignObjectAsync = sinon.stub().resolves();
+        const entries = [
+            { sourceId: 'mode.0', historyInstance: 'history.0', valueKind: 'gauge', valueKindSource: 'sampled', writePattern: 'continuous' },
+            { sourceId: 'manual.0', historyInstance: 'history.0', valueKind: 'gauge', valueKindSource: 'manual', dataQualitySource: 'manual', classificationSource: 'user', writePattern: 'continuous' },
+        ];
+
+        await adapter.backfillValueKinds(entries, { force: true });
+        await adapter.backfillDataQuality(entries, { force: true });
+
+        expect(classifyValueKind.calledOnce).to.equal(true);
+        expect(classifyDataQuality.calledOnce).to.equal(true);
+        expect(setCatalogEntry.firstCall.args[1].sourceId).to.equal('mode.0');
+        expect(setCatalogEntry.secondCall.args[1].sourceId).to.equal('mode.0');
+    });
+
+    it('disables the one-shot option only after both checks complete', async () => {
+        const { AiAnalytics: TestAdapter } = proxyquire.noCallThru()('../../main', {
+            '@iobroker/adapter-core': { Adapter: class {} },
+            './lib/catalog': { getAllCatalogEntries: sinon.stub().onFirstCall().resolves([]).onSecondCall().resolves([]), setCatalogEntry: sinon.stub(), markInactive: sinon.stub() },
+        });
+        const adapter = Object.create(TestAdapter.prototype);
+        adapter.config = { recheckValuesOnNextDiscovery: true };
+        adapter.namespace = 'ai-analytics.0';
+        adapter.updateCatalogSyncState = sinon.stub().resolves();
+        adapter.backfillValueKinds = sinon.stub().resolves();
+        adapter.backfillDataQuality = sinon.stub().resolves();
+        adapter.extendForeignObjectAsync = sinon.stub().resolves();
+
+        expect(await adapter.runOneShotValueRecheck()).to.equal(true);
+        expect(adapter.config.recheckValuesOnNextDiscovery).to.equal(false);
+        expect(adapter.extendForeignObjectAsync.calledOnce).to.equal(true);
+    });
+});
+
 describe('AiAnalytics syncCatalog flow', () => {
     it('discovers, onboards, and persists a new catalog entry through the real catalog state path', async () => {
         const discovered = [

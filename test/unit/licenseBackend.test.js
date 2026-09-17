@@ -32,4 +32,15 @@ describe('licenseBackend', () => {
         await client.renewEntitlement({ url: 'https://example.test', token: 'old-token' });
         expect(request.fetchWithTimeout.firstCall.args[1].headers.authorization).to.equal('Bearer old-token');
     });
+
+    it('renews only inside the final 24 hours of token validity', () => {
+        const client = require('../../lib/licenseBackend');
+        const now = 1_700_000_000;
+
+        expect(client.shouldRenewEntitlement(now + client.RENEWAL_WINDOW_SECONDS + 1, now)).to.equal(false);
+        expect(client.shouldRenewEntitlement(now + client.RENEWAL_WINDOW_SECONDS, now)).to.equal(true);
+        expect(client.shouldRenewEntitlement(now + 1, now)).to.equal(true);
+        expect(client.shouldRenewEntitlement(now, now)).to.equal(false);
+        expect(client.shouldRenewEntitlement(now - 1, now)).to.equal(false);
+    });
 });
