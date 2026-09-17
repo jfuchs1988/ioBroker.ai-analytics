@@ -224,6 +224,23 @@ describe('AiAnalytics command dispatch', () => {
     });
 });
 
+describe('AiAnalytics license persistence', () => {
+    it('merges license fields into the existing native configuration', async () => {
+        const adapter = Object.create(AiAnalytics.prototype);
+        adapter.namespace = 'ai-analytics.0';
+        adapter.config = {};
+        adapter.getForeignObjectAsync = sinon.stub().resolves({ native: { licenseToken: 'old-token', model: 'model-1' } });
+        adapter.extendForeignObjectAsync = sinon.stub().resolves();
+
+        await adapter.persistLicenseNative({ licenseToken: 'new-token' });
+
+        expect(adapter.extendForeignObjectAsync.calledOnceWithExactly('ai-analytics.0', {
+            native: { licenseToken: 'new-token', model: 'model-1' },
+        })).to.equal(true);
+        expect(adapter.config.licenseToken).to.equal('new-token');
+    });
+});
+
 describe('AiAnalytics data-quality backfill', () => {
     it('processes only active pending entries and preserves the batch limit', async () => {
         const classifyDataQuality = sinon.stub().resolves({

@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/), Versionierung nach [SemVer](https://semver.org/).
 
+## [0.1.9] - 2026-09-17
+
+### Behoben
+
+- Aktivierungstokens bleiben nach Adapter-Neustarts und Updates in der nativen
+  Konfiguration erhalten.
+
 ## [0.1.8] - 2026-09-17
 
 ### Hinzugefügt
