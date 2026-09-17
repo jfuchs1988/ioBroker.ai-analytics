@@ -140,7 +140,10 @@ class AiAnalytics extends utils.Adapter {
     }
 
     async persistLicenseNative(fields) {
-        await this.extendForeignObjectAsync(this.namespace, { native: fields });
+        const currentObject = await this.getForeignObjectAsync(this.namespace);
+        await this.extendForeignObjectAsync(this.namespace, {
+            native: { ...((currentObject && currentObject.native) || {}), ...fields },
+        });
         Object.assign(this.config, fields);
     }
 
